@@ -1,6 +1,6 @@
 {
   "name": "ownmem",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OwnMem gives every codebase its own local, deterministic memory.",
   "type": "module",
   "license": "Apache-2.0",

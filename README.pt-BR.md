@@ -72,8 +72,10 @@ O OwnMem faz quatro apostas, e toda decisão de design decorre delas:
 - **Não é captura automática.** As escritas são deliberadas e curadas — a
   revisão é o portão de qualidade. As memórias embutidas dos agentes são mais
   cômodas, ao custo de ficarem presas a uma ferramenta e não serem revisáveis.
-- **Não é multi-repositório nem sincronizado na nuvem.** Um repositório, uma
-  memória, totalmente local, por decisão de projeto.
+- **Não é multi-repositório nem sincronizado na nuvem.** A memória viaja com
+  o histórico git do próprio repositório — clone o repositório e ela está lá.
+  Mas nunca é compartilhada entre repositórios nem passa por um serviço de
+  memória, por decisão de projeto.
 
 ## Dentro de `.ownmem/`: a memória em três camadas
 

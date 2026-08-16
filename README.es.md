@@ -73,8 +73,10 @@ OwnMem hace cuatro apuestas, y cada decisión de diseño se deriva de ellas:
   revisión es la puerta de calidad. Las memorias integradas de cada agente
   son más cómodas, al precio de quedar atadas a una herramienta y de no ser
   revisables.
-- **No es memoria entre repositorios ni sincronizada en la nube.** Un
-  repositorio, una memoria, totalmente local, por diseño.
+- **No es memoria entre repositorios ni sincronizada en la nube.** La memoria
+  viaja con el historial git del propio repositorio: clona el repositorio y
+  ahí está. Pero nunca se comparte entre repositorios ni pasa por un servicio
+  de memoria, por diseño.
 
 ## Dentro de `.ownmem/`: la memoria de tres niveles
 

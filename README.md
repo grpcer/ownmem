@@ -67,8 +67,10 @@ OwnMem makes four bets, and every design decision follows from them:
 - **Not automatic capture.** Writes are deliberate and curated — review is
   the quality gate. Built-in agent memories are more convenient, at the cost
   of being tool-locked and unreviewable.
-- **Not cross-repository or cloud-synced.** One repository, one memory, fully
-  local, by design.
+- **Not cross-repository or cloud-synced.** Memory travels with the
+  repository's own git history — clone the repo and it is there. But it is
+  never shared across repositories, and it never passes through a memory
+  service, by design.
 
 ## Inside `.ownmem/`: the three-tier memory
 

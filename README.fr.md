@@ -73,8 +73,10 @@ OwnMem fait quatre paris, et chaque décision de conception en découle :
   la revue est la porte de qualité. Les mémoires intégrées des agents sont
   plus commodes, au prix d'un verrouillage sur un outil et d'une absence de
   révisabilité.
-- **Ni inter-dépôts, ni synchronisé dans le cloud.** Un dépôt, une mémoire,
-  entièrement local, par conception.
+- **Ni inter-dépôts, ni synchronisé dans le cloud.** La mémoire voyage avec
+  l'historique git du dépôt lui-même : clonez le dépôt et elle est là. Mais
+  elle n'est jamais partagée entre dépôts et ne transite jamais par un service
+  de mémoire, par conception.
 
 ## À l'intérieur de `.ownmem/` : la mémoire à trois niveaux
 

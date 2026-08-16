@@ -74,8 +74,10 @@ OwnMem geht vier Wetten ein, und jede Design-Entscheidung folgt aus ihnen:
   kuratiert — das Review ist das Qualitäts-Gate. Eingebaute
   Agent-Gedächtnisse sind bequemer, um den Preis von Tool-Bindung und
   fehlender Überprüfbarkeit.
-- **Nicht repository-übergreifend, nicht cloud-synchronisiert.** Ein
-  Repository, ein Gedächtnis, vollständig lokal — mit Absicht.
+- **Nicht repository-übergreifend, nicht cloud-synchronisiert.** Das
+  Gedächtnis reist mit der Git-Historie des Repositories — wer das Repository
+  klont, hat es. Es wird aber nie über Repositories hinweg geteilt und läuft
+  nie durch einen Gedächtnisdienst — mit Absicht.
 
 ## Ein Blick in `.ownmem/`: das dreistufige Gedächtnis
 

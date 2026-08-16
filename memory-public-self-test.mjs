@@ -44,9 +44,31 @@ function runCommand(command, args, cwd, expected = 0, extra = {}) {
   return result;
 }
 
+// npm must be launched as `node npm-cli.js`: Windows ships npm as a .cmd shim, which spawnSync
+// cannot execute without a shell, and a shell would mangle the deliberately space-laden fixture
+// paths. Under any `npm run`/`npm test` invocation npm_execpath points at the CLI script; the
+// bundled-layout probes cover direct `node memory-public-self-test.mjs` runs.
+function npmCliScript() {
+  const fromEnv = process.env.npm_execpath;
+  if (fromEnv && /\.[cm]?js$/.test(fromEnv) && existsSync(fromEnv)) return fromEnv;
+  const nodeDirectory = path.dirname(process.execPath);
+  for (const candidate of [
+    path.join(nodeDirectory, 'node_modules', 'npm', 'bin', 'npm-cli.js'),
+    path.resolve(nodeDirectory, '..', 'lib', 'node_modules', 'npm', 'bin', 'npm-cli.js'),
+  ]) {
+    if (existsSync(candidate)) return candidate;
+  }
+  throw new Error('npm CLI script was not found; run this self-test through `npm test`');
+}
+
+function runNpm(args, cwd, expected = 0, extra = {}) {
+  return runCommand(process.execPath, [npmCliScript(), ...args], cwd, expected, extra);
+}
+
 function packedOfflineInstall(fixture) {
   const packDirectory = path.join(fixture, 'packed artifact');
   const consumer = path.join(fixture, 'offline consumer 空格');
+  const cache = path.join(fixture, 'npm cache');
   mkdirSync(packDirectory, { recursive: true });
   mkdirSync(consumer, { recursive: true });
   // scripts/ is this repository's own private toolbox (firebase-admin, clear:user-data, private:true
@@ -62,28 +84,38 @@ function packedOfflineInstall(fixture) {
     release = path.join(fixture, 'generated release');
     runCommand('node', [releaseTool, '--output', release, '--no-git'], PACKAGE_ROOT);
   }
-  const packed = JSON.parse(runCommand('npm', [
+  const packed = JSON.parse(runNpm([
     'pack', release, '--json', '--ignore-scripts', '--pack-destination', packDirectory,
   ], release).stdout)[0];
   const tarball = path.join(packDirectory, packed.filename);
-  runCommand('npm', [
+  // The offline assertion is only meaningful against a cache this test controls: a developer's
+  // global cache hides missing-metadata failures, while a fresh CI cache holds tarballs but no
+  // packuments (npm ci never fetches them), so dependency-range resolution dies with ENOTCACHED.
+  // One online install of the same tarball into a throwaway consumer fills the fixture cache with
+  // exactly what the offline install needs.
+  const warmConsumer = path.join(fixture, 'warm consumer');
+  mkdirSync(warmConsumer, { recursive: true });
+  runNpm([
+    'install', '--ignore-scripts', '--no-audit', '--no-fund', tarball,
+  ], warmConsumer, 0, { env: { ...process.env, npm_config_cache: cache } });
+  runNpm([
     'install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund', tarball,
-  ], consumer, 0, { env: { ...process.env, npm_config_offline: 'true' } });
+  ], consumer, 0, { env: { ...process.env, npm_config_offline: 'true', npm_config_cache: cache } });
   const installedEntry = path.join(consumer, 'node_modules', 'ownmem', 'memory.mjs');
   assert(existsSync(installedEntry), 'offline tarball install did not materialize the package');
-  const help = runCommand('npm', ['exec', '--offline', '--', 'ownmem', '--help'], consumer, 0, {
-    env: { ...process.env, npm_config_offline: 'true' },
+  const help = runNpm(['exec', '--offline', '--', 'ownmem', '--help'], consumer, 0, {
+    env: { ...process.env, npm_config_offline: 'true', npm_config_cache: cache },
   });
   assert(help.stdout.includes('Usage: ownmem <command>'), 'offline installed npm bin did not execute');
   const project = path.join(consumer, 'initialized project');
   mkdirSync(project, { recursive: true });
-  const initialized = runCommand('npm', [
+  const initialized = runNpm([
     'exec', '--offline', '--', 'ownmem', 'init', '--root', project, '--hosts', 'generic', '--command', 'ownmem',
-  ], consumer, 0, { env: { ...process.env, npm_config_offline: 'true' } });
+  ], consumer, 0, { env: { ...process.env, npm_config_offline: 'true', npm_config_cache: cache } });
   assert(initialized.stdout.includes('ownmem init: ready'), 'offline installed npm bin did not initialize a clean consumer');
-  const recalled = JSON.parse(runCommand('npm', [
+  const recalled = JSON.parse(runNpm([
     'exec', '--offline', '--', 'ownmem', 'recall', '--root', project, '--json', '--', 'repository constraint',
-  ], consumer, 0, { env: { ...process.env, npm_config_offline: 'true' } }).stdout);
+  ], consumer, 0, { env: { ...process.env, npm_config_offline: 'true', npm_config_cache: cache } }).stdout);
   assert(recalled.results[0]?.memory_id === 'example_repository_memory', 'offline installed npm bin did not recall from the initialized consumer');
 }
 

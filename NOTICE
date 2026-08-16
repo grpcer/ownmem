@@ -1,0 +1,6 @@
+OwnMem
+Copyright 2026 grpcer
+
+This product depends on Ajv (MIT) and yaml (ISC). Those packages are not
+bundled in the source distribution. Their licenses are available in their
+respective npm packages.

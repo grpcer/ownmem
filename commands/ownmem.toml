@@ -1,0 +1,6 @@
+description = "Recall or grow this repository's OwnMem local memory"
+prompt = """
+Run `npx ownmem intent -- {{args}}` and follow its structured action. If this repository has no
+.ownmem/ directory yet, offer `npm install --save-dev ownmem` and `npx ownmem init --locale auto`
+first. Do not implement memory logic in this command.
+"""

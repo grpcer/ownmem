@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-hook-response/v1",
+  "title": "OwnMem memory hook response",
+  "type": "object",
+  "required": ["schema", "id", "ok", "result", "deduplicated", "error"],
+  "properties": {
+    "schema": { "const": "ownmem-hook-response/v1" },
+    "id": {
+      "anyOf": [
+        { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$" },
+        { "type": "null" }
+      ]
+    },
+    "ok": { "type": "boolean" },
+    "result": {
+      "anyOf": [
+        { "type": "object" },
+        { "type": "null" }
+      ]
+    },
+    "deduplicated": { "type": "boolean" },
+    "error": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "type": "string", "pattern": "^[A-Z0-9_-]+$", "maxLength": 64 },
+            "message": { "type": "string", "minLength": 1, "maxLength": 300 }
+          },
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "ok": { "const": true } }, "required": ["ok"] },
+      "then": { "properties": { "error": { "type": "null" } } },
+      "else": {
+        "properties": {
+          "result": { "type": "null" },
+          "deduplicated": { "const": false },
+          "error": { "type": "object" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "deduplicated": { "const": true } }, "required": ["deduplicated"] },
+      "then": { "properties": { "result": { "type": "null" } } }
+    }
+  ],
+  "additionalProperties": false
+}

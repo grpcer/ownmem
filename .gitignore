@@ -1,0 +1,6 @@
+node_modules/
+*.tgz
+.ownmem/
+.local-test/
+.DS_Store
+npm-debug.log*

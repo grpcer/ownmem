@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-embedding-eval-cache/v1",
+  "title": "OwnMem local memory embedding evaluation cache",
+  "type": "object",
+  "required": ["schema", "model", "dimensions", "entries"],
+  "properties": {
+    "schema": { "const": "ownmem-embedding-eval-cache/v1" },
+    "model": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "dimensions": { "type": "integer", "minimum": 1, "maximum": 65536 },
+    "entries": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-f0-9]{64}$" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["query_sha256", "vector_b64"],
+        "properties": {
+          "query_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "vector_b64": { "type": "string", "minLength": 4 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-embedding-config/v1",
+  "title": "OwnMem local memory embedding configuration",
+  "type": "object",
+  "required": [
+    "schema",
+    "provider",
+    "base_url",
+    "api_key",
+    "model",
+    "dimensions",
+    "enabled",
+    "rrf_weight",
+    "confidence_contribution",
+    "timeout_ms",
+    "updated_at",
+    "last_ab_report"
+  ],
+  "properties": {
+    "schema": { "const": "ownmem-embedding-config/v1" },
+    "provider": { "enum": ["siliconflow", "cloudflare", "gemini", "jina", "custom"] },
+    "base_url": { "type": "string", "minLength": 8, "maxLength": 2048, "pattern": "^https?://" },
+    "api_key": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "model": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "dimensions": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "integer", "minimum": 1, "maximum": 65536 }
+      ]
+    },
+    "enabled": { "type": "boolean" },
+    "rrf_weight": { "type": "number", "minimum": 0, "maximum": 100 },
+    "confidence_contribution": { "type": "boolean" },
+    "timeout_ms": { "type": "integer", "minimum": 100, "maximum": 120000 },
+    "updated_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T.*Z$" },
+    "last_ab_report": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" }
+      ]
+    },
+    "last_ab_report_id": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      ]
+    },
+    "enable_forced": { "type": "boolean" },
+    "enabled_at": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T.*Z$" }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

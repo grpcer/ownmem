@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/grpcer/ownmem/main/memory.schema.json",
+  "title": "Engineering memory topic",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "description", "metadata"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_type",
+        "type",
+        "status",
+        "scopes",
+        "applies_to",
+        "triggers",
+        "last_verified",
+        "expires_at",
+        "authority",
+        "authority_docs",
+        "history_docs",
+        "supersedes",
+        "code_evidence",
+        "evidence"
+      ],
+      "properties": {
+        "node_type": { "const": "memory" },
+        "type": {
+          "enum": ["lesson", "debug", "preference", "feedback", "decision-pointer"]
+        },
+        "status": { "const": "active" },
+        "scopes": { "$ref": "#/$defs/nonEmptyStringArray" },
+        "applies_to": { "$ref": "#/$defs/nonEmptyStringArray" },
+        "triggers": { "$ref": "#/$defs/nonEmptyStringArray" },
+        "last_verified": { "$ref": "#/$defs/date" },
+        "expires_at": {
+          "oneOf": [
+            { "$ref": "#/$defs/date" },
+            { "type": "null" }
+          ]
+        },
+        "review_by": { "$ref": "#/$defs/date" },
+        "authority": {
+          "enum": ["observed", "normative", "user-confirmed"]
+        },
+        "authority_docs": { "$ref": "#/$defs/stringArray" },
+        "history_docs": { "$ref": "#/$defs/stringArray" },
+        "supersedes": { "$ref": "#/$defs/stringArray" },
+        "retired_by": { "enum": ["hook", "ci", "entry"] },
+        "code_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "symbols", "tests"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "symbols": { "$ref": "#/$defs/stringArray" },
+              "tests": { "$ref": "#/$defs/stringArray" },
+              "commit": { "type": "string" }
+            }
+          }
+        },
+        "evidence": { "$ref": "#/$defs/stringArray" },
+        "originSessionId": { "type": "string", "minLength": 1 },
+        "created": { "type": "string", "minLength": 1 },
+        "modified": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": { "enum": ["preference", "feedback"] }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "properties": {
+              "review_by": { "$ref": "#/$defs/date" }
+            },
+            "required": ["review_by"]
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "stringArray": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "nonEmptyStringArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "name": "ownmem",
+  "version": "0.1.0",
+  "description": "OwnMem gives every codebase its own local, deterministic memory.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "grpcer",
+  "homepage": "https://github.com/grpcer/ownmem#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/grpcer/ownmem.git"
+  },
+  "bugs": {
+    "url": "https://github.com/grpcer/ownmem/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "ownmem": "./memory.mjs"
+  },
+  "exports": {
+    ".": "./memory.mjs"
+  },
+  "files": [
+    "*.mjs",
+    "*.json",
+    "lib/",
+    "test/",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "PRIVACY.md",
+    "CHANGELOG.md",
+    "RELEASE.md"
+  ],
+  "scripts": {
+    "test": "node ./memory-public-self-test.mjs",
+    "benchmark": "node ./memory-public-benchmark.mjs --iterations 20",
+    "benchmark:release": "node ./memory-public-benchmark.mjs --iterations 100",
+    "verify:release": "npm test && npm run benchmark:release && npm pack --dry-run --json"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "yaml": "^2.9.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "claude-code",
+    "codex",
+    "engineering-memory",
+    "local-first",
+    "ownmem"
+  ]
+}

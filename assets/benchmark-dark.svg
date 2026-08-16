@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 336" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+  <rect x="0" y="0" width="920" height="336" fill="#0d1117"/>
+  <!-- Panel A: Recall@1 -->
+  <text x="20" y="34" font-size="14" font-weight="600" fill="#e6edf3">Recall@1 — 128 queries, 40 languages</text>
+  <text x="20" y="80" font-size="13" fill="#9198a1">OwnMem (Unicode-script BM25F)</text>
+  <rect x="20" y="90" width="380" height="26" rx="4" fill="#3987e5"/>
+  <text x="390" y="107" text-anchor="end" font-size="12.5" font-weight="600" fill="#ffffff">100%</text>
+  <text x="20" y="146" font-size="13" fill="#9198a1">naive grep -F (same corpus)</text>
+  <rect x="20" y="156" width="12" height="26" rx="3" fill="#8b949e"/>
+  <text x="40" y="173" font-size="12.5" font-weight="600" fill="#9198a1">3.1%</text>
+
+  <!-- Panel B: latency -->
+  <text x="480" y="34" font-size="14" font-weight="600" fill="#e6edf3">Recall latency — 4,200 samples</text>
+  <text x="860" y="72" text-anchor="end" font-size="11.5" fill="#8b949e">release gate ≤ 5 ms</text>
+  <line x1="860" y1="80" x2="860" y2="182" stroke="#6e7681" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="480" y="80" font-size="13" fill="#9198a1">P50</text>
+  <rect x="480" y="90" width="89" height="26" rx="4" fill="#3987e5"/>
+  <text x="577" y="107" font-size="12.5" font-weight="600" fill="#9198a1">1.17 ms</text>
+  <text x="480" y="146" font-size="13" fill="#9198a1">P95</text>
+  <rect x="480" y="156" width="187" height="26" rx="4" fill="#3987e5"/>
+  <text x="675" y="173" font-size="12.5" font-weight="600" fill="#9198a1">2.46 ms</text>
+
+  <!-- stats row -->
+  <line x1="20" y1="216" x2="900" y2="216" stroke="#30363d" stroke-width="1"/>
+  <g>
+    <text x="20" y="258" font-size="20" font-weight="600" fill="#e6edf3">1.000</text>
+    <text x="20" y="280" font-size="11.5" fill="#8b949e">MRR</text>
+    <text x="250" y="258" font-size="20" font-weight="600" fill="#e6edf3">40 / 40</text>
+    <text x="250" y="280" font-size="11.5" fill="#8b949e">unrelated queries abstained</text>
+    <text x="480" y="258" font-size="20" font-weight="600" fill="#e6edf3">0 / 0</text>
+    <text x="480" y="280" font-size="11.5" fill="#8b949e">model · network calls at query time</text>
+    <text x="710" y="258" font-size="20" font-weight="600" fill="#e6edf3">2</text>
+    <text x="710" y="280" font-size="11.5" fill="#8b949e">runtime deps (pure JS: ajv, yaml)</text>
+  </g>
+  <text x="20" y="316" font-size="11" fill="#6e7681">Apple M5 Pro · Node 25 · locked CC0 corpus · 25 timed iterations per query · reversed-order rerun reproduces identical rankings</text>
+</svg>

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-hook-consume-request/v1",
+  "title": "OwnMem memory hook consumption request",
+  "type": "object",
+  "required": ["schema", "id", "session_id", "memory_id"],
+  "properties": {
+    "schema": { "const": "ownmem-hook-consume-request/v1" },
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$" },
+    "session_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "memory_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "maxLength": 160
+    }
+  },
+  "additionalProperties": false
+}

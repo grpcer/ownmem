@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-index/v1",
+  "title": "OwnMem compiled memory index manifest",
+  "type": "object",
+  "required": [
+    "schema",
+    "compiler",
+    "snapshot",
+    "source",
+    "artifacts",
+    "compatibility"
+  ],
+  "properties": {
+    "schema": { "const": "ownmem-index/v1" },
+    "compiler": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "ownmem-compiler" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$" }
+      },
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "required": ["id", "created_at", "content_sha256"],
+      "properties": {
+        "id": { "$ref": "#/$defs/sha256" },
+        "created_at": { "$ref": "#/$defs/isoTimestamp" },
+        "content_sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": ["memory_dir", "source_sha256", "active_topics", "archive_included", "files"],
+      "properties": {
+        "memory_dir": { "type": "string", "minLength": 1 },
+        "source_sha256": { "$ref": "#/$defs/sha256" },
+        "active_topics": { "type": "integer", "minimum": 0 },
+        "archive_included": { "const": false },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceFile" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "artifacts": {
+      "type": "object",
+      "required": ["documents", "postings", "exact_map", "graph", "ranking"],
+      "properties": {
+        "documents": {
+          "allOf": [
+            { "$ref": "#/$defs/artifact" },
+            {
+              "type": "object",
+              "properties": {
+                "file": { "const": "documents.json" },
+                "schema": { "const": "ownmem-index.documents/v1" }
+              }
+            }
+          ]
+        },
+        "postings": {
+          "allOf": [
+            { "$ref": "#/$defs/artifact" },
+            {
+              "type": "object",
+              "properties": {
+                "file": { "const": "postings.json" },
+                "schema": { "enum": ["ownmem-index.postings/v2", "ownmem-index.postings/v1"] }
+              }
+            }
+          ]
+        },
+        "exact_map": {
+          "allOf": [
+            { "$ref": "#/$defs/artifact" },
+            {
+              "type": "object",
+              "properties": {
+                "file": { "const": "exact-map.json" },
+                "schema": { "const": "ownmem-index.exact-map/v1" }
+              }
+            }
+          ]
+        },
+        "graph": {
+          "allOf": [
+            { "$ref": "#/$defs/artifact" },
+            {
+              "type": "object",
+              "properties": {
+                "file": { "const": "graph.json" },
+                "schema": { "const": "ownmem-index.graph/v2" }
+              }
+            }
+          ]
+        },
+        "ranking": {
+          "allOf": [
+            { "$ref": "#/$defs/artifact" },
+            {
+              "type": "object",
+              "properties": {
+                "file": { "const": "ranking.json" },
+                "schema": { "const": "ownmem-index.ranking/v3" }
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "compatibility": {
+      "type": "object",
+      "required": ["minimum_reader_version", "query_result_schema", "fallback_policy"],
+      "properties": {
+        "minimum_reader_version": { "type": "integer", "minimum": 1 },
+        "query_result_schema": { "const": "ownmem-query-result/v1" },
+        "fallback_policy": { "const": "rebuild-then-markdown-v1" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "isoTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+    },
+    "sourceFile": {
+      "type": "object",
+      "required": ["path", "kind", "sha256", "bytes"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+        },
+        "kind": { "enum": ["topic", "l2", "catalog", "ranking-config"] },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["file", "schema", "sha256", "bytes", "records"],
+      "properties": {
+        "file": { "type": "string", "minLength": 1 },
+        "schema": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "records": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

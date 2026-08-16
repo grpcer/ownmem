@@ -1,0 +1,19 @@
+{
+  "name": "ownmem",
+  "interface": {
+    "displayName": "OwnMem"
+  },
+  "plugins": [
+    {
+      "name": "ownmem",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ownmem"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Engineering"
+    }
+  ]
+}

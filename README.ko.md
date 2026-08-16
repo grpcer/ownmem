@@ -1,0 +1,366 @@
+<div align="center">
+
+# OwnMem
+
+**당신의 프로젝트에, 전용 메모리를.**
+
+Coding agent를 위한 로컬 · 결정적 · git 네이티브 메모리.<br>
+하나의 파일 세트로 Claude Code · Codex · Gemini CLI · Cursor · Grok CLI를 모두 지원합니다.
+
+[![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
+![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)
+![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)
+
+[English](./README.md) · [简体中文](./README.zh-CN.md) · [日本語](./README.ja.md) · **한국어** · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
+
+</div>
+
+OwnMem은 Claude Code, Codex를 비롯한 coding agent에게 저장소 안에서 사는
+메모리를 제공합니다. `.ownmem/`의 평범한 Markdown 파일을, 결정적이고 Unicode
+문자 체계를 인식하는 BM25F 엔진이 랭킹합니다. Recall은 모델을 호출하지 않고,
+네트워크에 닿지 않으며, 쿼리 시점의 token을 전혀 소비하지 않습니다 — 같은
+질문은 약 2밀리초 만에 같은 답을 돌려줍니다.
+
+OwnMem은 두 부분으로 구성됩니다. **npm 패키지**는 엔진입니다. 각 저장소에
+리뷰 가능한 `devDependency`로 설치되어 해당 저장소의 `.ownmem/` 메모리를
+관리합니다. **agent 플러그인**은 머신마다 한 번 설치하는 선택적 편의
+레이어로, agent에게 엔진 사용법을 가르치고 저장소별 설정 과정도 안내합니다.
+
+> **참고:** 어떤 경로로 도달했든, 저장소에 패키지와 `.ownmem/`이 갖춰지면
+> 준비 완료입니다. 어느 쪽에서 시작해도 좋습니다.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
+  <img alt="OwnMem 아키텍처: Markdown 메모리와 BM25F 엔진이 저장소 안에 살고, Claude Code·Codex·Gemini CLI·Cursor·Grok CLI가 같은 파일에서 recall하며, 메모리는 git과 함께 이동합니다" src="./assets/architecture-light.svg" width="100%">
+</picture>
+
+## 만들게 된 이유
+
+저는 Oriveo라는 BYOK 멀티모델 AI 클라이언트를 만들고 있습니다. iOS, Android, Web, 데스크톱에 걸친 큰 코드베이스를 매일 Claude Code와 Codex를 오가며 coding agent와 함께 개발합니다. 저장소마다 어렵게 얻은 교훈이 쌓여 갔습니다. 디버깅 근본 원인, 툴체인의 함정, 타이밍 경합 같은 것들입니다. 하지만 그 교훈은 한 도구의 메모리, 한 기계 안에만 있었고, agent나 기계, 동료가 바뀔 때마다 조용히 사라졌습니다.
+
+벡터나 클라우드 메모리 서비스는 이 용도에 맞지 않다고 느꼈습니다. 저장소에 관한 지식에 계정도, 서버도, 쿼리당 과금도 필요해서는 안 됩니다. 그래서 메모리를 저장소 자체로 옮겼습니다. OwnMem은 제가 Oriveo 코드베이스에서 매일 쓰는 그 시스템입니다. 쿼터와 감사로 관리되는 수백 개의 선별된 기억을, 깨끗한 공개 엔진으로 다시 만들었습니다.
+
+## 왜 OwnMem인가
+
+OwnMem은 네 가지에 베팅하며, 모든 설계 결정이 여기에서 따라 나옵니다:
+
+- **메모리는 저장소에 속합니다.** git과 함께 이동하고, pull request에
+  나타나며, 다른 코드처럼 롤백되는 리뷰 가능한 Markdown입니다. 저장소를
+  clone하면 메모리도 함께 옵니다 — 계정도, 동기화 서비스도, 내보내기 단계도
+  필요 없습니다.
+- **Recall은 무료이고 결정적이어야 합니다.** 같은 쿼리는 같은 랭킹을
+  돌려주며, 모델 호출도, 지연 비용도, 질문당 과금도 없습니다: 잠금된 공개
+  벤치마크에서 100% Recall@1, P95 2.46 ms.
+- **메모리는 어떤 단일 도구보다 오래 살아야 합니다.** 같은 파일들이
+  Claude Code, Codex, Gemini CLI, Cursor, Grok CLI를 동시에 지원하므로,
+  agent를 바꿔도 팀이 배운 것을 잃지 않습니다.
+- **메모리는 작아야 신뢰를 유지합니다.** 순 성장 제로 쿼터, 순수 Node audit,
+  근접 중복·드리프트 게이트가 메모리를, 아무도 가지치기하지 않는 제2의
+  위키가 아니라 작고 최신인 상태로 유지합니다.
+
+### OwnMem이 아닌 것
+
+- **벡터 데이터베이스가 아닙니다.** 큰 메모리 풀에서의 퍼지 시맨틱 검색을
+  원한다면 벡터·지식 그래프형 메모리 서비스가 더 맞습니다.
+- **자동 캡처가 아닙니다.** 기록은 의도적으로, 선별해서 이루어집니다 —
+  리뷰가 곧 품질 게이트입니다. 각 도구의 내장 agent 메모리가 더 편하지만,
+  도구에 종속되고 리뷰가 불가능해지는 대가를 치릅니다.
+- **저장소 간 공유도, 클라우드 동기화도 아닙니다.** 하나의 저장소, 하나의
+  메모리, 완전한 로컬 — 설계가 그렇습니다.
+
+## `.ownmem/` 내부: 3계층 메모리
+
+항상 로드되는 부분은 아주 작게 유지되고, 나머지는 전부 필요할 때 읽습니다:
+
+| 계층 | 파일 | 읽히는 시점 |
+| --- | --- | --- |
+| **L1** | `MEMORY.md` | 총 색인 — 매 세션 시작 시 로드 |
+| **L2** | `MEMORY-<area>.md` | 영역별 하위 색인 — 해당 영역을 건드릴 때 열림 |
+| **L3** | topic당 파일 하나 | 파일 하나에 교훈 하나 — triggers가 일치하면 `recall`이 반환 |
+
+topic 파일은 schema 검증을 거치는 엄격한 frontmatter를 가진 순수 Markdown
+입니다 — 증상과 표현은 `triggers`에, 증거는 `evidence`에(여기서는
+발췌본이며, 완전한 예시는 `ownmem init`가 생성합니다):
+
+```markdown
+---
+name: pool_cap_timeout
+description: staging deploys time out when workers exceed the pool cap
+metadata:
+  type: lesson
+  triggers: ["staging deploy timeout", "pool cap exceeded"]
+  evidence: [deploy-2026-08-12.log]
+---
+
+Raising the worker count without raising the connection pool cap exhausts
+the pool, and every deploy waits until it times out. Raise both together.
+```
+
+recall이 무료일 수 있는 이유가 바로 이 구조입니다. 색인은 상주할 만큼
+작고, BM25F는 작고 라벨이 잘 붙은 topic 파일만 순위를 매기면 됩니다.
+
+## 다른 도구와의 비교
+
+아래의 모든 열은 저마다 실제 문제를 풉니다 — 이 표는 우리 것을 포함해 각
+도구가 어떤 트레이드오프를 택했는지 보여 줍니다.
+
+| | OwnMem | [Mem0 (OSS)](https://github.com/mem0ai/mem0) | [Zep / Graphiti](https://github.com/getzep/graphiti) | [claude-mem](https://github.com/thedotmack/claude-mem) | 내장 자동 메모리¹ |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| 메모리가 저장소 안에 살며 git·PR과 함께 이동 | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 사람이 읽고 리뷰할 수 있는 Markdown | ✅ | ❌ | ❌ | ❌ | ⚠️² |
+| 모델·네트워크 호출 없는 recall | ✅ | ❌³ | ❌ | ❌ | — |
+| 결정적이고 재현 가능한 랭킹 | ✅ | ❌ | ❌ | ❌ | — |
+| Claude Code, Codex, Gemini CLI, Cursor, Grok CLI를 관통하는 하나의 메모리 | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
+| 비대화 방지 거버넌스(성장 쿼터, audit, 드리프트 게이트) | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
+| 시맨틱 패러프레이즈 검색 | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
+| 완전 자동 캡처 | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
+| 저장소 간·사용자 수준 메모리 | ❌⁷ | ✅ | ✅ | ⚠️ | ❌ |
+
+¹ Claude Code 자동 메모리와 Codex Memories: 홈 디렉터리 아래의 파일 — 머신
+로컬이고, 도구에 종속되며, 저장소 밖에 있습니다. Cursor는 2.1에서 Memories를
+은퇴시키고 Rules로 대체했으며, Windsurf 메모리는 한 머신에만 남고 절대
+커밋되지 않습니다.
+² 편집 가능한 Markdown이지만 저장소 밖에 살기 때문에 pull request에는 절대
+나타나지 않습니다.
+³ Mem0의 Apache-2.0 라이브러리는 로컬에서 동작하지만, 메모리를 쓰고
+조회하려면 여전히 LLM과 embedding 모델(기본은 OpenAI 키, 또는 Ollama를 통한
+로컬 모델)이 필요합니다.
+⁴ MCP 서버나 자체 API를 경유합니다 — 메모리는 사용자·앱 범위이지, 저장소가
+소유하는 파일 세트가 아닙니다.
+⁵ Claude Code는 항상 로드되는 인덱스에 상한(200 lines / 25 KB)을 두지만, 그
+뒤를 받치는 쿼터·audit·중복 게이트는 없습니다.
+⁶ 선택적 embedding 레인으로, 기본은 꺼져 있습니다. 로컬 A/B 증거가 안전
+게이트를 통과한 뒤에만 랭킹에 합류합니다.
+⁷ 의도된 설계입니다. OwnMem은 선별·리뷰된 기록과 단일 저장소 범위에
+베팅합니다. 자동 캡처나 앱을 가로지르는 사용자 수준 메모리가 필요하다면,
+그런 도구들이 정말로 더 맞습니다.
+
+사실 관계는 2026년 8월, 각 프로젝트의 공개 문서를 기준으로 확인했습니다 —
+정정 제안을 환영합니다.
+
+## 벤치마크
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/benchmark-dark.svg">
+  <img alt="OwnMem 벤치마크: Recall@1 100% (naive grep은 3.1%), recall 지연 P50 1.17 ms / P95 2.46 ms, 릴리스 게이트 5 ms" src="./assets/benchmark-light.svg" width="100%">
+</picture>
+
+모든 릴리스는 잠금된 공개 벤치마크를 통과해야 합니다: 40개의 BCP 47 언어
+태그와 25개의 문자 체계 그룹에 걸친 40개 주제의 CC0 코퍼스로, 128개의 정답
+쿼리와 40개의 무관한 부정 예를 담고 있습니다. 아래 수치는 릴리스 등급
+실행(쿼리당 25회 시간 측정 반복)에서 얻은 것입니다:
+
+| 지표 | 결과 | 릴리스 게이트 |
+| --- | --- | --- |
+| Recall@1 / Recall@5 (정답 쿼리 128개) | **100% / 100%** | = 100% |
+| MRR | **1.000** | = 1.000 |
+| 무관한 쿼리 40개에 대한 기권 | **40 / 40** | = 100% |
+| Recall 지연 P50 / P95 (시간 측정 샘플 4,200개) | **1.17 ms / 2.46 ms** | P95 ≤ 5 ms |
+| 같은 게이트를 적용한 언어 / 문자 체계 | 40개 태그 / 25개 문자 체계 | 언어별·문자 체계별 P95 ≤ 5 ms |
+| Recall 중 모델 호출 / 네트워크 호출 | **0 / 0** | = 0 |
+| 런타임 의존성 | 2 (`ajv`, `yaml` — 순수 JS) | 잠금 |
+| 실행 중 추가 메모리(RSS 증가분) | < 2 MB | — |
+
+같은 코퍼스에서 대소문자 무시 고정 문자열 grep은 Recall@1 3.1%에 그칩니다.
+렉시컬하고 결정적으로 유지하는 것 자체가 비결이 아니라, Unicode 문자 체계를
+인식하는 BM25F 랭킹이 비결입니다.
+
+직접 재현해 보세요:
+
+```bash
+git clone https://github.com/grpcer/ownmem
+cd ownmem && npm ci && npm run benchmark
+```
+
+> **참고:** Apple M5 Pro와 Node 25에서 측정했습니다. 코퍼스 해시, 랭킹,
+> 임계값은 잠겨 있으며, 주제 순서를 뒤집어 다시 실행해 결정성을 증명합니다.
+> 이 합성 지표는 회귀 증거일 뿐, 실사용자 정확도를 주장하지 않습니다.
+
+## 빠른 시작
+
+OwnMem은 Node.js 20 이상이 필요합니다. 자신의 엔지니어링 맥락을 기억해야 할
+저장소에 엔진을 설치하세요:
+
+```bash
+npm install --save-dev ownmem
+```
+
+Claude Code 사용자:
+
+```bash
+npx ownmem init --locale auto --hosts claude --layers compiler --hook --command "npx ownmem"
+```
+
+Codex 사용자:
+
+```bash
+npx ownmem init --locale auto --hosts codex --layers compiler --command "npx ownmem"
+```
+
+두 도구를 함께, 로컬 웹 콘솔까지 사용하려면:
+
+```bash
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+```
+
+초기화는 `.ownmem/`을 생성하고 호스트의 프로젝트 지침 파일에 경계 표시가 있는
+OwnMem 블록을 기록합니다. `ownmem-generated` 경계 밖의 모든 텍스트는 그대로
+보존됩니다. Claude Code에는 `/ownmem` 명령이 추가되고, `--hook` 활성화 시
+`PreToolUse` 가드도 설치됩니다. Codex는 `AGENTS.md`와 저장소 수준 skill
+`.agents/skills/ownmem/`을 통해 같은 규율을 받으며, Cursor와 Grok CLI도 같은
+경로에서 이를 자동으로 발견합니다. Gemini CLI와 Cursor 규칙도 지원되며
+(`--hosts gemini,cursor`), `--hosts generic`은 다른 모든 agent를 위한 일반
+`MEMORY_INSTRUCTIONS.md`를 작성합니다.
+
+배포 전 소스 체크아웃에서 작업할 때는 동등한 로컬 진입점
+`node memory.mjs init --locale auto`를 사용하세요.
+
+> **참고:** 슬래시 명령은 두 곳에서 나옵니다. `init`가 쓰는 것은 방금
+> 설치한 저장소 단위 명령(Claude Code의 `/ownmem`, 그리고 Codex·Cursor·
+> Grok CLI가 공유하는 `.agents/skills/ownmem/` skill)입니다. 다음 섹션의
+> 선택형 플러그인은 머신 전역 `/ownmem:recall`과 `/ownmem:init`를
+> 추가합니다 — 아직 `.ownmem/`가 없는 저장소에서도 유용합니다.
+
+## agent 플러그인 설치(선택, 머신마다 한 번)
+
+**꼭 설치해야 하나요? 아니요 — 설치하지 않아도 모든 것이 동작합니다.**
+`ownmem init`가 이미 저장소의 agent 지침 파일에 규율을 써 두었기 때문에,
+이 저장소를 여는 어떤 agent든 그것을 따릅니다. 플러그인이 해결하는 것은
+머신 전체의 편의입니다. 머신의 모든 저장소에 `/ownmem:recall`과
+`/ownmem:init`를 추가하며 — 아직 `.ownmem/`가 없는 저장소에서도 init
+skill이 agent를 엔진 설치로 안내합니다. 이 저장소는 플러그인 marketplace를
+겸하고, 플러그인의 명령은 `npx ownmem`으로 라우팅될 뿐이라 플러그인
+업데이트가 메모리를 다시 쓰는 일은 없습니다.
+
+Claude Code:
+
+```
+/plugin marketplace add grpcer/ownmem
+/plugin install ownmem@ownmem
+```
+
+이로써 `/ownmem:recall`과 `/ownmem:init` 명령과 모델이 자동 호출하는 skill이
+추가됩니다. `/plugin` → Marketplaces에서 이 marketplace의 자동 업데이트를
+켜면 새 버전을 자동으로 받습니다.
+
+Codex CLI:
+
+```
+codex plugin marketplace add grpcer/ownmem
+codex plugin add ownmem@ownmem
+```
+
+이로써 `$ownmem`과 `$ownmem-init` skill이 설치됩니다. 이후
+`codex plugin marketplace upgrade ownmem`으로 갱신하세요.
+
+Gemini CLI:
+
+```
+gemini extensions install https://github.com/grpcer/ownmem
+```
+
+이로써 `/ownmem` 명령과 같은 두 skill이 추가됩니다. 업데이트는
+`gemini extensions update ownmem`입니다.
+
+## 안전한 자동 업데이트
+
+OwnMem은 조용한 백그라운드 재작성이 아니라 리뷰 가능한 의존성 업데이트를
+위해 설계되었습니다. npm 의존성에 Dependabot 또는 Renovate를 활성화하세요.
+OwnMem 업그레이드 PR이 열리면 CI에서 다음을 실행해야 합니다:
+
+```bash
+npx ownmem init --update
+npx ownmem init --check
+npx ownmem audit
+```
+
+`init --update`는 OwnMem이 관리하는 경계 블록만 갱신하고 프로젝트 메모리는
+보존합니다. `init --check`는 생성된 어댑터가 드리프트하면 실패합니다.
+`package-lock.json`을 커밋해 두면 모든 agent와 CI 작업이 리뷰된 버전에
+머뭅니다.
+
+수동 업데이트:
+
+```bash
+npm install --save-dev ownmem@latest
+npx ownmem init --update
+npx ownmem init --check
+npx ownmem audit
+```
+
+프로덕션 저장소에서 버전이 떠다니는 `npx ownmem@latest`는 피하세요. 처음
+살펴볼 때는 편리하지만 실행 재현성이 사라집니다.
+
+## 일상 사용
+
+**교훈을 가르치세요.** staging 배포가 타임아웃되는 원인이 커넥션 풀
+상한 5였다는 걸 알아내는 데 한 시간을 날렸습니다. agent에게 말하세요:
+
+> "기억해 둬 — 타임아웃의 원인은 풀 상한이지 worker 수가 아니야. 풀을
+> 늘리지 않고 worker를 늘리면 안 돼."
+
+agent는 `.ownmem/` 아래에 작은 topic 파일 하나를 씁니다 — 증상은
+`triggers`에, 증거는 `evidence`에 — 그리고 게이트가 그 정직함을
+지킵니다:
+
+```bash
+npx ownmem audit
+```
+
+**필요한 순간에 recall하세요.** 다음 주, 다른 머신, 다른 agent, 같은
+증상:
+
+```bash
+npx ownmem recall -- "staging deploy timeout"
+```
+
+교훈이 약 2밀리초 만에 증거와 함께 돌아옵니다 — 모델 호출도, 네트워크
+요청도, token 소비도 없습니다.
+
+**돌아온 답을 채점하세요.** 명시적 피드백은 git이 무시하는 로컬
+수신함에 남습니다 — 업로드되지 않고, 벤치마크로 자동 승격되지도
+않습니다:
+
+```bash
+npx ownmem recall --feedback correct -- "staging deploy timeout"
+npx ownmem recall --feedback miss --expected pool_cap_timeout -- "why do deploys hang"
+```
+
+**전체를 살펴보세요.** OwnMem Console은 이 저장소의 채택률·recall
+품질·지연·거버넌스를 보여줍니다 — 127.0.0.1에서만 제공(`--status`와
+`--stop`으로 관리):
+
+```bash
+npx ownmem dashboard --open
+```
+
+<img alt="OwnMem Console — 채택 퍼널, recall 품질, 코퍼스와 거버넌스, 전부 로컬" src="./assets/console.png" width="100%">
+
+## 레이어
+
+필요한 만큼만 골라 쓰세요 — 각 레이어는 이전 레이어를 포함합니다:
+
+| 레이어 | 추가 요소 |
+| --- | --- |
+| `core` | 초기화, 엄격한 schema, Unicode 문자 체계 인식 BM25F recall, 결정적 다중 쿼리 융합, 성장 쿼터 |
+| `gates` | 순수 Node audit과 근접 중복 게이트 |
+| `compiler` | 불변 스냅샷, stdio 상주 런타임, 선택적 Claude Code hook |
+| `dashboard` | OwnMem Console과 선택적 embedding 평가 레인 |
+
+모든 레이어는 순수 JavaScript인 `ajv`와 `yaml` 두 런타임 의존성만 사용합니다.
+OwnMem Console은 영어, 중국어 간체·번체, 일본어, 한국어, 스페인어, 프랑스어,
+독일어, 브라질 포르투갈어, 아랍어, 힌디어, 인도네시아어, 러시아어, 태국어,
+터키어, 베트남어의 완전한 카탈로그를 포함합니다.
+
+## 안전과 증거
+
+- 메모리 파일은 언제나 저장소 안의 검토 가능한 Markdown으로 남습니다.
+- Schema, 쿼터, 생성 경계, 근접 중복 검사가 모두 로컬에서 실행됩니다.
+- `recall.consumed`가 채택률의 북극성이며, Recall@K는 과정 지표일 뿐입니다.
+- 기본 설치는 어떤 모델도 다운로드하거나 호출하지 않습니다.
+- 선택적 embedding 레인은 로컬 A/B 증거가 안전 게이트를 통과하기 전까지 랭킹에 관여하지 않습니다.
+
+OwnMem은 Apache-2.0으로 라이선스됩니다. 산출물을 공유하거나 릴리스를
+게시하기 전에 `PRIVACY.md`, `SECURITY.md`, `RELEASE.md`를 읽어 주세요.

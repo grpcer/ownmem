@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-query-result/v1",
+  "title": "OwnMem memory query result envelope",
+  "type": "object",
+  "required": ["schema", "trace_id", "query", "source", "results", "abstain", "budget", "warnings"],
+  "properties": {
+    "schema": { "const": "ownmem-query-result/v1" },
+    "trace_id": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "query": {
+      "type": "object",
+      "required": ["classifications", "cache_key_sha256"],
+      "properties": {
+        "classifications": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["identifier", "path", "error", "natural", "decision", "mixed"] }
+        },
+        "cache_key_sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "mode",
+        "status",
+        "snapshot_id",
+        "snapshot_schema",
+        "degraded",
+        "rebuild_trigger",
+        "fallback_reason"
+      ],
+      "properties": {
+        "mode": { "enum": ["snapshot", "markdown-fallback"] },
+        "status": { "enum": ["ready", "rebuilt", "previous", "fallback"] },
+        "snapshot_id": {
+          "anyOf": [
+            { "$ref": "#/$defs/sha256" },
+            { "type": "null" }
+          ]
+        },
+        "snapshot_schema": {
+          "anyOf": [
+            { "const": "ownmem-index/v1" },
+            { "type": "null" }
+          ]
+        },
+        "degraded": { "type": "boolean" },
+        "rebuild_trigger": {
+          "enum": [null, "missing", "schema-incompatible", "manifest-invalid", "checksum-mismatch"]
+        },
+        "fallback_reason": { "enum": [null, "rebuild-failed"] }
+      },
+      "allOf": [
+        {
+          "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "ready" } } },
+          "then": {
+            "type": "object",
+            "properties": {
+              "mode": { "const": "snapshot" },
+              "snapshot_id": { "$ref": "#/$defs/sha256" },
+              "snapshot_schema": { "const": "ownmem-index/v1" },
+              "degraded": { "const": false },
+              "rebuild_trigger": { "type": "null" },
+              "fallback_reason": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "rebuilt" } } },
+          "then": {
+            "type": "object",
+            "properties": {
+              "mode": { "const": "snapshot" },
+              "snapshot_id": { "$ref": "#/$defs/sha256" },
+              "snapshot_schema": { "const": "ownmem-index/v1" },
+              "degraded": { "const": false },
+              "rebuild_trigger": { "enum": ["missing", "schema-incompatible", "manifest-invalid", "checksum-mismatch"] },
+              "fallback_reason": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "previous" } } },
+          "then": {
+            "type": "object",
+            "properties": {
+              "mode": { "const": "snapshot" },
+              "snapshot_id": { "$ref": "#/$defs/sha256" },
+              "snapshot_schema": { "const": "ownmem-index/v1" },
+              "degraded": { "const": true },
+              "rebuild_trigger": { "enum": ["missing", "schema-incompatible", "manifest-invalid", "checksum-mismatch"] },
+              "fallback_reason": { "const": "rebuild-failed" }
+            }
+          }
+        },
+        {
+          "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "fallback" } } },
+          "then": {
+            "type": "object",
+            "properties": {
+              "mode": { "const": "markdown-fallback" },
+              "degraded": { "const": true },
+              "rebuild_trigger": { "enum": ["missing", "schema-incompatible", "manifest-invalid", "checksum-mismatch"] },
+              "fallback_reason": { "const": "rebuild-failed" }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "array",
+      "maxItems": 3,
+      "items": { "$ref": "#/$defs/result" }
+    },
+    "abstain": {
+      "type": "object",
+      "required": ["abstained", "reason"],
+      "properties": {
+        "abstained": { "type": "boolean" },
+        "reason": { "enum": [null, "no-trusted-candidate", "below-threshold", "budget-empty", "all-candidates-excluded"] }
+      },
+      "additionalProperties": false
+    },
+    "budget": {
+      "type": "object",
+      "required": ["tier", "max_topics", "max_tokens", "estimated_tokens", "estimator", "truncated"],
+      "properties": {
+        "tier": { "enum": ["default", "expanded"] },
+        "max_topics": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "max_tokens": { "type": "integer", "minimum": 1, "maximum": 1200 },
+        "estimated_tokens": { "type": "integer", "minimum": 0, "maximum": 1200 },
+        "estimator": { "const": "cjk1-ascii4-v1" },
+        "truncated": { "type": "boolean" },
+        "dropped_topics": { "type": "integer", "minimum": 0, "maximum": 3 }
+      },
+      "allOf": [
+        {
+          "if": { "type": "object", "properties": { "tier": { "const": "default" } } },
+          "then": { "type": "object", "properties": { "max_tokens": { "type": "integer", "maximum": 400 } } }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 5,
+      "items": { "type": "string", "minLength": 1, "maxLength": 160 }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "object",
+            "properties": { "abstained": { "const": true } }
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "results": { "type": "array", "maxItems": 0 },
+          "abstain": {
+            "type": "object",
+            "properties": { "reason": { "enum": ["no-trusted-candidate", "below-threshold", "budget-empty", "all-candidates-excluded"] } }
+          }
+        }
+      },
+      "else": {
+        "type": "object",
+        "properties": {
+          "results": { "type": "array", "minItems": 1 },
+          "abstain": { "type": "object", "properties": { "reason": { "type": "null" } } }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "rank",
+        "memory_id",
+        "path",
+        "score",
+        "channels",
+        "matched_fields",
+        "matched_terms",
+        "excerpt",
+        "authority_docs",
+        "explanation"
+      ],
+      "properties": {
+        "rank": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "memory_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+        "path": { "type": "string", "minLength": 1 },
+        "score": { "type": "number", "minimum": 0 },
+        "channels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["exact", "bm25f", "ngram", "fuzzy", "graph", "embedding"] }
+        },
+        "matched_fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "matched_terms": {
+          "type": "array",
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": ["field", "text"],
+              "properties": {
+                "field": { "type": "string", "minLength": 1 },
+                "text": { "type": "string", "minLength": 1, "maxLength": 600 }
+              },
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "authority_docs": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 3 }
+        },
+        "explanation": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

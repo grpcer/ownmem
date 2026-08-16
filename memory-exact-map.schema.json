@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-index.exact-map/v1",
+  "title": "OwnMem exact memory anchors",
+  "type": "object",
+  "required": ["schema", "entries"],
+  "properties": {
+    "schema": { "const": "ownmem-index.exact-map/v1" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "value", "normalized", "documents"],
+        "properties": {
+          "kind": { "enum": ["name", "trigger", "path", "basename", "symbol", "symbol-suffix", "test", "test-case", "doc-id", "error"] },
+          "value": { "type": "string", "minLength": 1 },
+          "normalized": { "type": "string", "minLength": 1 },
+          "documents": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

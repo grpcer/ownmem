@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-index.ranking/v3",
+  "title": "OwnMem deterministic ranking manifest",
+  "type": "object",
+  "required": [
+    "schema",
+    "profile",
+    "compiler_version",
+    "bm25",
+    "field_weights",
+    "rrf",
+    "features",
+    "thresholds",
+    "mmr",
+    "conflicts",
+    "quality_source"
+  ],
+  "properties": {
+    "schema": { "const": "ownmem-index.ranking/v3" },
+    "profile": { "const": "deterministic-ranker-v1" },
+    "compiler_version": { "$ref": "#/$defs/semver" },
+    "bm25": {
+      "type": "object",
+      "required": ["k1"],
+      "properties": { "k1": { "type": "number", "exclusiveMinimum": 0 } },
+      "additionalProperties": false
+    },
+    "field_weights": {
+      "type": "object",
+      "minProperties": 10,
+      "maxProperties": 10,
+      "patternProperties": {
+        "^(name|hooks|description|triggers|codePath|codeSymbol|codeTest|authorityDocs|scopes|body)$": {
+          "type": "object",
+          "required": ["weight", "length_normalization", "exact_boost"],
+          "properties": {
+            "weight": { "type": "number", "minimum": 0 },
+            "length_normalization": { "type": "number", "minimum": 0, "maximum": 1 },
+            "exact_boost": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "rrf": {
+      "type": "object",
+      "required": ["k", "channel_weights"],
+      "properties": {
+        "k": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "channel_weights": {
+          "type": "object",
+          "required": ["exact", "bm25f", "ngram", "fuzzy", "graph", "embedding"],
+          "properties": {
+            "exact": { "$ref": "#/$defs/nonNegativeNumber" },
+            "bm25f": { "$ref": "#/$defs/nonNegativeNumber" },
+            "ngram": { "$ref": "#/$defs/nonNegativeNumber" },
+            "fuzzy": { "$ref": "#/$defs/nonNegativeNumber" },
+            "graph": { "$ref": "#/$defs/nonNegativeNumber" },
+            "embedding": { "$ref": "#/$defs/nonNegativeNumber" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "features": {
+      "type": "object",
+      "required": [
+        "rrf_weight",
+        "weights",
+        "confidence_weights",
+        "authority_strength",
+        "evidence_strength",
+        "exact_kind_strength",
+        "graph_kind_strength",
+        "freshness_half_life_days"
+      ],
+      "properties": {
+        "rrf_weight": { "$ref": "#/$defs/nonNegativeNumber" },
+        "weights": {
+          "type": "object",
+          "required": [
+            "exact_anchor",
+            "approximate_anchor",
+            "embedding_similarity",
+            "query_coverage",
+            "matched_terms",
+            "high_signal_concepts",
+            "high_signal_terms",
+            "anchor_terms",
+            "field_coverage",
+            "scope_overlap",
+            "authority",
+            "evidence",
+            "freshness",
+            "graph_quality",
+            "channel_diversity"
+          ],
+          "properties": {
+            "exact_anchor": { "$ref": "#/$defs/nonNegativeNumber" },
+            "approximate_anchor": { "$ref": "#/$defs/nonNegativeNumber" },
+            "embedding_similarity": { "$ref": "#/$defs/nonNegativeNumber" },
+            "query_coverage": { "$ref": "#/$defs/nonNegativeNumber" },
+            "matched_terms": { "$ref": "#/$defs/nonNegativeNumber" },
+            "high_signal_concepts": { "$ref": "#/$defs/nonNegativeNumber" },
+            "high_signal_terms": { "$ref": "#/$defs/nonNegativeNumber" },
+            "anchor_terms": { "$ref": "#/$defs/nonNegativeNumber" },
+            "field_coverage": { "$ref": "#/$defs/nonNegativeNumber" },
+            "scope_overlap": { "$ref": "#/$defs/nonNegativeNumber" },
+            "authority": { "$ref": "#/$defs/nonNegativeNumber" },
+            "evidence": { "$ref": "#/$defs/nonNegativeNumber" },
+            "freshness": { "$ref": "#/$defs/nonNegativeNumber" },
+            "graph_quality": { "$ref": "#/$defs/nonNegativeNumber" },
+            "channel_diversity": { "$ref": "#/$defs/nonNegativeNumber" }
+          },
+          "additionalProperties": false
+        },
+        "confidence_weights": {
+          "type": "object",
+          "required": ["approximate", "embedding", "concept", "density"],
+          "properties": {
+            "approximate": {
+              "type": "object",
+              "required": ["approximate_anchor", "field_coverage", "channel_diversity"],
+              "properties": {
+                "approximate_anchor": { "$ref": "#/$defs/nonNegativeNumber" },
+                "field_coverage": { "$ref": "#/$defs/nonNegativeNumber" },
+                "channel_diversity": { "$ref": "#/$defs/nonNegativeNumber" }
+              },
+              "additionalProperties": false
+            },
+            "embedding": {
+              "type": "object",
+              "required": ["embedding_similarity"],
+              "properties": {
+                "embedding_similarity": { "$ref": "#/$defs/nonNegativeNumber" }
+              },
+              "additionalProperties": false
+            },
+            "concept": {
+              "type": "object",
+              "required": ["high_signal_concepts", "high_signal_terms", "field_coverage", "query_coverage"],
+              "properties": {
+                "high_signal_concepts": { "$ref": "#/$defs/nonNegativeNumber" },
+                "high_signal_terms": { "$ref": "#/$defs/nonNegativeNumber" },
+                "field_coverage": { "$ref": "#/$defs/nonNegativeNumber" },
+                "query_coverage": { "$ref": "#/$defs/nonNegativeNumber" }
+              },
+              "additionalProperties": false
+            },
+            "density": {
+              "type": "object",
+              "required": ["matched_terms", "query_coverage", "field_coverage"],
+              "properties": {
+                "matched_terms": { "$ref": "#/$defs/nonNegativeNumber" },
+                "query_coverage": { "$ref": "#/$defs/nonNegativeNumber" },
+                "field_coverage": { "$ref": "#/$defs/nonNegativeNumber" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "authority_strength": {
+          "type": "object",
+          "required": ["observed", "normative", "user-confirmed"],
+          "properties": {
+            "observed": { "$ref": "#/$defs/unitNumber" },
+            "normative": { "$ref": "#/$defs/unitNumber" },
+            "user-confirmed": { "$ref": "#/$defs/unitNumber" }
+          },
+          "additionalProperties": false
+        },
+        "evidence_strength": {
+          "type": "object",
+          "required": ["l2_hook", "authority_doc", "code_path", "code_symbol", "code_test"],
+          "properties": {
+            "l2_hook": { "$ref": "#/$defs/unitNumber" },
+            "authority_doc": { "$ref": "#/$defs/unitNumber" },
+            "code_path": { "$ref": "#/$defs/unitNumber" },
+            "code_symbol": { "$ref": "#/$defs/unitNumber" },
+            "code_test": { "$ref": "#/$defs/unitNumber" }
+          },
+          "additionalProperties": false
+        },
+        "exact_kind_strength": {
+          "type": "object",
+          "required": ["name", "trigger", "path", "basename", "symbol", "symbol-suffix", "test", "test-case", "doc-id", "error"],
+          "properties": {
+            "name": { "$ref": "#/$defs/unitNumber" },
+            "trigger": { "$ref": "#/$defs/unitNumber" },
+            "path": { "$ref": "#/$defs/unitNumber" },
+            "basename": { "$ref": "#/$defs/unitNumber" },
+            "symbol": { "$ref": "#/$defs/unitNumber" },
+            "symbol-suffix": { "$ref": "#/$defs/unitNumber" },
+            "test": { "$ref": "#/$defs/unitNumber" },
+            "test-case": { "$ref": "#/$defs/unitNumber" },
+            "doc-id": { "$ref": "#/$defs/unitNumber" },
+            "error": { "$ref": "#/$defs/unitNumber" }
+          },
+          "additionalProperties": false
+        },
+        "graph_kind_strength": {
+          "type": "object",
+          "required": ["wiki-link", "supersedes", "authority-doc", "history-doc", "code-evidence", "code-test", "l2-hook"],
+          "properties": {
+            "wiki-link": { "$ref": "#/$defs/unitNumber" },
+            "supersedes": { "$ref": "#/$defs/unitNumber" },
+            "authority-doc": { "$ref": "#/$defs/unitNumber" },
+            "history-doc": { "$ref": "#/$defs/unitNumber" },
+            "code-evidence": { "$ref": "#/$defs/unitNumber" },
+            "code-test": { "$ref": "#/$defs/unitNumber" },
+            "l2-hook": { "$ref": "#/$defs/unitNumber" }
+          },
+          "additionalProperties": false
+        },
+        "freshness_half_life_days": { "type": "integer", "minimum": 1, "maximum": 3650 }
+      },
+      "additionalProperties": false
+    },
+    "thresholds": {
+      "type": "object",
+      "required": ["identifier", "path", "error", "natural", "decision", "mixed"],
+      "properties": {
+        "identifier": { "$ref": "#/$defs/unitNumber" },
+        "path": { "$ref": "#/$defs/unitNumber" },
+        "error": { "$ref": "#/$defs/unitNumber" },
+        "natural": { "$ref": "#/$defs/unitNumber" },
+        "decision": { "$ref": "#/$defs/unitNumber" },
+        "mixed": { "$ref": "#/$defs/unitNumber" }
+      },
+      "additionalProperties": false
+    },
+    "mmr": {
+      "type": "object",
+      "required": ["lambda", "similarity_threshold", "default_limit", "maximum_limit"],
+      "properties": {
+        "lambda": { "$ref": "#/$defs/unitNumber" },
+        "similarity_threshold": { "$ref": "#/$defs/unitNumber" },
+        "default_limit": { "type": "integer", "minimum": 1, "maximum": 50 },
+        "maximum_limit": { "type": "integer", "minimum": 1, "maximum": 100 }
+      },
+      "additionalProperties": false
+    },
+    "conflicts": {
+      "type": "object",
+      "required": ["explicit_superseded_penalty", "authority_role_penalty"],
+      "properties": {
+        "explicit_superseded_penalty": { "$ref": "#/$defs/unitNumber" },
+        "authority_role_penalty": { "$ref": "#/$defs/unitNumber" }
+      },
+      "additionalProperties": false
+    },
+    "quality_source": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+        "sha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "semver": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "nonNegativeNumber": { "type": "number", "minimum": 0 },
+    "unitNumber": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "additionalProperties": false
+}

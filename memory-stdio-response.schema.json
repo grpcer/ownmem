@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-stdio-response/v1",
+  "title": "OwnMem memory stdio response",
+  "type": "object",
+  "required": ["schema", "id", "ok", "observation_trace_id", "result", "error"],
+  "properties": {
+    "schema": { "const": "ownmem-stdio-response/v1" },
+    "id": {
+      "anyOf": [
+        { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$" },
+        { "type": "null" }
+      ]
+    },
+    "ok": { "type": "boolean" },
+    "observation_trace_id": {
+      "anyOf": [
+        { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" },
+        { "type": "null" }
+      ]
+    },
+    "result": {
+      "anyOf": [
+        { "type": "object" },
+        { "type": "null" }
+      ]
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "type": "string", "pattern": "^[A-Z0-9_-]+$", "maxLength": 64 },
+            "message": { "type": "string", "minLength": 1, "maxLength": 300 }
+          },
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "ok": { "const": true } }, "required": ["ok"] },
+      "then": {
+        "properties": {
+          "result": { "type": "object" },
+          "error": { "type": "null" }
+        }
+      },
+      "else": {
+        "properties": {
+          "observation_trace_id": { "type": "null" },
+          "result": { "type": "null" },
+          "error": { "type": "object" }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

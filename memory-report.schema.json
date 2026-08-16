@@ -1,0 +1,447 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/grpcer/ownmem/main/memory-report.schema.json",
+  "title": "OwnMem local memory report v5",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "generated_at", "environment", "window", "metric_roles", "samples", "delivery", "adoption", "performance", "quality", "context", "maintenance", "gates", "data_quality", "recommendations"],
+  "properties": {
+    "schema": { "const": "ownmem-report/v5" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["installation_id", "event_data_local_only"],
+      "properties": {
+        "installation_id": { "type": ["string", "null"], "pattern": "^local-[a-f0-9]{12}$" },
+        "event_data_local_only": { "const": true }
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested", "from", "to", "observed_from", "observed_to"],
+      "properties": {
+        "requested": { "type": "string", "pattern": "^([1-9][0-9]*[dh]|custom:[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+Z)$" },
+        "from": { "type": "string", "format": "date-time" },
+        "to": { "type": "string", "format": "date-time" },
+        "observed_from": { "type": ["string", "null"], "format": "date-time" },
+        "observed_to": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "metric_roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["north_star", "north_star_event", "offline_quality_role", "offline_quality_metrics", "accuracy_evidence", "actual_application_evidence"],
+      "properties": {
+        "north_star": { "const": "recall.consumed confirmed_fulltext_open_rate" },
+        "north_star_event": { "const": "recall.consumed" },
+        "offline_quality_role": { "const": "process_gate" },
+        "offline_quality_metrics": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "Recall@1" },
+            { "const": "Recall@5" },
+            { "const": "MRR" }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "accuracy_evidence": { "const": "explicit_feedback_only" },
+        "actual_application_evidence": { "const": "unavailable" }
+      }
+    },
+    "samples": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["events", "recalls", "delivered", "consumed", "feedback", "builds", "maintenance", "gates", "by_type"],
+      "properties": {
+        "events": { "$ref": "#/$defs/count" },
+        "recalls": { "$ref": "#/$defs/count" },
+        "delivered": { "$ref": "#/$defs/count" },
+        "consumed": { "$ref": "#/$defs/count" },
+        "feedback": { "$ref": "#/$defs/count" },
+        "builds": { "$ref": "#/$defs/count" },
+        "maintenance": { "$ref": "#/$defs/count" },
+        "gates": { "$ref": "#/$defs/count" },
+        "by_type": { "$ref": "#/$defs/countMap" }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_version", "produced_traces", "delivered_traces", "delivery_rate", "fulltext_open_traces", "fulltext_open_rate", "top1_open_share", "actual_application_rate", "orphan_delivery_events", "fulltext_open_without_delivery_events"],
+      "properties": {
+        "runtime_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "produced_traces": { "$ref": "#/$defs/count" },
+        "delivered_traces": { "$ref": "#/$defs/count" },
+        "delivery_rate": { "$ref": "#/$defs/ratio" },
+        "fulltext_open_traces": { "$ref": "#/$defs/count" },
+        "fulltext_open_rate": { "$ref": "#/$defs/ratio" },
+        "top1_open_share": { "$ref": "#/$defs/ratio" },
+        "actual_application_rate": { "type": "null" },
+        "orphan_delivery_events": { "$ref": "#/$defs/count" },
+        "fulltext_open_without_delivery_events": { "$ref": "#/$defs/count" }
+      }
+    },
+    "adoption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eligible_recalls", "observable_eligible_recalls", "unobservable_eligible_recalls", "coverage_source", "consumed_traces", "observable_consumed_traces", "consumption_coverage_rate", "adopted_recalls", "adoption_rate", "top1_adoption_rate", "topk_adoption_rate", "authority_observed_traces", "authority_follow_rate"],
+      "properties": {
+        "eligible_recalls": { "$ref": "#/$defs/count" },
+        "observable_eligible_recalls": { "$ref": "#/$defs/count" },
+        "unobservable_eligible_recalls": { "$ref": "#/$defs/count" },
+        "coverage_source": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["claude-hook", "cli", "manual"] }
+        },
+        "consumed_traces": { "$ref": "#/$defs/count" },
+        "observable_consumed_traces": { "$ref": "#/$defs/count" },
+        "consumption_coverage_rate": { "$ref": "#/$defs/ratio" },
+        "adopted_recalls": { "$ref": "#/$defs/count" },
+        "adoption_rate": { "$ref": "#/$defs/ratio" },
+        "top1_adoption_rate": { "$ref": "#/$defs/ratio" },
+        "topk_adoption_rate": { "$ref": "#/$defs/ratio" },
+        "authority_observed_traces": { "$ref": "#/$defs/count" },
+        "authority_follow_rate": { "$ref": "#/$defs/ratio" }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total_ms", "hot_ms", "cold_ms", "cold_rate", "hot_rate", "current_runtime", "historical_runtime_samples", "cache_hit_observed", "cache_hit_rate", "snapshot_degradation", "embedding", "query_classes", "channels", "retrieval_attempts", "retrieval_abstained", "retrieval_abstain_rate", "retrieval_by_surface", "unclassified_abstains", "deduplicated", "deduplication_rate", "abstain_reasons"],
+      "properties": {
+        "total_ms": { "$ref": "#/$defs/distribution" },
+        "hot_ms": { "$ref": "#/$defs/distribution" },
+        "cold_ms": { "$ref": "#/$defs/distribution" },
+        "cold_rate": { "$ref": "#/$defs/ratio" },
+        "hot_rate": { "$ref": "#/$defs/ratio" },
+        "current_runtime": { "$ref": "#/$defs/runtimePerformance" },
+        "historical_runtime_samples": { "$ref": "#/$defs/count" },
+        "cache_hit_observed": { "$ref": "#/$defs/count" },
+        "cache_hit_rate": { "$ref": "#/$defs/ratio" },
+        "snapshot_degradation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["observed", "snapshot", "previous", "fallback", "rate"],
+          "properties": {
+            "observed": { "$ref": "#/$defs/count" },
+            "snapshot": { "$ref": "#/$defs/count" },
+            "previous": { "$ref": "#/$defs/count" },
+            "fallback": { "$ref": "#/$defs/count" },
+            "rate": { "$ref": "#/$defs/ratio" }
+          }
+        },
+        "embedding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["current", "current_state", "observed", "successful", "degraded", "degradation_rate", "latency_ms", "reasons", "by_mode"],
+          "properties": {
+            "current": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["configured", "mode", "since", "provider", "model", "rrf_weight", "timeout_ms"],
+              "properties": {
+                "configured": { "type": ["boolean", "null"] },
+                "mode": { "enum": ["off", "observe", "weighted", "unknown"] },
+                "since": { "type": ["string", "null"], "format": "date-time" },
+                "provider": { "type": ["string", "null"] },
+                "model": { "type": ["string", "null"] },
+                "rrf_weight": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+                "timeout_ms": { "type": ["integer", "null"], "minimum": 100, "maximum": 120000 }
+              }
+            },
+            "current_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["from", "to", "samples", "successful", "degraded", "degradation_rate", "latency_ms", "reasons"],
+              "properties": {
+                "from": { "type": "string", "format": "date-time" },
+                "to": { "type": "string", "format": "date-time" },
+                "samples": { "$ref": "#/$defs/count" },
+                "successful": { "$ref": "#/$defs/count" },
+                "degraded": { "$ref": "#/$defs/count" },
+                "degradation_rate": { "$ref": "#/$defs/ratio" },
+                "latency_ms": { "$ref": "#/$defs/distribution" },
+                "reasons": { "$ref": "#/$defs/countMap" }
+              }
+            },
+            "observed": { "$ref": "#/$defs/count" },
+            "successful": { "$ref": "#/$defs/count" },
+            "degraded": { "$ref": "#/$defs/count" },
+            "degradation_rate": { "$ref": "#/$defs/ratio" },
+            "latency_ms": { "$ref": "#/$defs/distribution" },
+            "reasons": { "$ref": "#/$defs/countMap" },
+            "by_mode": {
+              "type": "object",
+              "propertyNames": { "enum": ["observe", "weighted", "unknown"] },
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["samples", "successful", "degraded", "degradation_rate", "latency_ms"],
+                "properties": {
+                  "samples": { "$ref": "#/$defs/count" },
+                  "successful": { "$ref": "#/$defs/count" },
+                  "degraded": { "$ref": "#/$defs/count" },
+                  "degradation_rate": { "$ref": "#/$defs/ratio" },
+                  "latency_ms": { "$ref": "#/$defs/distribution" }
+                }
+              }
+            }
+          }
+        },
+        "query_classes": { "$ref": "#/$defs/countMap" },
+        "channels": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-z][a-z0-9_-]*$" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["candidates", "queries_with_candidates"],
+            "properties": {
+              "candidates": { "$ref": "#/$defs/count" },
+              "queries_with_candidates": { "$ref": "#/$defs/count" }
+            }
+          }
+        },
+        "retrieval_attempts": { "$ref": "#/$defs/count" },
+        "retrieval_abstained": { "$ref": "#/$defs/count" },
+        "retrieval_abstain_rate": { "$ref": "#/$defs/ratio" },
+        "retrieval_by_surface": { "type": "object", "description": "Abstain rate per recall surface. cli (a deliberate question) and claude-hook (fires on every Read/Edit/Write) differ by an order of magnitude, so the blended rate alone is misleading.", "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["attempts", "abstained", "abstain_rate"], "properties": { "attempts": { "$ref": "#/$defs/count" }, "abstained": { "$ref": "#/$defs/count" }, "abstain_rate": { "$ref": "#/$defs/ratio" } } } },
+        "unclassified_abstains": { "$ref": "#/$defs/count" },
+        "deduplicated": { "$ref": "#/$defs/count" },
+        "deduplication_rate": { "$ref": "#/$defs/ratio" },
+        "abstain_reasons": { "type": "object", "additionalProperties": { "$ref": "#/$defs/count" } }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feedback"],
+      "properties": {
+        "feedback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["total", "correct", "wrong", "miss", "wrong_miss_rate", "expected_in_top_k_rate", "accuracy_measurable", "accuracy_unmeasurable_reason"],
+          "properties": {
+            "total": { "$ref": "#/$defs/count" },
+            "correct": { "$ref": "#/$defs/count" },
+            "wrong": { "$ref": "#/$defs/count" },
+            "miss": { "$ref": "#/$defs/count" },
+            "wrong_miss_rate": { "$ref": "#/$defs/ratio" },
+            "expected_in_top_k_rate": { "$ref": "#/$defs/ratio" },
+            "accuracy_measurable": { "type": "boolean", "const": false, "description": "Always false, and not a sample-size gate: a wrong recall leaves no behavioural trace, so `wrong` has no source and the denominator cannot form." },
+            "accuracy_unmeasurable_reason": { "type": "string", "minLength": 1, "description": "Rendered verbatim. Must not read as 'not collected yet'." }
+          }
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["samples", "legacy_samples", "estimated_tokens", "truncated", "truncation_rate", "dropped_topics_observed", "topic_dropping_envelopes", "dropped_topics"],
+      "properties": {
+        "samples": { "$ref": "#/$defs/count" },
+        "legacy_samples": { "$ref": "#/$defs/count" },
+        "estimated_tokens": { "$ref": "#/$defs/distribution" },
+        "truncated": { "$ref": "#/$defs/count" },
+        "truncation_rate": { "$ref": "#/$defs/ratio" },
+        "dropped_topics_observed": { "$ref": "#/$defs/count" },
+        "topic_dropping_envelopes": { "$ref": "#/$defs/count" },
+        "dropped_topics": { "$ref": "#/$defs/count" }
+      }
+    },
+    "maintenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["builds", "failed_builds", "fallback_builds", "latest_build_succeeded", "latest_build_used_fallback", "latest_snapshot_bytes", "build_ms", "runs", "proposals", "conflicts", "orphans", "drift"],
+      "properties": {
+        "builds": { "$ref": "#/$defs/count" },
+        "failed_builds": { "$ref": "#/$defs/count" },
+        "fallback_builds": { "$ref": "#/$defs/count" },
+        "latest_build_succeeded": { "type": ["boolean", "null"], "description": "State of the most recent build. Null with no build in the window. Window totals answer what happened; this answers what is true now." },
+        "latest_build_used_fallback": { "type": ["boolean", "null"] },
+        "latest_snapshot_bytes": { "type": ["integer", "null"], "minimum": 0 },
+        "build_ms": { "$ref": "#/$defs/distribution" },
+        "runs": { "$ref": "#/$defs/count" },
+        "proposals": { "$ref": "#/$defs/nullableCount", "description": "Null when no maintenance run exists in the window: an absent measurement, not an empty backlog." },
+        "conflicts": { "$ref": "#/$defs/nullableCount" },
+        "orphans": { "$ref": "#/$defs/nullableCount" },
+        "drift": { "$ref": "#/$defs/nullableCount" }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runs", "failed", "by_gate", "current"],
+      "properties": {
+        "runs": { "$ref": "#/$defs/count" },
+        "failed": { "$ref": "#/$defs/count" },
+        "by_gate": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-z0-9.-]+$" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["passed", "failed", "errors", "warnings"],
+            "properties": {
+              "passed": { "$ref": "#/$defs/count" },
+              "failed": { "$ref": "#/$defs/count" },
+              "errors": { "$ref": "#/$defs/count" },
+              "warnings": { "$ref": "#/$defs/count" }
+            }
+          }
+        },
+        "current": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema", "quota", "quality_lock"],
+          "properties": {
+            "schema": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["healthy", "errors", "warnings", "valid_topics", "active_topics"],
+                  "properties": {
+                    "healthy": { "type": "boolean" },
+                    "errors": { "$ref": "#/$defs/count" },
+                    "warnings": { "$ref": "#/$defs/count" },
+                    "valid_topics": { "$ref": "#/$defs/count" },
+                    "active_topics": { "$ref": "#/$defs/count" }
+                  }
+                }
+              ]
+            },
+            "quota": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["healthy", "lock_exists", "lock_valid", "active_topics", "max_active_topics", "active_bytes", "max_active_bytes"],
+              "properties": {
+                "healthy": { "type": "boolean" },
+                "lock_exists": { "type": "boolean" },
+                "lock_valid": { "type": "boolean" },
+                "active_topics": { "$ref": "#/$defs/nullableCount" },
+                "max_active_topics": { "$ref": "#/$defs/nullableCount" },
+                "active_bytes": { "$ref": "#/$defs/nullableCount" },
+                "max_active_bytes": { "$ref": "#/$defs/nullableCount" }
+              }
+            },
+            "quality_lock": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["healthy", "lock_exists", "lock_valid", "schema"],
+              "properties": {
+                "healthy": { "type": "boolean" },
+                "lock_exists": { "type": "boolean" },
+                "lock_valid": { "type": "boolean" },
+                "schema": { "type": ["string", "null"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "invalid_events", "event_errors", "gaps", "gap_codes"],
+      "properties": {
+        "files": { "$ref": "#/$defs/count" },
+        "invalid_events": { "$ref": "#/$defs/count" },
+        "event_errors": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["file", "line", "error"],
+            "properties": {
+              "file": { "type": "string" },
+              "line": { "type": "integer", "minimum": 1 },
+              "error": { "type": "string" }
+            }
+          }
+        },
+        "gaps": { "type": "array", "items": { "type": "string" } },
+        "gap_codes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "impact", "cost", "evidence", "action"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "impact": { "enum": ["high", "medium", "low", "unknown"] },
+          "cost": { "enum": ["high", "medium", "low", "unknown"] },
+          "evidence": { "type": "string" },
+          "action": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "count": { "type": "integer", "minimum": 0 },
+    "nullableCount": { "type": ["integer", "null"], "minimum": 0 },
+    "ratio": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "nullableNumber": { "type": ["number", "null"], "minimum": 0 },
+    "countMap": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-zA-Z0-9._-]+$" },
+      "additionalProperties": { "$ref": "#/$defs/count" }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["samples", "p50", "p95", "p99"],
+      "properties": {
+        "samples": { "$ref": "#/$defs/count" },
+        "p50": { "$ref": "#/$defs/nullableNumber" },
+        "p95": { "$ref": "#/$defs/nullableNumber" },
+        "p99": { "$ref": "#/$defs/nullableNumber" }
+      }
+    },
+    "runtimePerformance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "samples", "observed_from", "observed_to", "total_ms", "hot_ms", "cold_ms", "cohorts"],
+      "properties": {
+        "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "samples": { "$ref": "#/$defs/count" },
+        "observed_from": { "type": ["string", "null"], "format": "date-time" },
+        "observed_to": { "type": ["string", "null"], "format": "date-time" },
+        "total_ms": { "$ref": "#/$defs/distribution" },
+        "hot_ms": { "$ref": "#/$defs/distribution" },
+        "cold_ms": { "$ref": "#/$defs/distribution" },
+        "cohorts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/performanceCohort" }
+        }
+      }
+    },
+    "performanceCohort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "execution", "query_shape", "samples", "total_ms", "retrieval_attempts", "retrieval_abstained", "retrieval_abstain_rate", "deduplicated"],
+      "properties": {
+        "surface": { "enum": ["claude-hook", "cli", "unknown"] },
+        "execution": { "enum": ["cold", "hot"] },
+        "query_shape": { "enum": ["pure-path", "natural-only", "mixed", "other"] },
+        "samples": { "$ref": "#/$defs/count" },
+        "total_ms": { "$ref": "#/$defs/distribution" },
+        "retrieval_attempts": { "$ref": "#/$defs/count" },
+        "retrieval_abstained": { "$ref": "#/$defs/count" },
+        "retrieval_abstain_rate": { "$ref": "#/$defs/ratio" },
+        "deduplicated": { "$ref": "#/$defs/count" }
+      }
+    }
+  }
+}

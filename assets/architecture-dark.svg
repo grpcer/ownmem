@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 508" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#3987e5"/>
+    </marker>
+    <marker id="arrow-git" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="920" height="508" fill="#0d1117"/>
+
+  <!-- recall guarantee badge -->
+  <rect x="475" y="16" width="330" height="30" rx="15" fill="#0f1b2d" stroke="#3987e5" stroke-width="1"/>
+  <text x="640" y="35" text-anchor="middle" font-size="12.5" fill="#6cb0f5">0 model calls · 0 network calls · P95 2.46 ms</text>
+
+  <!-- repository container -->
+  <rect x="20" y="52" width="520" height="392" rx="12" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="44" y="84" font-size="15" font-weight="600" fill="#e6edf3">Your repository</text>
+
+  <!-- .ownmem/ memory box: three-tier memory -->
+  <rect x="44" y="100" width="472" height="152" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="64" y="126" font-size="14" font-weight="600" fill="#e6edf3">.ownmem/ — three-tier Markdown memory</text>
+  <rect x="64" y="140" width="400" height="24" rx="5" fill="#161b22" stroke="#30363d"/>
+  <text x="76" y="156" font-size="11.5" fill="#9198a1"><tspan font-weight="600" fill="#e6edf3">L1</tspan>  MEMORY.md — index, loaded every session</text>
+  <path d="M 72 164 V 184 H 78" fill="none" stroke="#6e7681" stroke-width="1"/>
+  <rect x="80" y="172" width="384" height="24" rx="5" fill="#161b22" stroke="#30363d"/>
+  <text x="92" y="188" font-size="11.5" fill="#9198a1"><tspan font-weight="600" fill="#e6edf3">L2</tspan>  MEMORY-&lt;area&gt;.md — area sub-indexes</text>
+  <path d="M 88 196 V 216 H 94" fill="none" stroke="#6e7681" stroke-width="1"/>
+  <rect x="96" y="204" width="368" height="24" rx="5" fill="#161b22" stroke="#30363d"/>
+  <text x="108" y="220" font-size="11.5" fill="#9198a1"><tspan font-weight="600" fill="#e6edf3">L3</tspan>  topic files — one lesson each, recalled on demand</text>
+  <text x="64" y="244" font-size="11" fill="#8b949e">reviewed in pull requests, rolls back like code</text>
+
+  <!-- engine box: layered build -->
+  <rect x="44" y="268" width="472" height="150" rx="8" fill="#0f1b2d" stroke="#3987e5" stroke-width="1.5"/>
+  <text x="64" y="294" font-size="14" font-weight="600" fill="#e6edf3">ownmem engine — npm devDependency</text>
+  <text x="64" y="316" font-size="13" fill="#9198a1">Unicode-script BM25F recall · deterministic fusion</text>
+  <g>
+    <rect x="56" y="332" width="98" height="42" rx="8" fill="#0d1117" stroke="#30363d"/>
+    <text x="105" y="350" text-anchor="middle" font-size="12.5" font-weight="600" fill="#e6edf3">core</text>
+    <text x="105" y="365" text-anchor="middle" font-size="9.5" fill="#8b949e">recall · quota</text>
+    <line x1="156" y1="353" x2="168" y2="353" stroke="#3987e5" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <rect x="172" y="332" width="98" height="42" rx="8" fill="#0d1117" stroke="#30363d"/>
+    <text x="221" y="350" text-anchor="middle" font-size="12.5" font-weight="600" fill="#e6edf3">gates</text>
+    <text x="221" y="365" text-anchor="middle" font-size="9.5" fill="#8b949e">audit · dedup</text>
+    <line x1="272" y1="353" x2="284" y2="353" stroke="#3987e5" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <rect x="288" y="332" width="98" height="42" rx="8" fill="#0d1117" stroke="#30363d"/>
+    <text x="337" y="350" text-anchor="middle" font-size="12.5" font-weight="600" fill="#e6edf3">compiler</text>
+    <text x="337" y="365" text-anchor="middle" font-size="9.5" fill="#8b949e">snapshots · hook</text>
+    <line x1="388" y1="353" x2="400" y2="353" stroke="#3987e5" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <rect x="404" y="332" width="98" height="42" rx="8" fill="#0d1117" stroke="#30363d"/>
+    <text x="453" y="350" text-anchor="middle" font-size="12.5" font-weight="600" fill="#e6edf3">dashboard</text>
+    <text x="453" y="365" text-anchor="middle" font-size="9.5" fill="#8b949e">console · embeddings</text>
+  </g>
+  <text x="64" y="404" font-size="11" fill="#8b949e">layers — each one contains the previous</text>
+
+  <!-- recall bus -->
+  <line x1="640" y1="46" x2="640" y2="350" stroke="#3987e5" stroke-width="1.5"/>
+  <line x1="516" y1="343" x2="640" y2="343" stroke="#3987e5" stroke-width="1.5"/>
+  <text x="574" y="332" text-anchor="middle" font-size="11.5" font-weight="600" fill="#6cb0f5">npx ownmem recall</text>
+  <line x1="640" y1="110" x2="692" y2="110" stroke="#3987e5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="170" x2="692" y2="170" stroke="#3987e5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="230" x2="692" y2="230" stroke="#3987e5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="290" x2="692" y2="290" stroke="#3987e5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="350" x2="692" y2="350" stroke="#3987e5" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- agents -->
+  <text x="800" y="78" text-anchor="middle" font-size="11" letter-spacing="1.5" fill="#9198a1">CODING AGENTS</text>
+  <g font-size="14" font-weight="600" fill="#e6edf3">
+    <rect x="700" y="90" width="200" height="40" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="800" y="115" text-anchor="middle">Claude Code</text>
+    <rect x="700" y="150" width="200" height="40" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="800" y="175" text-anchor="middle">Codex</text>
+    <rect x="700" y="210" width="200" height="40" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="800" y="235" text-anchor="middle">Gemini CLI</text>
+    <rect x="700" y="270" width="200" height="40" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="800" y="295" text-anchor="middle">Cursor</text>
+    <rect x="700" y="330" width="200" height="40" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="800" y="355" text-anchor="middle">Grok CLI</text>
+  </g>
+
+  <!-- git lane -->
+  <g font-size="12.5" fill="#9198a1">
+    <rect x="20" y="458" width="92" height="30" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="66" y="477" text-anchor="middle">git commit</text>
+    <line x1="112" y1="473" x2="140" y2="473" stroke="#8b949e" stroke-width="1.2" marker-end="url(#arrow-git)"/>
+    <rect x="144" y="458" width="150" height="30" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="219" y="477" text-anchor="middle">pull request review</text>
+    <line x1="294" y1="473" x2="322" y2="473" stroke="#8b949e" stroke-width="1.2" marker-end="url(#arrow-git)"/>
+    <rect x="326" y="458" width="104" height="30" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="378" y="477" text-anchor="middle">clone / pull</text>
+    <text x="446" y="477" font-size="12.5" font-style="italic" fill="#8b949e">memory travels with git</text>
+  </g>
+</svg>

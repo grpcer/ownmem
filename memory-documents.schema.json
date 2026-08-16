@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-index.documents/v1",
+  "title": "OwnMem compiled memory documents",
+  "type": "object",
+  "required": ["schema", "compiler_version", "field_names", "documents"],
+  "properties": {
+    "schema": { "const": "ownmem-index.documents/v1" },
+    "compiler_version": { "$ref": "#/$defs/semver" },
+    "field_names": {
+      "type": "array",
+      "prefixItems": [
+        { "const": "name" },
+        { "const": "hooks" },
+        { "const": "description" },
+        { "const": "triggers" },
+        { "const": "codePath" },
+        { "const": "codeSymbol" },
+        { "const": "codeTest" },
+        { "const": "authorityDocs" },
+        { "const": "scopes" },
+        { "const": "body" }
+      ],
+      "items": false,
+      "minItems": 10,
+      "maxItems": 10
+    },
+    "documents": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/document" }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "semver": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$" },
+    "safePath": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "stringArray": { "type": "array", "items": { "type": "string" } },
+    "fields": {
+      "type": "object",
+      "required": ["name", "hooks", "description", "triggers", "codePath", "codeSymbol", "codeTest", "authorityDocs", "scopes", "body"],
+      "properties": {
+        "name": { "$ref": "#/$defs/stringArray" },
+        "hooks": { "$ref": "#/$defs/stringArray" },
+        "description": { "$ref": "#/$defs/stringArray" },
+        "triggers": { "$ref": "#/$defs/stringArray" },
+        "codePath": { "$ref": "#/$defs/stringArray" },
+        "codeSymbol": { "$ref": "#/$defs/stringArray" },
+        "codeTest": { "$ref": "#/$defs/stringArray" },
+        "authorityDocs": { "$ref": "#/$defs/stringArray" },
+        "scopes": { "$ref": "#/$defs/stringArray" },
+        "body": { "$ref": "#/$defs/stringArray" }
+      },
+      "additionalProperties": false
+    },
+    "lengths": {
+      "type": "object",
+      "required": ["name", "hooks", "description", "triggers", "codePath", "codeSymbol", "codeTest", "authorityDocs", "scopes", "body"],
+      "properties": {
+        "name": { "type": "integer", "minimum": 0 },
+        "hooks": { "type": "integer", "minimum": 0 },
+        "description": { "type": "integer", "minimum": 0 },
+        "triggers": { "type": "integer", "minimum": 0 },
+        "codePath": { "type": "integer", "minimum": 0 },
+        "codeSymbol": { "type": "integer", "minimum": 0 },
+        "codeTest": { "type": "integer", "minimum": 0 },
+        "authorityDocs": { "type": "integer", "minimum": 0 },
+        "scopes": { "type": "integer", "minimum": 0 },
+        "body": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "hook": {
+      "type": "object",
+      "required": ["path", "line", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/safePath" },
+        "line": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "codeEvidence": {
+      "type": "object",
+      "required": ["path", "symbols", "tests"],
+      "properties": {
+        "path": { "$ref": "#/$defs/safePath" },
+        "symbols": { "$ref": "#/$defs/stringArray" },
+        "tests": { "$ref": "#/$defs/stringArray" }
+      },
+      "additionalProperties": false
+    },
+    "relations": {
+      "type": "object",
+      "required": ["authority_docs", "history_docs", "supersedes", "wiki_links", "code_evidence"],
+      "properties": {
+        "authority_docs": { "$ref": "#/$defs/stringArray" },
+        "history_docs": { "$ref": "#/$defs/stringArray" },
+        "supersedes": { "$ref": "#/$defs/stringArray" },
+        "wiki_links": { "$ref": "#/$defs/stringArray" },
+        "code_evidence": { "type": "array", "items": { "$ref": "#/$defs/codeEvidence" } }
+      },
+      "additionalProperties": false
+    },
+    "chunk": {
+      "type": "object",
+      "required": ["id", "field", "start_byte", "end_byte", "sha256"],
+      "properties": {
+        "id": { "$ref": "#/$defs/sha256" },
+        "field": { "const": "body" },
+        "start_byte": { "type": "integer", "minimum": 0 },
+        "end_byte": { "type": "integer", "minimum": 0 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "document": {
+      "type": "object",
+      "required": ["id", "path", "source_sha256", "compile_sha256", "metadata", "provenance", "relations", "fields", "field_lengths", "chunks"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+        "path": { "$ref": "#/$defs/safePath" },
+        "source_sha256": { "$ref": "#/$defs/sha256" },
+        "compile_sha256": { "$ref": "#/$defs/sha256" },
+        "metadata": {
+          "type": "object",
+          "required": ["type", "authority", "last_verified", "scopes", "applies_to", "triggers"],
+          "properties": {
+            "type": { "enum": ["lesson", "debug", "preference", "feedback", "decision-pointer"] },
+            "authority": { "enum": ["observed", "normative", "user-confirmed"] },
+            "last_verified": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+            "scopes": { "$ref": "#/$defs/stringArray" },
+            "applies_to": { "$ref": "#/$defs/stringArray" },
+            "triggers": { "$ref": "#/$defs/stringArray" }
+          },
+          "additionalProperties": false
+        },
+        "provenance": {
+          "type": "object",
+          "required": ["topic_path", "topic_sha256", "l2_hooks"],
+          "properties": {
+            "topic_path": { "$ref": "#/$defs/safePath" },
+            "topic_sha256": { "$ref": "#/$defs/sha256" },
+            "l2_hooks": { "type": "array", "items": { "$ref": "#/$defs/hook" } }
+          },
+          "additionalProperties": false
+        },
+        "relations": { "$ref": "#/$defs/relations" },
+        "fields": { "$ref": "#/$defs/fields" },
+        "field_lengths": { "$ref": "#/$defs/lengths" },
+        "chunks": { "type": "array", "items": { "$ref": "#/$defs/chunk" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

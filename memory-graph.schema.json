@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-index.graph/v2",
+  "title": "OwnMem memory relation graph",
+  "type": "object",
+  "required": ["schema", "nodes", "edges", "reverse_dependencies"],
+  "properties": {
+    "schema": { "const": "ownmem-index.graph/v2" },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "label"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["topic", "l2", "document", "code"] },
+          "label": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "kind"],
+        "properties": {
+          "from": { "type": "string", "minLength": 1 },
+          "to": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["l2-hook", "authority-doc", "history-doc", "supersedes", "wiki-link", "code-evidence", "code-test"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "reverse_dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "references"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["from", "kind"],
+              "properties": {
+                "from": { "type": "string", "minLength": 1 },
+                "kind": { "enum": ["l2-hook", "authority-doc", "history-doc", "supersedes", "wiki-link", "code-evidence", "code-test"] }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

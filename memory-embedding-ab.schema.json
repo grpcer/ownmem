@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-embedding-ab/v1",
+  "title": "OwnMem local memory embedding A/B report",
+  "type": "object",
+  "required": [
+    "schema", "report_id", "snapshot_id", "provider", "model", "dimensions",
+    "weights", "corpus", "metrics", "guard", "diffs"
+  ],
+  "properties": {
+    "schema": { "const": "ownmem-embedding-ab/v1" },
+    "report_id": { "$ref": "#/$defs/sha256" },
+    "snapshot_id": { "$ref": "#/$defs/sha256" },
+    "provider": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "model": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "component_version": {
+      "description": "Recall stack version (MEMORY_RECALL_RUNTIME_VERSION) that produced this report. Deliberately not required: reports written before this field existed stay readable for history, but the enable gate treats a missing or mismatched value as no evidence at all.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "dimensions": { "type": "integer", "minimum": 1, "maximum": 65536 },
+    "weights": {
+      "type": "object",
+      "required": ["a", "b"],
+      "properties": {
+        "a": { "const": 0 },
+        "b": { "type": "number", "exclusiveMinimum": 0, "maximum": 100 }
+      },
+      "additionalProperties": false
+    },
+    "corpus": {
+      "type": "object",
+      "required": ["golden", "negative", "holdout"],
+      "properties": {
+        "golden": { "$ref": "#/$defs/nonNegativeInteger" },
+        "negative": { "$ref": "#/$defs/nonNegativeInteger" },
+        "holdout": { "$ref": "#/$defs/nonNegativeInteger" }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["golden", "negative", "holdout"],
+      "properties": {
+        "golden": { "$ref": "#/$defs/rankingComparison" },
+        "negative": { "$ref": "#/$defs/negativeComparison" },
+        "holdout": {
+          "type": "object",
+          "required": ["available", "cases", "a", "b"],
+          "properties": {
+            "available": { "type": "boolean" },
+            "cases": { "$ref": "#/$defs/nonNegativeInteger" },
+            "a": { "anyOf": [{ "$ref": "#/$defs/rankingMetrics" }, { "type": "null" }] },
+            "b": { "anyOf": [{ "$ref": "#/$defs/rankingMetrics" }, { "type": "null" }] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "guard": {
+      "type": "object",
+      "required": ["negative_not_worse", "recommended_weight_safe"],
+      "properties": {
+        "negative_not_worse": { "type": "boolean" },
+        "recommended_weight_safe": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "diffs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/diff" }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "nonNegativeInteger": { "type": "integer", "minimum": 0 },
+    "unit": { "type": "number", "minimum": 0, "maximum": 1 },
+    "rankingMetrics": {
+      "type": "object",
+      "required": ["cases", "recall_at_1", "recall_at_5", "mrr", "by_group"],
+      "properties": {
+        "cases": { "$ref": "#/$defs/nonNegativeInteger" },
+        "recall_at_1": { "$ref": "#/$defs/unit" },
+        "recall_at_5": { "$ref": "#/$defs/unit" },
+        "mrr": { "$ref": "#/$defs/unit" },
+        "by_group": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/groupRankingMetrics" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "groupRankingMetrics": {
+      "type": "object",
+      "required": ["cases", "recall_at_1", "recall_at_5", "mrr"],
+      "properties": {
+        "cases": { "$ref": "#/$defs/nonNegativeInteger" },
+        "recall_at_1": { "$ref": "#/$defs/unit" },
+        "recall_at_5": { "$ref": "#/$defs/unit" },
+        "mrr": { "$ref": "#/$defs/unit" }
+      },
+      "additionalProperties": false
+    },
+    "rankingComparison": {
+      "type": "object",
+      "required": ["a", "b"],
+      "properties": {
+        "a": { "$ref": "#/$defs/rankingMetrics" },
+        "b": { "$ref": "#/$defs/rankingMetrics" }
+      },
+      "additionalProperties": false
+    },
+    "negativeMetrics": {
+      "type": "object",
+      "required": ["cases", "abstained", "abstain_rate", "by_group"],
+      "properties": {
+        "cases": { "$ref": "#/$defs/nonNegativeInteger" },
+        "abstained": { "$ref": "#/$defs/nonNegativeInteger" },
+        "abstain_rate": { "$ref": "#/$defs/unit" },
+        "by_group": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/groupNegativeMetrics" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "groupNegativeMetrics": {
+      "type": "object",
+      "required": ["cases", "abstained", "abstain_rate"],
+      "properties": {
+        "cases": { "$ref": "#/$defs/nonNegativeInteger" },
+        "abstained": { "$ref": "#/$defs/nonNegativeInteger" },
+        "abstain_rate": { "$ref": "#/$defs/unit" }
+      },
+      "additionalProperties": false
+    },
+    "negativeComparison": {
+      "type": "object",
+      "required": ["a", "b"],
+      "properties": {
+        "a": { "$ref": "#/$defs/negativeMetrics" },
+        "b": { "$ref": "#/$defs/negativeMetrics" }
+      },
+      "additionalProperties": false
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["rank", "abstained", "returned"],
+      "properties": {
+        "rank": { "type": ["integer", "null"], "minimum": 1 },
+        "abstained": { "type": "boolean" },
+        "returned": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "diff": {
+      "type": "object",
+      "required": ["case_id", "kind", "partition", "group", "expected", "a", "b", "change"],
+      "properties": {
+        "case_id": { "$ref": "#/$defs/sha256" },
+        "kind": { "enum": ["golden", "negative"] },
+        "partition": { "enum": ["regression", "challenge", "holdout"] },
+        "group": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "expected": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" }
+        },
+        "a": { "$ref": "#/$defs/outcome" },
+        "b": { "$ref": "#/$defs/outcome" },
+        "change": { "enum": ["improved", "regressed", "unchanged"] }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

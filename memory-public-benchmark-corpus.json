@@ -1,0 +1,185 @@
+{
+  "schema": "ownmem-public-benchmark-corpus/v1",
+  "license": "CC0-1.0",
+  "topics": [
+    {
+      "id": "decorrelated_retry_jitter",
+      "description": "Decorrelated retry jitter prevents synchronized reconnect storms",
+      "triggers": ["decorrelated retry jitter", "clients reconnect in one synchronized wave", "randomize exponential retry delay"],
+      "body": "When an outage ends, identical exponential schedules can make every client reconnect together. Use decorrelated jitter and a bounded retry budget to spread the load."
+    },
+    {
+      "id": "sqlite_wal_checkpoint_busy",
+      "description": "A long read transaction can keep a SQLite WAL checkpoint busy",
+      "triggers": ["SQLite WAL 检查点 忙", "数据库 写入 阻塞 检查点", "长事务 占住 WAL"],
+      "body": "长时间未提交的读事务会阻止 WAL 检查点推进并拖慢写入。先结束读事务，再重新执行检查点，不要删除 WAL 文件。"
+    },
+    {
+      "id": "keychain_accessibility_migration",
+      "description": "Keychain accessibility changes require a read-copy-delete migration",
+      "triggers": ["鑰匙圈 可存取性 遷移", "裝置鎖定後 讀不到 憑證", "Keychain 舊項目 屬性"],
+      "body": "變更鑰匙圈項目的可存取性不會自動更新既有資料。應讀取舊項目、以新屬性寫入，再刪除舊項目，避免裝置鎖定後無法讀取憑證。"
+    },
+    {
+      "id": "main_actor_ui_update",
+      "description": "UI state published from a background task must return to MainActor",
+      "triggers": ["MainActor UI 更新", "バックグラウンド 状態変更 警告", "画面更新 メインスレッド"],
+      "body": "バックグラウンド処理の完了後に画面状態を更新する場合は MainActor に戻す。非同期タスクから直接 published state を変更しない。"
+    },
+    {
+      "id": "workmanager_unique_work",
+      "description": "Android WorkManager jobs need a unique-work policy to prevent duplicates",
+      "triggers": ["WorkManager 중복 작업", "고유 작업 정책", "앱 재시작 백그라운드 작업 두 번"],
+      "body": "앱 재시작 때 같은 백그라운드 작업이 두 번 예약되면 고유 작업 이름과 ExistingWorkPolicy를 사용한다. 태그만으로는 중복 실행을 막지 못한다."
+    },
+    {
+      "id": "transactional_schema_migration",
+      "description": "A schema migration should roll back atomically when data copying fails",
+      "triggers": ["migración transacción rollback", "copia de datos falla a mitad", "esquema queda parcialmente actualizado"],
+      "body": "Ejecuta el cambio de esquema y la copia de datos dentro de una transacción. Si falla una fila, revierte toda la migración y conserva la versión anterior."
+    },
+    {
+      "id": "singleflight_cache_stampede",
+      "description": "Single-flight request coalescing prevents a cache stampede",
+      "triggers": ["cache stampede requêtes simultanées", "une seule requête de remplissage", "expiration cache surcharge origine"],
+      "body": "Quand une entrée expire, regrouper les demandes concurrentes autour d'une seule requête de remplissage. Les autres attendent le même résultat au lieu de surcharger le service d'origine."
+    },
+    {
+      "id": "certificate_pin_rotation",
+      "description": "Certificate pin rotation needs an overlap window for old and new keys",
+      "triggers": ["Zertifikat Pin Rotation", "neuer Schlüssel sperrt alte App", "zwei Pins Übergangszeit"],
+      "body": "Bei der Pin-Rotation müssen alter und neuer öffentlicher Schlüssel während eines Übergangsfensters gültig sein. Erst nach dem App-Rollout darf der alte Pin entfernt werden."
+    },
+    {
+      "id": "cursor_pagination_duplicates",
+      "description": "Cursor pagination requires a stable tie-breaker to avoid duplicate rows",
+      "triggers": ["paginação cursor itens duplicados", "ordenação empate cursor", "próxima página repete registro"],
+      "body": "Use uma ordenação estável com um desempate único, como created_at mais id. Um cursor baseado apenas no horário pode repetir ou pular itens entre páginas."
+    },
+    {
+      "id": "signed_request_clock_skew",
+      "description": "Signed API requests need a bounded clock-skew policy",
+      "triggers": ["انحراف الساعة توقيع الطلب", "رفض المصادقة الوقت غير متزامن", "نافذة زمنية للطلب الموقّع"],
+      "body": "إذا رُفض الطلب الموقّع بسبب اختلاف الوقت، قِس انحراف ساعة الجهاز وطبّق نافذة زمنية محدودة. لا تعطّل التحقق من الطابع الزمني."
+    },
+    {
+      "id": "idempotent_payment_webhook",
+      "description": "Payment webhooks must use an idempotency key before applying side effects",
+      "triggers": ["भुगतान वेबहुक दो बार", "इडेम्पोटेंसी कुंजी", "एक ही घटना से दो रसीद"],
+      "body": "प्रदाता एक भुगतान वेबहुक कई बार भेज सकता है। दुष्प्रभाव लागू करने से पहले घटना आईडी को इडेम्पोटेंसी कुंजी के रूप में संग्रहित करें, ताकि दो रसीद न बनें।"
+    },
+    {
+      "id": "bounded_exponential_backoff",
+      "description": "Retries need exponential backoff, a cap, and a total attempt budget",
+      "triggers": ["retry backoff eksponensial", "percobaan ulang tanpa batas", "batas waktu dan jumlah retry"],
+      "body": "Gunakan backoff eksponensial dengan jeda maksimum dan anggaran percobaan total. Retry tanpa batas memperpanjang gangguan dan membebani layanan yang sedang pulih."
+    },
+    {
+      "id": "unicode_filename_normalization",
+      "description": "Unicode filename normalization can differ across filesystems",
+      "triggers": ["нормализация Unicode имени файла", "файл существует но путь не совпадает", "NFC NFD файловая система"],
+      "body": "Файловые системы могут хранить визуально одинаковые имена в NFC или NFD. Нормализуйте сравниваемые строки, но открывайте фактическое имя из каталога."
+    },
+    {
+      "id": "poison_message_dead_letter",
+      "description": "A poison queue message should move to a dead-letter queue after bounded retries",
+      "triggers": ["ข้อความเสียค้างคิว", "คิวจดหมายตาย", "ลองประมวลผลซ้ำไม่สิ้นสุด"],
+      "body": "เมื่อข้อความเดิมประมวลผลล้มเหลวซ้ำจนเกินจำนวนที่กำหนด ให้ย้ายไปคิวจดหมายตายพร้อมสาเหตุ อย่าปล่อยให้ข้อความเสียกีดขวางคิวหลัก"
+    },
+    {
+      "id": "turkish_dotted_i_casefold",
+      "description": "Turkish dotted and dotless I need locale-aware identifier handling",
+      "triggers": ["Türkçe noktalı İ dönüşümü", "kullanıcı adı büyük küçük harf", "I ı ve İ i eşleştirme", "protokol kimliğini sabit kuralla normalleştirin"],
+      "body": "Türkçe metinde İ, i, I ve ı aynı dönüşümü izlemez. Kullanıcı görünen metnini yerel kuralla karşılaştırın; protokol kimliklerini sabit ve belgelenmiş bir kuralla normalleştirin."
+    },
+    {
+      "id": "optimistic_version_conflict",
+      "description": "Optimistic concurrency must surface a version conflict instead of overwriting",
+      "triggers": ["xung đột phiên bản lạc quan", "hai người sửa cùng bản ghi", "ghi đè thay đổi mới hơn"],
+      "body": "Khi hai người cùng sửa một bản ghi, câu lệnh cập nhật phải kiểm tra phiên bản cũ. Nếu số phiên bản đã đổi, trả về xung đột và yêu cầu hợp nhất thay vì ghi đè."
+    }
+  ],
+  "queries": [
+    { "group": "symptom", "locale": "en", "query": "all clients reconnect in the same wave after an outage", "expected": "decorrelated_retry_jitter" },
+    { "group": "cause", "locale": "en", "query": "identical exponential retry schedules synchronize callers", "expected": "decorrelated_retry_jitter" },
+    { "group": "remedy", "locale": "en", "query": "spread reconnect load with decorrelated jitter", "expected": "decorrelated_retry_jitter" },
+
+    { "group": "symptom", "locale": "zh-Hans", "query": "SQLite WAL 检查点一直忙", "expected": "sqlite_wal_checkpoint_busy" },
+    { "group": "cause", "locale": "zh-Hans", "query": "长事务导致数据库写入阻塞", "expected": "sqlite_wal_checkpoint_busy" },
+    { "group": "remedy", "locale": "zh-Hans", "query": "提交读事务后重新执行检查点", "expected": "sqlite_wal_checkpoint_busy" },
+
+    { "group": "symptom", "locale": "zh-Hant", "query": "裝置鎖定後讀不到鑰匙圈憑證", "expected": "keychain_accessibility_migration" },
+    { "group": "cause", "locale": "zh-Hant", "query": "既有 Keychain 項目沒有更新可存取性", "expected": "keychain_accessibility_migration" },
+    { "group": "remedy", "locale": "zh-Hant", "query": "讀取舊項目再用新屬性寫入", "expected": "keychain_accessibility_migration" },
+
+    { "group": "symptom", "locale": "ja", "query": "バックグラウンドから画面状態を更新すると警告", "expected": "main_actor_ui_update" },
+    { "group": "cause", "locale": "ja", "query": "非同期タスクが published state を直接変更", "expected": "main_actor_ui_update" },
+    { "group": "remedy", "locale": "ja", "query": "UI 更新を MainActor に戻す", "expected": "main_actor_ui_update" },
+
+    { "group": "symptom", "locale": "ko", "query": "앱 재시작 후 백그라운드 작업이 두 번 실행", "expected": "workmanager_unique_work" },
+    { "group": "cause", "locale": "ko", "query": "WorkManager 태그만 사용해서 중복 예약", "expected": "workmanager_unique_work" },
+    { "group": "remedy", "locale": "ko", "query": "고유 작업 이름과 ExistingWorkPolicy 사용", "expected": "workmanager_unique_work" },
+
+    { "group": "symptom", "locale": "es", "query": "la migración falla y deja el esquema actualizado a medias", "expected": "transactional_schema_migration" },
+    { "group": "cause", "locale": "es", "query": "error durante la copia de datos de una migración", "expected": "transactional_schema_migration" },
+    { "group": "remedy", "locale": "es", "query": "revertir toda la migración dentro de una transacción", "expected": "transactional_schema_migration" },
+
+    { "group": "symptom", "locale": "fr", "query": "expiration du cache surcharge le service d'origine", "expected": "singleflight_cache_stampede" },
+    { "group": "cause", "locale": "fr", "query": "toutes les requêtes remplissent la même entrée expirée", "expected": "singleflight_cache_stampede" },
+    { "group": "remedy", "locale": "fr", "query": "regrouper les demandes autour d'une seule requête", "expected": "singleflight_cache_stampede" },
+
+    { "group": "symptom", "locale": "de", "query": "neuer Zertifikat Pin sperrt die alte App", "expected": "certificate_pin_rotation" },
+    { "group": "cause", "locale": "de", "query": "alter Schlüssel wurde vor dem App Rollout entfernt", "expected": "certificate_pin_rotation" },
+    { "group": "remedy", "locale": "de", "query": "alte und neue Pins im Übergangsfenster erlauben", "expected": "certificate_pin_rotation" },
+
+    { "group": "symptom", "locale": "pt-BR", "query": "a próxima página repete registros do cursor", "expected": "cursor_pagination_duplicates" },
+    { "group": "cause", "locale": "pt-BR", "query": "ordenação por horário tem empate na paginação", "expected": "cursor_pagination_duplicates" },
+    { "group": "remedy", "locale": "pt-BR", "query": "usar created_at e id como desempate estável", "expected": "cursor_pagination_duplicates" },
+
+    { "group": "symptom", "locale": "ar", "query": "رفض الطلب الموقّع لأن وقت الجهاز غير متزامن", "expected": "signed_request_clock_skew" },
+    { "group": "cause", "locale": "ar", "query": "انحراف الساعة يفسد توقيع المصادقة", "expected": "signed_request_clock_skew" },
+    { "group": "remedy", "locale": "ar", "query": "قياس الانحراف وتطبيق نافذة زمنية محدودة", "expected": "signed_request_clock_skew" },
+
+    { "group": "symptom", "locale": "hi", "query": "एक भुगतान वेबहुक से दो रसीद बनती हैं", "expected": "idempotent_payment_webhook" },
+    { "group": "cause", "locale": "hi", "query": "प्रदाता वही घटना कई बार भेजता है", "expected": "idempotent_payment_webhook" },
+    { "group": "remedy", "locale": "hi", "query": "घटना आईडी को इडेम्पोटेंसी कुंजी में रखें", "expected": "idempotent_payment_webhook" },
+
+    { "group": "symptom", "locale": "id", "query": "retry tanpa batas membebani layanan yang pulih", "expected": "bounded_exponential_backoff" },
+    { "group": "cause", "locale": "id", "query": "percobaan ulang langsung memperpanjang gangguan", "expected": "bounded_exponential_backoff" },
+    { "group": "remedy", "locale": "id", "query": "pakai backoff eksponensial dan anggaran percobaan", "expected": "bounded_exponential_backoff" },
+
+    { "group": "symptom", "locale": "ru", "query": "файл существует но строка пути не совпадает", "expected": "unicode_filename_normalization" },
+    { "group": "cause", "locale": "ru", "query": "имя файла хранится в другой нормализации Unicode", "expected": "unicode_filename_normalization" },
+    { "group": "remedy", "locale": "ru", "query": "сравнить NFC и NFD но открыть фактическое имя", "expected": "unicode_filename_normalization" },
+
+    { "group": "symptom", "locale": "th", "query": "ข้อความเสียทำให้คิวหลักค้าง", "expected": "poison_message_dead_letter" },
+    { "group": "cause", "locale": "th", "query": "ลองประมวลผลข้อความเดิมซ้ำไม่สิ้นสุด", "expected": "poison_message_dead_letter" },
+    { "group": "remedy", "locale": "th", "query": "ย้ายข้อความไปคิวจดหมายตายหลังครบจำนวน", "expected": "poison_message_dead_letter" },
+
+    { "group": "symptom", "locale": "tr", "query": "Türkçe kullanıcı adı büyük küçük harfte eşleşmiyor", "expected": "turkish_dotted_i_casefold" },
+    { "group": "cause", "locale": "tr", "query": "noktalı İ ve noktasız ı aynı çevriliyor", "expected": "turkish_dotted_i_casefold" },
+    { "group": "remedy", "locale": "tr", "query": "protokol kimliğini sabit kuralla normalleştirin", "expected": "turkish_dotted_i_casefold" },
+
+    { "group": "symptom", "locale": "vi", "query": "hai người sửa cùng bản ghi và mất thay đổi", "expected": "optimistic_version_conflict" },
+    { "group": "cause", "locale": "vi", "query": "cập nhật không kiểm tra số phiên bản cũ", "expected": "optimistic_version_conflict" },
+    { "group": "remedy", "locale": "vi", "query": "trả về xung đột thay vì ghi đè", "expected": "optimistic_version_conflict" }
+  ],
+  "negative_queries": [
+    { "group": "unrelated", "locale": "en", "query": "quantum foam renderer calibrates lunar antenna" },
+    { "group": "unrelated", "locale": "zh-Hans", "query": "月球天线校准量子泡沫渲染器" },
+    { "group": "unrelated", "locale": "zh-Hant", "query": "月球天線校準量子泡沫渲染器" },
+    { "group": "unrelated", "locale": "ja", "query": "月面アンテナで量子泡レンダラーを校正する" },
+    { "group": "unrelated", "locale": "ko", "query": "달 안테나로 양자 거품 렌더러 보정" },
+    { "group": "unrelated", "locale": "es", "query": "calibrar antena lunar con espuma cuántica" },
+    { "group": "unrelated", "locale": "fr", "query": "calibrer une antenne lunaire avec une mousse quantique" },
+    { "group": "unrelated", "locale": "de", "query": "Mondantenne mit Quantenschaum kalibrieren" },
+    { "group": "unrelated", "locale": "pt-BR", "query": "calibrar antena lunar com espuma quântica" },
+    { "group": "unrelated", "locale": "ar", "query": "معايرة هوائي قمري برغوة كمومية" },
+    { "group": "unrelated", "locale": "hi", "query": "क्वांटम फोम से चंद्र एंटीना अंशांकित करें" },
+    { "group": "unrelated", "locale": "id", "query": "kalibrasi antena bulan dengan busa kuantum" },
+    { "group": "unrelated", "locale": "ru", "query": "калибровка лунной антенны квантовой пеной" },
+    { "group": "unrelated", "locale": "th", "query": "ปรับเทียบเสาอากาศดวงจันทร์ด้วยโฟมควอนตัม" },
+    { "group": "unrelated", "locale": "tr", "query": "ay antenini kuantum köpüğüyle kalibre et" },
+    { "group": "unrelated", "locale": "vi", "query": "hiệu chỉnh ăng ten mặt trăng bằng bọt lượng tử" }
+  ]
+}

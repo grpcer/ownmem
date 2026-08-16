@@ -1,0 +1,11 @@
+{
+  "schema": "ownmem.quota/v3",
+  "mode": "growth",
+  "updated_at": "2026-08-16",
+  "transitioned_at": null,
+  "growth_threshold": 50,
+  "target_hooks_per_l2": 40,
+  "max_active_l3": 50,
+  "max_active_bytes": 262144,
+  "l2_baseline": {}
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "ownmem.config/v1",
+  "version": 1,
+  "memory_dir": ".ownmem",
+  "locale": "en",
+  "layers": [
+    "core"
+  ],
+  "command": "ownmem",
+  "adapters": [
+    "generic"
+  ],
+  "hook_enabled": false
+}

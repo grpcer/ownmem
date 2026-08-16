@@ -1,0 +1,14 @@
+{
+  "schema": "ownmem.adapters/v1",
+  "version": 1,
+  "hosts": [
+    "generic"
+  ],
+  "files": [
+    {
+      "path": "MEMORY_INSTRUCTIONS.md",
+      "host": "generic",
+      "sha256": "fd8f7f8f520476451b1a0b4531f5ffb7727e2b0c751af2ada3bc2e9fa32141b2"
+    }
+  ]
+}

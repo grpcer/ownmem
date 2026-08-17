@@ -5,7 +5,7 @@
 **你的项目，拥有自己的记忆。**
 
 面向编程 Agent 的本地工程记忆：结果确定，随 Git 管理。<br>
-一套记忆，同时供 Claude Code · Codex · Gemini CLI · Cursor · Grok CLI 使用。
+一套记忆，同时供 Claude Code · Codex · Antigravity · Cursor · Grok CLI 使用。
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -37,31 +37,44 @@ OwnMem 分为两部分。**npm 包**是核心引擎：以可审查的 `devDepend
 
 ## 快速开始
 
-OwnMem 需要 Node.js 20 或更新版本。进入你希望“会记事”的项目目录，复制运行：
+OwnMem 需要 Node.js 20 或更新版本。三个步骤，全部在你希望“会记事”的
+仓库里完成。
+
+**第 1 步——安装引擎。** 它会成为一个普通的 `devDependency`，像其他依赖
+一样可审查、可锁定版本：
 
 ```bash
 npm install --save-dev ownmem
+```
+
+**第 2 步——初始化这个仓库。** 这会创建 `.ownmem/` 和每个 Agent 的
+适配文件：
+
+```bash
 npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
-这是最省心的推荐配置：Claude Code 和 Codex 都能直接使用，同时带本地控制台。
-初始化完成后，重新打开 Agent——Agent 在会话开始时才会发现命令，所以下面
-这些都出现在下一个会话里，而不是运行 init 的那个会话。
+**第 3 步——重新打开你的 Agent。** Agent 在会话开始时才会发现命令，所以
+下面这些都出现在下一个会话里，而不是运行 init 的那个会话。
 
+这是推荐配置——Claude Code 和 Codex 都能直接使用，同时带本地控制台。
 重新打开后你将拥有：
 
 - **Claude Code** 获得一个项目命令：`/ownmem <任何你想让记忆做的事>`。
-- **Codex** 会自动发现仓库里的 `ownmem` skill。
-- **每个 Agent** 都遵守写进项目说明（`CLAUDE.md`、`AGENTS.md`）里的
-  记忆纪律。
+- **Codex 和 Grok CLI** 会自动发现仓库里的 `ownmem` skill。
+- **Antigravity** 会加载同样的项目说明（`AGENTS.md`、`GEMINI.md`），
+  因此同样遵守记忆纪律——所有读取这些文件的其他 Agent 也是如此。
 - **控制台**是终端命令，不是斜杠命令：`npx ownmem dashboard --open`。
   （下文的可选插件会额外提供 `/ownmem:dashboard`。）
 
-不需要每天再运行命令——照常工作即可。
+不需要每天再运行命令——照常工作即可。每个需要独立记忆的仓库，都把这
+三个步骤重复一次。
 
 只用一种工具？把 `--hosts claude,codex` 改成 `--hosts claude` 或
-`--hosts codex`。Gemini CLI 和 Cursor 使用 `--hosts gemini,cursor`；其他
-Agent 可以使用 `--hosts generic`。
+`--hosts codex`。Antigravity 和 Grok CLI 读取的是和 Codex 相同的
+`AGENTS.md`（Grok 还会读 `.agents/skills/`）文件，所以 `--hosts codex`
+就覆盖了两者。Cursor 使用 `--hosts cursor`，经典 Gemini CLI 环境使用
+`--hosts gemini`；其他 Agent 可以使用 `--hosts generic`。
 
 初始化会创建 `.ownmem/`，并在 Agent 的项目说明里加入一小段 OwnMem 配置；
 所有标记范围之外的原有内容都不会被改动。
@@ -112,7 +125,7 @@ OwnMem 坚持四个原则，所有设计都围绕它们展开：
   延迟税、没有按次计费：在锁定的公开 benchmark 上 Recall@1 100%，P95 仅
   2.46 ms。
 - **记忆必须比任何单一工具活得久。** 同一批文件同时服务 Claude Code、
-  Codex、Gemini CLI、Cursor 与 Grok CLI，换 agent 永远不意味着丢掉团队
+  Codex、Antigravity、Cursor 与 Grok CLI，换 agent 永远不意味着丢掉团队
   学到的东西。
 - **记忆库必须控制规模，才能长期可信。** 零净增长配额、纯 Node 审计、
   近重复与防漂移检查让内容保持精简、及时更新，不会变成没人维护的第二个 Wiki。
@@ -167,7 +180,7 @@ the pool, and every deploy waits until it times out. Raise both together.
 | 人类可读、可审阅的 Markdown | ✅ | ❌ | ❌ | ❌ | ⚠️² |
 | 召回不调用模型、不发网络请求 | ✅ | ❌³ | ❌ | ❌ | — |
 | 确定性、可复现的排序 | ✅ | ❌ | ❌ | ❌ | — |
-| 一份记忆通吃 Claude Code、Codex、Gemini CLI、Cursor、Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
+| 一份记忆通吃 Claude Code、Codex、Antigravity、Cursor、Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
 | 防膨胀治理（增长配额、审计、防漂移门禁） | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
 | 语义级同义改写检索 | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
 | 全自动捕获 | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
@@ -289,14 +302,27 @@ codex plugin add ownmem@ownmem
 之后可用 `codex plugin marketplace upgrade ownmem` 加
 `codex plugin add ownmem@ownmem` 刷新。
 
-Gemini CLI：
+Grok CLI：
 
 ```
-gemini extensions install https://github.com/grpcer/ownmem
+grok plugin marketplace add grpcer/ownmem
+grok plugin install ownmem@ownmem --trust
 ```
 
-这会添加 `/ownmem` 命令与 `ownmem`、`ownmem-init`、`ownmem-dashboard`
-三个 skill。用 `gemini extensions update ownmem` 更新。
+这会安装同样的三个 skill。当裸 skill 名已被占用时，Grok 会加上命名空间——
+它内置的 dashboard 会让我们的变成 `/ownmem:dashboard`。用
+`grok plugin update ownmem` 更新。
+
+Antigravity：
+
+```
+agy plugin install https://github.com/grpcer/ownmem
+```
+
+这会导入 `ownmem`、`ownmem-init`、`ownmem-dashboard` 三个 skill；
+重新运行同一条命令即可更新。（经典 Gemini CLI 环境——API key、Vertex AI
+或企业许可——仍可以用 `gemini extensions install https://github.com/grpcer/ownmem`
+安装同一个仓库。）
 
 ## 安全的自动更新
 

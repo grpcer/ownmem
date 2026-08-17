@@ -5,7 +5,7 @@
 **당신의 프로젝트에, 전용 메모리를.**
 
 Coding agent를 위한 로컬 · 결정적 · git 네이티브 메모리.<br>
-하나의 파일 세트로 Claude Code · Codex · Gemini CLI · Cursor · Grok CLI를 모두 지원합니다.
+하나의 파일 세트로 Claude Code · Codex · Antigravity · Cursor · Grok CLI를 모두 지원합니다.
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -39,34 +39,46 @@ OwnMem은 두 부분으로 구성됩니다. **npm 패키지**는 엔진입니다
 
 ## 빠른 시작
 
-OwnMem은 Node.js 20 이상이 필요합니다. 기억을 추가하고 싶은 저장소에서 다음을
-실행하세요:
+OwnMem은 Node.js 20 이상이 필요합니다. 세 단계 모두 기억을 추가하고 싶은
+저장소 안에서 실행합니다.
+
+**1단계 — 엔진 설치.** 다른 의존성과 마찬가지로 리뷰하고 버전을 고정하는
+평범한 `devDependency`가 됩니다:
 
 ```bash
 npm install --save-dev ownmem
+```
+
+**2단계 — 이 저장소 초기화.** `.ownmem/`과 agent별 어댑터 파일을 만듭니다:
+
+```bash
 npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
-가장 간단한 권장 설정입니다. Claude Code와 Codex를 바로 사용할 수 있고 로컬
-콘솔도 함께 설치됩니다. 초기화가 끝나면 agent를 다시 여세요 — agent는 세션
-시작 시점에 명령을 발견하므로, 아래 내용은 init를 실행한 세션이 아니라 다음
-세션부터 나타납니다.
+**3단계 — agent 다시 열기.** agent는 세션 시작 시점에 명령을 발견하므로,
+아래 내용은 init를 실행한 세션이 아니라 다음 세션부터 나타납니다.
 
-다시 열고 나면 다음이 준비됩니다:
+이것이 권장 설정입니다 — Claude Code와 Codex를 바로 사용할 수 있고 로컬
+콘솔도 함께 설치됩니다. 다시 열고 나면 다음이 준비됩니다:
 
 - **Claude Code**에는 프로젝트 명령이 생깁니다:
   `/ownmem <메모리가 해 주길 바라는 무엇이든>`.
-- **Codex**는 저장소의 `ownmem` skill을 자동으로 발견합니다.
-- **모든 agent**는 프로젝트 지침(`CLAUDE.md`, `AGENTS.md`)에 기록된 메모리
-  규율을 따릅니다.
+- **Codex와 Grok CLI**는 저장소의 `ownmem` skill을 자동으로 발견합니다.
+- **Antigravity**는 같은 프로젝트 지침(`AGENTS.md`, `GEMINI.md`)을 로드하여
+  메모리 규율을 그대로 따릅니다 — 이 지침을 읽는 다른 모든 agent도
+  마찬가지입니다.
 - **콘솔**은 slash 명령이 아니라 터미널 명령입니다:
   `npx ownmem dashboard --open`. (아래의 선택적 플러그인이
   `/ownmem:dashboard`를 추가합니다.)
 
-매일 실행할 설정 명령은 없습니다 — 그냥 평소처럼 작업하세요.
+매일 실행할 설정 명령은 없습니다 — 그냥 평소처럼 작업하세요. 자체 메모리를
+가져야 할 저장소마다 위 세 단계를 한 번씩 반복하세요.
 
 agent 하나만 사용하나요? `--hosts claude,codex`를 `--hosts claude` 또는
-`--hosts codex`로 바꾸세요. Gemini CLI와 Cursor는 `--hosts gemini,cursor`,
+`--hosts codex`로 바꾸세요. Antigravity와 Grok CLI는 Codex와 같은
+`AGENTS.md`(그리고 Grok의 경우 `.agents/skills/`) 파일을 읽으므로
+`--hosts codex`로 함께 지원됩니다. Cursor는 `--hosts cursor`, 클래식
+Gemini CLI 설정은 `--hosts gemini`,
 그 밖의 agent는 `--hosts generic`을 사용할 수 있습니다.
 
 초기화는 `.ownmem/`을 만들고 agent의 프로젝트 지침에 작은 OwnMem 섹션을
@@ -122,7 +134,7 @@ OwnMem은 네 가지에 베팅하며, 모든 설계 결정이 여기에서 따�
   돌려주며, 모델 호출도, 지연 비용도, 질문당 과금도 없습니다: 잠금된 공개
   벤치마크에서 100% Recall@1, P95 2.46 ms.
 - **메모리는 어떤 단일 도구보다 오래 살아야 합니다.** 같은 파일들이
-  Claude Code, Codex, Gemini CLI, Cursor, Grok CLI를 동시에 지원하므로,
+  Claude Code, Codex, Antigravity, Cursor, Grok CLI를 동시에 지원하므로,
   agent를 바꿔도 팀이 배운 것을 잃지 않습니다.
 - **메모리는 작아야 신뢰를 유지합니다.** 순 성장 제로 쿼터, 순수 Node audit,
   근접 중복·드리프트 게이트가 메모리를, 아무도 가지치기하지 않는 제2의
@@ -182,7 +194,7 @@ recall이 무료일 수 있는 이유가 바로 이 구조입니다. 색인은 �
 | 사람이 읽고 리뷰할 수 있는 Markdown | ✅ | ❌ | ❌ | ❌ | ⚠️² |
 | 모델·네트워크 호출 없는 recall | ✅ | ❌³ | ❌ | ❌ | — |
 | 결정적이고 재현 가능한 랭킹 | ✅ | ❌ | ❌ | ❌ | — |
-| Claude Code, Codex, Gemini CLI, Cursor, Grok CLI를 관통하는 하나의 메모리 | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
+| Claude Code, Codex, Antigravity, Cursor, Grok CLI를 관통하는 하나의 메모리 | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
 | 비대화 방지 거버넌스(성장 쿼터, audit, 드리프트 게이트) | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
 | 시맨틱 패러프레이즈 검색 | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
 | 완전 자동 캡처 | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
@@ -312,14 +324,28 @@ codex plugin add ownmem@ownmem
 있습니다. 이후 `codex plugin marketplace upgrade ownmem`을 실행한 다음
 `codex plugin add ownmem@ownmem`으로 갱신하세요.
 
-Gemini CLI:
+Grok CLI:
 
 ```
-gemini extensions install https://github.com/grpcer/ownmem
+grok plugin marketplace add grpcer/ownmem
+grok plugin install ownmem@ownmem --trust
 ```
 
-이로써 `/ownmem` 명령과 `ownmem`, `ownmem-init`, `ownmem-dashboard` skill이
-추가됩니다. 업데이트는 `gemini extensions update ownmem`입니다.
+같은 세 가지 skill이 설치됩니다. skill 이름이 이미 사용 중이면 Grok이
+namespace를 붙입니다 — 내장 dashboard 때문에 우리 것은
+`/ownmem:dashboard`가 됩니다. 업데이트는 `grok plugin update ownmem`입니다.
+
+Antigravity:
+
+```
+agy plugin install https://github.com/grpcer/ownmem
+```
+
+이로써 `ownmem`, `ownmem-init`, `ownmem-dashboard` skill을 가져옵니다.
+업데이트는 같은 명령을 다시 실행하면 됩니다. (API key, Vertex AI 또는
+엔터프라이즈 라이선스를 쓰는 클래식 Gemini CLI 설정은 지금도
+`gemini extensions install https://github.com/grpcer/ownmem`으로 같은
+저장소를 설치할 수 있습니다.)
 
 ## 안전한 자동 업데이트
 

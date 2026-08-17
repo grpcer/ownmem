@@ -5,7 +5,7 @@
 **Tu proyecto. Su propia memoria.**
 
 Memoria local, determinista y nativa de git para coding agents.<br>
-Un mismo conjunto de archivos sirve a Claude Code · Codex · Gemini CLI · Cursor · Grok CLI.
+Un mismo conjunto de archivos sirve a Claude Code · Codex · Antigravity · Cursor · Grok CLI.
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -41,37 +41,51 @@ motor, incluida la guía por la configuración de cada repositorio.
 
 ## Inicio rápido
 
-OwnMem requiere Node.js 20 o superior. En el repositorio al que quieras dar
-memoria, ejecuta:
+OwnMem requiere Node.js 20 o superior. Tres pasos, todos dentro del
+repositorio al que quieras dar memoria.
+
+**Paso 1 — instala el motor.** Se convierte en una `devDependency` normal,
+revisada y fijada como cualquier otra:
 
 ```bash
 npm install --save-dev ownmem
+```
+
+**Paso 2 — inicializa este repositorio.** Esto crea `.ownmem/` y los archivos
+adaptadores por agente:
+
+```bash
 npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
-Esta es la configuración recomendada y más sencilla: Claude Code y Codex
-quedan listos, y también se incluye la consola local. Cuando termine la
-inicialización, vuelve a abrir tu agente — los agentes descubren los comandos
-al inicio de la sesión, así que todo lo de abajo aparece en la siguiente
-sesión, no en la que ejecutó el init.
+**Paso 3 — vuelve a abrir tu agente.** Los agentes descubren los comandos al
+inicio de la sesión, así que todo lo de abajo aparece en la siguiente sesión,
+no en la que ejecutó el init.
 
-Lo que tienes tras reabrir:
+Esta es la configuración recomendada: Claude Code y Codex quedan listos, y
+también se incluye la consola local. Lo que tienes tras reabrir:
 
 - **Claude Code** gana un comando de proyecto: `/ownmem <lo que quieras que
   haga la memoria>`.
-- **Codex** descubre automáticamente la skill `ownmem` del repositorio.
-- **Todos los agentes** siguen la disciplina de memoria escrita en las
-  instrucciones del proyecto (`CLAUDE.md`, `AGENTS.md`).
+- **Codex y Grok CLI** descubren automáticamente la skill `ownmem` del
+  repositorio.
+- **Antigravity** carga las mismas instrucciones del proyecto (`AGENTS.md`,
+  `GEMINI.md`), así que también sigue la disciplina de memoria — igual que
+  cualquier otro agente que las lea.
 - **La consola** es un comando de terminal, no un slash command:
   `npx ownmem dashboard --open`. (El plugin opcional de más abajo añade
   `/ownmem:dashboard`.)
 
 No hay ningún comando que debas ejecutar cada día — simplemente trabaja como
-siempre.
+siempre. Repite los tres pasos una vez por cada repositorio que deba tener su
+propia memoria.
 
 ¿Solo usas un agente? Cambia `--hosts claude,codex` por `--hosts claude` o
-`--hosts codex`. Gemini CLI y Cursor funcionan con `--hosts gemini,cursor`;
-para otros agentes puedes usar `--hosts generic`.
+`--hosts codex`. Antigravity y Grok CLI leen los mismos archivos `AGENTS.md`
+(y, en el caso de Grok, `.agents/skills/`) que Codex, así que `--hosts codex`
+cubre ambos. Cursor usa `--hosts cursor`, las configuraciones clásicas de
+Gemini CLI usan `--hosts gemini`, y `--hosts generic` funciona con otros
+agentes.
 
 La inicialización crea `.ownmem/` y añade una pequeña sección de OwnMem a las
 instrucciones del proyecto. Nunca modifica el texto que queda fuera de sus
@@ -130,7 +144,7 @@ OwnMem hace cuatro apuestas, y cada decisión de diseño se deriva de ellas:
   factura por pregunta: 100% de Recall@1 con un P95 de 2.46 ms en el
   benchmark público bloqueado.
 - **La memoria debe sobrevivir a cualquier herramienta concreta.** Los mismos
-  archivos sirven a Claude Code, Codex, Gemini CLI, Cursor y Grok CLI, así que
+  archivos sirven a Claude Code, Codex, Antigravity, Cursor y Grok CLI, así que
   cambiar de agente nunca significa perder lo que el equipo aprendió.
 - **La memoria debe mantenerse pequeña para seguir siendo fiable.** Una cuota
   de crecimiento neto cero, una auditoría en Node puro y puertas de casi
@@ -195,7 +209,7 @@ compromisos asume cada una, incluidos los nuestros.
 | Markdown legible y revisable por humanos | ✅ | ❌ | ❌ | ❌ | ⚠️² |
 | Recall sin llamadas a modelos ni a la red | ✅ | ❌³ | ❌ | ❌ | — |
 | Ranking determinista y reproducible | ✅ | ❌ | ❌ | ❌ | — |
-| Una sola memoria para Claude Code, Codex, Gemini CLI, Cursor y Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
+| Una sola memoria para Claude Code, Codex, Antigravity, Cursor y Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
 | Gobernanza anti-inflado (cuota de crecimiento, auditoría, puertas de deriva) | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
 | Búsqueda semántica por paráfrasis | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
 | Captura totalmente automática | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
@@ -333,14 +347,28 @@ el selector de skills `$`. Actualiza después con
 `codex plugin marketplace upgrade ownmem` seguido de
 `codex plugin add ownmem@ownmem`.
 
-Gemini CLI:
+Grok CLI:
 
 ```
-gemini extensions install https://github.com/grpcer/ownmem
+grok plugin marketplace add grpcer/ownmem
+grok plugin install ownmem@ownmem --trust
 ```
 
-Esto añade el comando `/ownmem` y las skills `ownmem`, `ownmem-init` y
-`ownmem-dashboard`. Actualiza con `gemini extensions update ownmem`.
+Esto instala las mismas tres skills. Cuando un nombre de skill a secas ya está
+ocupado, Grok le añade un namespace: su dashboard integrado convierte el
+nuestro en `/ownmem:dashboard`. Actualiza con `grok plugin update ownmem`.
+
+Antigravity:
+
+```
+agy plugin install https://github.com/grpcer/ownmem
+```
+
+Esto importa las skills `ownmem`, `ownmem-init` y `ownmem-dashboard`;
+actualiza volviendo a ejecutar el mismo comando. (Las configuraciones
+clásicas de Gemini CLI — API key, Vertex AI o una licencia enterprise — aún
+pueden instalar el mismo repositorio con
+`gemini extensions install https://github.com/grpcer/ownmem`.)
 
 ## Actualizaciones automáticas seguras
 

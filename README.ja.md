@@ -5,7 +5,7 @@
 **あなたのプロジェクトに、専属のメモリを。**
 
 coding agent のための、ローカルで決定的な git ネイティブメモリ。<br>
-ひとつのファイル群が Claude Code · Codex · Gemini CLI · Cursor · Grok CLI のすべてに働きます。
+ひとつのファイル群が Claude Code · Codex · Antigravity · Cursor · Grok CLI のすべてに働きます。
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -40,35 +40,49 @@ OwnMem は 2 つの部品から成ります。**npm パッケージ**はエン�
 
 ## クイックスタート
 
-OwnMem には Node.js 20 以降が必要です。記憶を持たせたいリポジトリで、次を実行します:
+OwnMem には Node.js 20 以降が必要です。記憶を持たせたいリポジトリの中で、
+3 つのステップを実行します。
+
+**ステップ 1 — エンジンをインストールする。** 他の依存と同じようにレビューし、
+バージョンを固定できる、通常の `devDependency` になります:
 
 ```bash
 npm install --save-dev ownmem
+```
+
+**ステップ 2 — このリポジトリを初期化する。** `.ownmem/` と agent ごとの
+アダプタファイルが作成されます:
+
+```bash
 npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
-これが最も簡単な推奨設定です。Claude Code と Codex の両方がすぐに使え、
-ローカルコンソールも含まれます。初期化が終わったら agent を開き直して
-ください——agent がコマンドを発見するのはセッション開始時なので、以下の
-内容が現れるのは init を実行したセッションではなく、次のセッションです。
+**ステップ 3 — agent を開き直す。** agent がコマンドを発見するのはセッション
+開始時なので、以下の内容が現れるのは init を実行したセッションではなく、
+次のセッションです。
 
-開き直した後に使えるもの:
+これが推奨のセットアップです——Claude Code と Codex がすぐに使え、ローカル
+コンソールも含まれます。開き直した後に使えるもの:
 
 - **Claude Code** にプロジェクトコマンドが追加されます:
   `/ownmem <メモリにやってほしいこと>`。
-- **Codex** はリポジトリの `ownmem` skill を自動的に発見します。
-- **すべての agent** が、プロジェクト指示(`CLAUDE.md`、`AGENTS.md`)に
-  書き込まれたメモリの規律に従います。
+- **Codex と Grok CLI** はリポジトリの `ownmem` skill を自動的に発見します。
+- **Antigravity** は同じプロジェクト指示(`AGENTS.md`、`GEMINI.md`)を
+  読み込むため、同様にメモリの規律に従います——これらを読む他のすべての
+  agent も同じです。
 - **コンソール**は slash コマンドではなくターミナルコマンドです:
   `npx ownmem dashboard --open`。(下記の任意プラグインを入れると
   `/ownmem:dashboard` が追加されます。)
 
 日常的にセットアップコマンドを実行する必要はありません——いつもどおり
-作業するだけです。
+作業するだけです。専属のメモリを持たせたいリポジトリごとに、この 3 つの
+ステップを 1 回ずつ繰り返してください。
 
 agent を 1 つしか使わない場合は、`--hosts claude,codex` を `--hosts claude`
-または `--hosts codex` に変えてください。Gemini CLI と Cursor は
-`--hosts gemini,cursor`、その他の agent は `--hosts generic` で利用できます。
+または `--hosts codex` に変えてください。Antigravity と Grok CLI は Codex と
+同じ `AGENTS.md`(Grok はさらに `.agents/skills/`)を読むため、`--hosts codex`
+で両方カバーされます。Cursor は `--hosts cursor`、従来型の Gemini CLI 環境は
+`--hosts gemini`、その他の agent は `--hosts generic` で利用できます。
 
 初期化では `.ownmem/` を作成し、agent のプロジェクト指示に小さな OwnMem
 セクションを追加します。マークされた範囲外の文章は変更しません。
@@ -124,7 +138,7 @@ OwnMem は 4 つの賭けをしており、すべての設計判断はそこか�
   モデル呼び出しも、レイテンシ税も、質問ごとの課金もありません:ロックされた
   公開ベンチマークで Recall@1 100%、P95 2.46 ms。
 - **メモリはどの単一ツールよりも長生きすべき。** 同じファイル群が Claude Code、
-  Codex、Gemini CLI、Cursor、Grok CLI に働くため、agent を乗り換えてもチームの
+  Codex、Antigravity、Cursor、Grok CLI に働くため、agent を乗り換えてもチームの
   学びは失われません。
 - **メモリは小さく保たれてこそ信頼される。** 正味ゼロ成長のクォータ、純 Node の
   audit、近接重複ゲートとドリフトゲートが、誰も剪定しない第二の wiki 化を防ぎ、
@@ -187,7 +201,7 @@ recall が無料でいられる理由はこの構造にあります。索引は�
 | 人間が読め、レビューできる Markdown | ✅ | ❌ | ❌ | ❌ | ⚠️² |
 | モデル・ネットワーク呼び出しなしの recall | ✅ | ❌³ | ❌ | ❌ | — |
 | 決定的で再現可能なランキング | ✅ | ❌ | ❌ | ❌ | — |
-| Claude Code・Codex・Gemini CLI・Cursor・Grok CLI で共有するひとつのメモリ | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
+| Claude Code・Codex・Antigravity・Cursor・Grok CLI で共有するひとつのメモリ | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
 | 肥大化を防ぐガバナンス(成長クォータ・audit・ドリフトゲート) | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
 | セマンティックな言い換え検索 | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
 | 完全自動キャプチャ | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
@@ -319,14 +333,28 @@ codex plugin add ownmem@ownmem
 見つけられます。更新は `codex plugin marketplace upgrade ownmem` に続けて
 `codex plugin add ownmem@ownmem` を実行してください。
 
-Gemini CLI:
+Grok CLI:
 
 ```
-gemini extensions install https://github.com/grpcer/ownmem
+grok plugin marketplace add grpcer/ownmem
+grok plugin install ownmem@ownmem --trust
 ```
 
-これで `/ownmem` コマンドと `ownmem`、`ownmem-init`、`ownmem-dashboard` の
-skill が追加されます。更新は `gemini extensions update ownmem` です。
+これで同じ 3 つの skill がインストールされます。素の skill 名がすでに使われて
+いる場合、Grok は名前空間を付けます——組み込みの dashboard があるため、こちらは
+`/ownmem:dashboard` になります。更新は `grok plugin update ownmem` です。
+
+Antigravity:
+
+```
+agy plugin install https://github.com/grpcer/ownmem
+```
+
+これで `ownmem`、`ownmem-init`、`ownmem-dashboard` の skill がインポート
+されます。更新は同じコマンドの再実行です。(従来型の Gemini CLI 環境——
+API key、Vertex AI、エンタープライズライセンス——では、引き続き
+`gemini extensions install https://github.com/grpcer/ownmem` で同じ
+リポジトリをインストールできます。)
 
 ## 安全な自動更新
 

@@ -5,7 +5,7 @@
 **Votre projet. Sa propre mémoire.**
 
 Une mémoire locale, déterministe et native git pour les coding agents.<br>
-Un même jeu de fichiers sert Claude Code · Codex · Gemini CLI · Cursor · Grok CLI.
+Un même jeu de fichiers sert Claude Code · Codex · Antigravity · Cursor · Grok CLI.
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -41,37 +41,52 @@ moteur, y compris en vous guidant dans la configuration par dépôt.
 
 ## Démarrage rapide
 
-OwnMem nécessite Node.js 20 ou plus récent. Dans le dépôt auquel vous voulez
-donner une mémoire, exécutez :
+OwnMem nécessite Node.js 20 ou plus récent. Trois étapes, toutes dans le
+dépôt auquel vous voulez donner une mémoire.
+
+**Étape 1 — installez le moteur.** Il devient une `devDependency` normale,
+révisée et épinglée comme n'importe quelle autre :
 
 ```bash
 npm install --save-dev ownmem
+```
+
+**Étape 2 — initialisez ce dépôt.** Cela crée `.ownmem/` et les fichiers
+adaptateurs par agent :
+
+```bash
 npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
-C'est la configuration recommandée et la plus simple : Claude Code et Codex
-sont prêts à l'emploi, et la console locale est incluse. Une fois
-l'initialisation terminée, rouvrez votre agent — les agents découvrent les
-commandes au démarrage de session, donc tout ce qui suit apparaît dans la
-session suivante, pas dans celle qui a exécuté init.
+**Étape 3 — rouvrez votre agent.** Les agents découvrent les commandes au
+démarrage de session, donc tout ce qui suit apparaît dans la session
+suivante, pas dans celle qui a exécuté init.
 
-Voici ce dont vous disposez après la réouverture :
+C'est la configuration recommandée — Claude Code et Codex sont prêts à
+l'emploi, et la console locale est incluse. Voici ce dont vous disposez après
+la réouverture :
 
 - **Claude Code** gagne une commande de projet : `/ownmem <tout ce que vous
   voulez que la mémoire fasse>`.
-- **Codex** découvre automatiquement la skill `ownmem` du dépôt.
-- **Chaque agent** suit la discipline de mémoire écrite dans les instructions
-  du projet (`CLAUDE.md`, `AGENTS.md`).
+- **Codex et Grok CLI** découvrent automatiquement la skill `ownmem` du
+  dépôt.
+- **Antigravity** charge les mêmes instructions de projet (`AGENTS.md`,
+  `GEMINI.md`) et suit donc lui aussi la discipline de mémoire — comme tout
+  autre agent qui les lit.
 - **La console** est une commande de terminal, pas une slash command :
   `npx ownmem dashboard --open`. (Le plugin optionnel ci-dessous ajoute
   `/ownmem:dashboard`.)
 
 Aucune commande de configuration n'est nécessaire au quotidien — travaillez
-simplement comme d'habitude.
+simplement comme d'habitude. Répétez les trois étapes une fois pour chaque
+dépôt qui doit avoir sa propre mémoire.
 
 Vous n'utilisez qu'un seul agent ? Remplacez `--hosts claude,codex` par
-`--hosts claude` ou `--hosts codex`. Gemini CLI et Cursor fonctionnent avec
-`--hosts gemini,cursor` ; pour les autres agents, utilisez `--hosts generic`.
+`--hosts claude` ou `--hosts codex`. Antigravity et Grok CLI lisent les
+mêmes fichiers `AGENTS.md` (et, pour Grok, `.agents/skills/`) que Codex,
+donc `--hosts codex` couvre les deux. Cursor utilise `--hosts cursor`, les
+installations Gemini CLI classiques utilisent `--hosts gemini`, et
+`--hosts generic` fonctionne avec les autres agents.
 
 L'initialisation crée `.ownmem/` et ajoute une petite section OwnMem aux
 instructions du projet. Elle ne modifie jamais le texte situé en dehors de ses
@@ -130,7 +145,7 @@ OwnMem fait quatre paris, et chaque décision de conception en découle :
   la question : 100 % de Recall@1 avec un P95 de 2.46 ms sur le benchmark
   public verrouillé.
 - **La mémoire doit survivre à chaque outil pris isolément.** Les mêmes
-  fichiers servent Claude Code, Codex, Gemini CLI, Cursor et Grok CLI, donc
+  fichiers servent Claude Code, Codex, Antigravity, Cursor et Grok CLI, donc
   changer d'agent ne signifie jamais perdre ce que l'équipe a appris.
 - **La mémoire doit rester petite pour rester digne de confiance.** Un quota à
   croissance nette nulle, un audit en Node pur, des portes anti quasi-doublons
@@ -195,7 +210,7 @@ compromis que fait chacune, les nôtres compris.
 | Markdown lisible et révisable par un humain | ✅ | ❌ | ❌ | ❌ | ⚠️² |
 | Recall sans appel de modèle ni réseau | ✅ | ❌³ | ❌ | ❌ | — |
 | Classement déterministe et reproductible | ✅ | ❌ | ❌ | ❌ | — |
-| Une seule mémoire pour Claude Code, Codex, Gemini CLI, Cursor, Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
+| Une seule mémoire pour Claude Code, Codex, Antigravity, Cursor, Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
 | Gouvernance anti-enflure (quota de croissance, audit, portes anti-dérive) | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
 | Recherche sémantique par paraphrase | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
 | Capture entièrement automatique | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
@@ -334,14 +349,28 @@ dans le sélecteur de skills `$`. Rafraîchissez ensuite avec
 `codex plugin marketplace upgrade ownmem` suivi de
 `codex plugin add ownmem@ownmem`.
 
-Gemini CLI :
+Grok CLI :
 
 ```
-gemini extensions install https://github.com/grpcer/ownmem
+grok plugin marketplace add grpcer/ownmem
+grok plugin install ownmem@ownmem --trust
 ```
 
-Cela ajoute la commande `/ownmem` et les skills `ownmem`, `ownmem-init` et
-`ownmem-dashboard`. Mettez à jour avec `gemini extensions update ownmem`.
+Cela installe les trois mêmes skills. Quand un nom de skill est déjà pris
+tel quel, Grok lui ajoute un namespace — sa console intégrée fait de la
+nôtre `/ownmem:dashboard`. Mettez à jour avec `grok plugin update ownmem`.
+
+Antigravity :
+
+```
+agy plugin install https://github.com/grpcer/ownmem
+```
+
+Cela importe les skills `ownmem`, `ownmem-init` et `ownmem-dashboard` ;
+mettez à jour en réexécutant la même commande. (Les installations Gemini CLI
+classiques — clé API, Vertex AI ou licence entreprise — peuvent toujours
+installer le même dépôt avec
+`gemini extensions install https://github.com/grpcer/ownmem`.)
 
 ## Mises à jour automatiques sûres
 

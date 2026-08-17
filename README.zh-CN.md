@@ -4,8 +4,8 @@
 
 **你的项目，拥有自己的记忆。**
 
-为 coding agent 打造的本地、确定性、git 原生工程记忆。<br>
-一套文件，同时服务 Claude Code · Codex · Gemini CLI · Cursor · Grok CLI。
+面向编程 Agent 的本地工程记忆：结果确定，随 Git 管理。<br>
+一套记忆，同时供 Claude Code · Codex · Gemini CLI · Cursor · Grok CLI 使用。
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -17,22 +17,72 @@
 
 </div>
 
-OwnMem 让 Claude Code、Codex 以及其他 coding agent 拥有一份住在仓库里的记忆：
-`.ownmem/` 中的纯 Markdown，由一个确定性的、Unicode 文字系统感知的 BM25F
-引擎负责排序。召回不调用模型、不发网络请求、不消耗任何查询时 token——
-同样的问题返回同样的答案，耗时大约两毫秒。
+OwnMem 给 Claude Code、Codex 和其他编程 Agent 提供一份随仓库保存的工程记忆。
+记忆以纯 Markdown 存放在 `.ownmem/` 中，由支持多种语言文字的确定性 BM25F
+引擎排序。每次召回都不调用模型、不请求网络，也不消耗 Token；同样的问题会
+得到同样的结果，通常只需两毫秒左右。
 
-OwnMem 由两部分组成。**npm 包**是引擎：以可审查的 `devDependency` 形式安装在
-每个仓库里，负责该仓库 `.ownmem/` 中的记忆。**agent 插件**是可选的便捷层，
-每台机器安装一次：它教你的 agent 调用引擎，并会引导你完成仓库级安装。
+OwnMem 分为两部分。**npm 包**是核心引擎：以可审查的 `devDependency` 安装在
+每个仓库中，管理该仓库 `.ownmem/` 里的记忆。**Agent 插件**是可选的辅助工具，
+每台电脑只需安装一次；它会教 Agent 调用引擎，并引导你完成项目初始化。
 
-> **提示：** 只要仓库里有了 npm 包和 `.ownmem/`，它就已就绪——从哪个入口
-> 开始都可以。
+> **提示：** 只要仓库中已有 npm 包和 `.ownmem/`，OwnMem 就可以工作；使用
+> 哪种安装入口都不影响结果。
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-zh-CN-dark.svg">
   <img alt="OwnMem 端到端架构：精选 Markdown 经本地治理后编译为可信快照；每个问题依次经过多种查询措辞、六路候选、确定性排序、可信度门、上下文预算、Agent 复核和本地反馈闭环" src="./assets/architecture-zh-CN-light.svg" width="100%">
 </picture>
+
+## 快速开始
+
+OwnMem 需要 Node.js 20 或更新版本。进入你希望“会记事”的项目目录，复制运行：
+
+```bash
+npm install --save-dev ownmem
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+```
+
+这是最省心的推荐配置：Claude Code 和 Codex 都能直接使用，同时带本地控制台。
+初始化完成后，重新打开 Agent，之后照常聊天和写代码即可，不需要每天再运行命令。
+
+只用一种工具？把 `--hosts claude,codex` 改成 `--hosts claude` 或
+`--hosts codex`。Gemini CLI 和 Cursor 使用 `--hosts gemini,cursor`；其他
+Agent 可以使用 `--hosts generic`。
+
+初始化会创建 `.ownmem/`，并在 Agent 的项目说明里加入一小段 OwnMem 配置；
+所有标记范围之外的原有内容都不会被改动。
+
+若从源码检出且尚未发布，可使用等价的本地入口：
+`node memory.mjs init --locale auto`。
+
+## 日常使用
+
+安装完成后，平时只需要做两件事。
+
+**1. 直接告诉 Agent。** 遇到值得留下来的经验，用平常说话的方式告诉它：
+
+> “记住：staging 部署超时是因为连接池上限是 5，不是 worker 太少。以后调整
+> worker 时，要一起检查连接池。”
+
+下次再遇到类似问题，照常提问即可：
+
+> “staging 部署又卡住了，先查一下项目记忆里有没有类似问题，再开始改。”
+
+Agent 会自己完成记忆写入、检查和召回。你不需要打开 `.ownmem/`，也不用
+手动运行 `audit` 或 `recall`。
+
+**2. 想看运行情况时，打开控制台。** 这里可以看到使用情况、召回质量、延迟
+和记忆库健康状态；页面只在你自己的电脑上通过 127.0.0.1 打开：
+
+```bash
+npx ownmem dashboard --open
+```
+
+<img alt="OwnMem 控制台——使用情况、召回质量、记忆库与治理状态，全部在本地" src="./assets/console.png" width="100%">
+
+就这么简单。`audit`、手动 `recall` 和反馈命令是给 CI 与排障用的，正常使用
+不需要记。
 
 ## 缘起
 
@@ -42,7 +92,7 @@ OwnMem 由两部分组成。**npm 包**是引擎：以可审查的 `devDependenc
 
 ## 为什么选 OwnMem
 
-OwnMem 押了四个赌注，所有设计决策都由此推导而来：
+OwnMem 坚持四个原则，所有设计都围绕它们展开：
 
 - **记忆属于仓库。** 以可审阅的 Markdown 形式随 git 流转，出现在 pull
   request 里，像任何代码一样可回滚。克隆仓库即得到记忆——不需要账号、
@@ -53,15 +103,15 @@ OwnMem 押了四个赌注，所有设计决策都由此推导而来：
 - **记忆必须比任何单一工具活得久。** 同一批文件同时服务 Claude Code、
   Codex、Gemini CLI、Cursor 与 Grok CLI，换 agent 永远不意味着丢掉团队
   学到的东西。
-- **记忆必须保持小，才值得信任。** 零净增长配额、纯 Node 审计、近重复与
-  防漂移门禁让它精瘦且常新，而不是变成一个没人修剪的第二 wiki。
+- **记忆库必须控制规模，才能长期可信。** 零净增长配额、纯 Node 审计、
+  近重复与防漂移检查让内容保持精简、及时更新，不会变成没人维护的第二个 Wiki。
 
 ### OwnMem 不是什么
 
 - **不是向量数据库。** 想要在大记忆池上做模糊语义检索，向量或知识图谱类
   记忆服务更合适。
-- **不是全自动捕获。** 写入是刻意且经过筛选的——审阅本身就是质量门。
-  各工具内建记忆更省事，代价是被锁死在单一工具里且不可审阅。
+- **不会自动收集一切。** 每条记忆都要主动写入并经过筛选，审阅本身就是
+  质量保障。各工具的内建记忆更省事，但通常只能留在单一工具中，也不便审查。
 - **不是跨仓库或云同步的记忆。** 记忆随仓库自己的 git 历史走——clone 下来
   就有；但它不跨仓库共享，也不经过任何云端记忆服务，这是设计使然。
 
@@ -167,50 +217,6 @@ cd ownmem && npm ci && npm run benchmark
 > 锁定，且每次运行都会以倒序主题重跑一遍以证明确定性。这些合成指标是
 > 回归证据，不代表真实用户准确率。
 
-## 快速开始
-
-OwnMem 需要 Node.js 20 或更新版本。在需要记住自身工程上下文的仓库里安装
-引擎：
-
-```bash
-npm install --save-dev ownmem
-```
-
-Claude Code 用户：
-
-```bash
-npx ownmem init --locale auto --hosts claude --layers compiler --hook --command "npx ownmem"
-```
-
-Codex 用户：
-
-```bash
-npx ownmem init --locale auto --hosts codex --layers compiler --command "npx ownmem"
-```
-
-两者同时启用，并带本地 Web 控制台：
-
-```bash
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
-```
-
-初始化会创建 `.ownmem/`，并在宿主的项目指令文件中写入带边界标记的 OwnMem
-区块；`ownmem-generated` 边界之外的所有文本都会原样保留。Claude Code 还会
-获得 `/ownmem` 命令，启用 `--hook` 时另有一个 `PreToolUse` 守卫。Codex 通过
-`AGENTS.md` 获得同样的纪律，外加仓库级 skill `.agents/skills/ownmem/`——
-Cursor 与 Grok CLI 也从同一路径自动发现它。Gemini CLI 与 Cursor 规则同样受
-支持（`--hosts gemini,cursor`），`--hosts generic` 则为任何其他 agent 生成
-一份纯文本的 `MEMORY_INSTRUCTIONS.md`。
-
-若从源码检出且尚未发布，可使用等价的本地入口：
-`node memory.mjs init --locale auto`。
-
-> **提示：** 斜杠命令来自两个地方。`init` 写入的是仓库级命令，也就是你
-> 刚刚装好的这些（Claude Code 的 `/ownmem`，以及 Codex、Cursor、Grok CLI
-> 共用的 `.agents/skills/ownmem/` skill）；下一节的可选插件则添加机器级的
-> `/ownmem:recall` 与 `/ownmem:init`——在还没有 `.ownmem/` 的仓库里也
-> 用得上。
-
 ## 安装 agent 插件（可选，每台机器一次）
 
 **到底要不要装？不装也一切正常。** `ownmem init` 已经把纪律写进了仓库的
@@ -276,47 +282,6 @@ npx ownmem audit
 
 避免在生产仓库里使用漂移的 `npx ownmem@latest`：初次尝鲜方便，但会让每次
 执行不可复现。
-
-## 日常使用
-
-**教它一课。** 你刚花了一小时才发现：staging 部署超时是因为连接池上限
-是 5。告诉你的 agent：
-
-> “记下来——超时来自连接池上限，不是 worker 数量。以后不涨池子就不许
-> 涨 worker。”
-
-agent 会在 `.ownmem/` 下写一个小小的 topic 文件——症状写进
-`triggers`，证据写进 `evidence`——门禁负责让它保持诚实：
-
-```bash
-npx ownmem audit
-```
-
-**在关键时刻召回。** 下周，换了机器、换了 agent，同样的症状：
-
-```bash
-npx ownmem recall -- "staging deploy timeout"
-```
-
-教训约两毫秒就回来了，证据随附——没有模型调用、没有网络请求、不花
-一个 token。
-
-**给结果打分。** 显式反馈留在被 git 忽略的本地待复盘队列里——绝不
-上传，也绝不自动进入任何 benchmark：
-
-```bash
-npx ownmem recall --feedback correct -- "staging deploy timeout"
-npx ownmem recall --feedback miss --expected pool_cap_timeout -- "why do deploys hang"
-```
-
-**看全局。** OwnMem Console 展示这个仓库的采用率、召回质量、延迟与
-治理状况——只在 127.0.0.1 提供（`--status` 与 `--stop` 负责管理）：
-
-```bash
-npx ownmem dashboard --open
-```
-
-<img alt="OwnMem Console——采用漏斗、召回质量、语料与治理，全部本地" src="./assets/console.png" width="100%">
 
 ## 分层
 

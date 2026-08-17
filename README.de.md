@@ -39,6 +39,65 @@ pro Repository.
   <img alt="OwnMem-End-to-End-Architektur: Kuratierter Markdown-Speicher wird geprüft und zu einem verifizierten Snapshot kompiliert; jede Frage durchläuft Varianten, sechs Kandidatenkanäle, deterministisches Ranking, Konfidenztor, Kontextbudget, Agent-Prüfung und lokales Feedback" src="./assets/architecture-de-light.svg" width="100%">
 </picture>
 
+## Schnellstart
+
+OwnMem benötigt Node.js 20 oder neuer. Führe im Repository, das sich seinen
+eigenen Kontext merken soll, Folgendes aus:
+
+```bash
+npm install --save-dev ownmem
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+```
+
+Das ist die empfohlene, unkomplizierte Einrichtung: Claude Code und Codex
+funktionieren sofort, die lokale Konsole ist ebenfalls dabei. Öffne deinen
+Agenten nach der Initialisierung neu und arbeite danach wie gewohnt — im Alltag
+musst du keinen weiteren Einrichtungsbefehl ausführen.
+
+Du nutzt nur einen Agenten? Ersetze `--hosts claude,codex` durch
+`--hosts claude` oder `--hosts codex`. Gemini CLI und Cursor werden mit
+`--hosts gemini,cursor` unterstützt; für andere Agenten gibt es
+`--hosts generic`.
+
+Die Initialisierung erstellt `.ownmem/` und ergänzt die Projektanweisungen des
+Agenten um einen kleinen OwnMem-Abschnitt. Text außerhalb der markierten
+Grenzen bleibt unverändert.
+
+Wer vor der Veröffentlichung aus einem Quell-Checkout arbeitet, nutzt den
+gleichwertigen lokalen Einstieg: `node memory.mjs init --locale auto`.
+
+## Täglicher Gebrauch
+
+Nach der Einrichtung musst du dir nur zwei Dinge merken.
+
+**1. Sprich einfach mit deinem Agenten.** Wenn du etwas lernst, das später
+nützlich sein könnte, sag es in ganz normalen Worten:
+
+> „Merk dir das — der Timeout kommt vom Pool-Limit, nicht von der
+> Worker-Zahl. Nie die Worker erhöhen, ohne den Pool zu erhöhen."
+
+Später fragst du so natürlich wie immer:
+
+> „Das Staging-Deployment hängt wieder. Prüfe zuerst den Projektspeicher,
+> bevor du etwas änderst."
+
+Der Agent kümmert sich um Schreiben, Prüfen und Abrufen. Du musst weder
+`.ownmem/` öffnen noch selbst `audit` oder `recall` ausführen.
+
+**2. Öffne die Konsole, wenn du einen Überblick möchtest.** Sie zeigt
+Nutzung, Recall-Qualität, Latenz und Zustand des Speichers für dieses
+Repository und ist nur auf deinem Computer unter 127.0.0.1 erreichbar:
+
+```bash
+npx ownmem dashboard --open
+```
+
+<img alt="OwnMem Console — Adoptions-Funnel, Recall-Qualität, Korpus und Governance, alles lokal" src="./assets/console.png" width="100%">
+
+Das ist der gesamte Alltagsablauf. `audit`, manuelles `recall` und die
+Feedback-Befehle sind für CI und Fehlersuche gedacht; normale Nutzer müssen
+sie sich nicht merken.
+
 ## Wie OwnMem entstanden ist
 
 Ich baue Oriveo, einen BYOK-Multi-Modell-AI-Client für iOS, Android, Web und Desktop — eine große Codebasis, an der ich täglich mit Coding-Agents arbeite und dabei zwischen Claude Code und Codex wechsle. In jedem Repository sammelten sich hart erarbeitete Lektionen an: Debugging-Ursachen, Toolchain-Fallen, Timing-Races. Und bei jedem Wechsel von Agent, Maschine oder Teamkollege gingen sie leise verloren, weil sie im Gedächtnis eines einzelnen Tools auf einer einzelnen Maschine lebten.
@@ -194,53 +253,6 @@ cd ownmem && npm ci && npm run benchmark
 > synthetischen Metriken sind Regressionsbelege, keine Behauptung über die
 > Genauigkeit bei echten Nutzern.
 
-## Schnellstart
-
-OwnMem benötigt Node.js 20 oder neuer. Installiere den Motor in dem
-Repository, das sich seinen eigenen Engineering-Kontext merken soll:
-
-```bash
-npm install --save-dev ownmem
-```
-
-Für Claude Code:
-
-```bash
-npx ownmem init --locale auto --hosts claude --layers compiler --hook --command "npx ownmem"
-```
-
-Für Codex:
-
-```bash
-npx ownmem init --locale auto --hosts codex --layers compiler --command "npx ownmem"
-```
-
-Für beide Tools, mit der lokalen Web-Konsole:
-
-```bash
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
-```
-
-Die Initialisierung erstellt `.ownmem/` sowie begrenzte OwnMem-Blöcke in den
-Projektanweisungen des Hosts. Sämtlicher Text außerhalb der
-`ownmem-generated`-Grenzen bleibt erhalten. Claude Code erhält zusätzlich
-`/ownmem` und, wenn `--hook` aktiviert ist, einen `PreToolUse`-Wächter. Codex
-erhält dieselbe Disziplin über `AGENTS.md`, plus einen Skill auf
-Repository-Ebene unter `.agents/skills/ownmem/`, den Cursor und Grok CLI vom
-selben Pfad aus entdecken. Gemini CLI und Cursor-Regeln werden ebenfalls
-unterstützt (`--hosts gemini,cursor`), und `--hosts generic` schreibt eine
-schlichte `MEMORY_INSTRUCTIONS.md` für jeden anderen Agent.
-
-Wer vor der Veröffentlichung aus einem Quell-Checkout arbeitet, nutzt den
-gleichwertigen lokalen Einstieg: `node memory.mjs init --locale auto`.
-
-> **Hinweis:** Slash-Befehle kommen aus zwei Quellen. `init` schreibt die
-> Repository-eigenen, die du gerade eingerichtet hast (das `/ownmem` für
-> Claude Code plus den Skill `.agents/skills/ownmem/`, den Codex, Cursor und
-> Grok CLI teilen). Das optionale Plugin im nächsten Abschnitt ergänzt
-> maschinenweite `/ownmem:recall` und `/ownmem:init` — nützlich auch in
-> Repositories, die noch kein `.ownmem/` haben.
-
 ## Agent-Plugin installieren (optional, einmal pro Maschine)
 
 **Musst du es installieren? Nein — auch ohne funktioniert alles.**
@@ -313,51 +325,6 @@ npx ownmem audit
 
 Vermeide ein schwebendes `npx ownmem@latest` in Produktions-Repositories: für
 den ersten Blick bequem, macht es Ausführungen aber nicht reproduzierbar.
-
-## Täglicher Gebrauch
-
-**Bring ihm eine Lektion bei.** Du hast gerade eine Stunde verbrannt, um
-herauszufinden, dass Staging-Deploys wegen des Pool-Limits von fünf in den
-Timeout laufen. Sag deinem Agenten:
-
-> „Merk dir das — der Timeout kommt vom Pool-Limit, nicht von der
-> Worker-Zahl. Nie die Worker erhöhen, ohne den Pool zu erhöhen."
-
-Der Agent schreibt eine kleine Topic-Datei unter `.ownmem/` — Symptome
-in `triggers`, Belege in `evidence` — und die Gates halten sie ehrlich:
-
-```bash
-npx ownmem audit
-```
-
-**Ruf sie ab, wenn es zählt.** Nächste Woche, andere Maschine, anderer
-Agent, dasselbe Symptom:
-
-```bash
-npx ownmem recall -- "staging deploy timeout"
-```
-
-Die Lektion ist in rund zwei Millisekunden zurück, Belege inklusive — ohne
-Modellaufruf, ohne Netzwerk, ohne einen Token auszugeben.
-
-**Bewerte, was zurückkam.** Explizites Feedback bleibt in einem
-git-ignorierten lokalen Posteingang — nie hochgeladen, nie automatisch in
-einen Benchmark befördert:
-
-```bash
-npx ownmem recall --feedback correct -- "staging deploy timeout"
-npx ownmem recall --feedback miss --expected pool_cap_timeout -- "why do deploys hang"
-```
-
-**Behalte das Ganze im Blick.** OwnMem Console zeigt Adoption,
-Recall-Qualität, Latenz und Governance dieses Repositories — nur auf
-127.0.0.1 (`--status` und `--stop` verwalten sie):
-
-```bash
-npx ownmem dashboard --open
-```
-
-<img alt="OwnMem Console — Adoptions-Funnel, Recall-Qualität, Korpus und Governance, alles lokal" src="./assets/console.png" width="100%">
 
 ## Schichten
 

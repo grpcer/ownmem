@@ -36,6 +36,60 @@ OwnMem은 두 부분으로 구성됩니다. **npm 패키지**는 엔진입니다
   <img alt="OwnMem 엔드투엔드 아키텍처: 선별된 Markdown을 거버넌스와 컴파일을 거쳐 검증된 snapshot으로 만들고, 각 질문을 여러 query 표현, 6개 후보 channel, 결정적 랭킹, 신뢰도 게이트, context 예산, Agent 검증, 로컬 feedback으로 연결합니다" src="./assets/architecture-ko-light.svg" width="100%">
 </picture>
 
+## 빠른 시작
+
+OwnMem은 Node.js 20 이상이 필요합니다. 기억을 추가하고 싶은 저장소에서 다음을
+실행하세요:
+
+```bash
+npm install --save-dev ownmem
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+```
+
+가장 간단한 권장 설정입니다. Claude Code와 Codex를 바로 사용할 수 있고 로컬
+콘솔도 함께 설치됩니다. 초기화가 끝나면 agent를 다시 열고 평소처럼 작업하세요.
+매일 별도의 설정 명령을 실행할 필요는 없습니다.
+
+agent 하나만 사용하나요? `--hosts claude,codex`를 `--hosts claude` 또는
+`--hosts codex`로 바꾸세요. Gemini CLI와 Cursor는 `--hosts gemini,cursor`,
+그 밖의 agent는 `--hosts generic`을 사용할 수 있습니다.
+
+초기화는 `.ownmem/`을 만들고 agent의 프로젝트 지침에 작은 OwnMem 섹션을
+추가합니다. 표시된 경계 밖의 기존 내용은 변경하지 않습니다.
+
+배포 전 소스 체크아웃에서 작업할 때는 동등한 로컬 진입점
+`node memory.mjs init --locale auto`를 사용하세요.
+
+## 일상 사용
+
+설정이 끝나면 두 가지만 기억하면 됩니다.
+
+**1. agent에게 평소처럼 말하세요.** 나중에도 도움이 될 내용을 알게 되면
+자연스러운 말로 알려 주세요:
+
+> "기억해 둬 — 타임아웃의 원인은 풀 상한이지 worker 수가 아니야. 풀을
+> 늘리지 않고 worker를 늘리면 안 돼."
+
+나중에 비슷한 문제가 생기면 평소처럼 질문하세요:
+
+> "staging 배포가 또 멈췄어. 뭔가 바꾸기 전에 프로젝트 메모리부터 확인해 줘."
+
+메모리 작성, 검사, recall은 agent가 알아서 처리합니다. `.ownmem/`을 열거나
+직접 `audit` 또는 `recall`을 실행할 필요가 없습니다.
+
+**2. 전체 상황이 궁금할 때만 콘솔을 여세요.** 이 저장소의 사용 현황,
+recall 품질, 지연 시간, 메모리 상태를 보여 주며 자신의 컴퓨터에 있는
+127.0.0.1에서만 열립니다:
+
+```bash
+npx ownmem dashboard --open
+```
+
+<img alt="OwnMem Console — 채택 퍼널, recall 품질, 코퍼스와 거버넌스, 전부 로컬" src="./assets/console.png" width="100%">
+
+일상적인 사용법은 이것이 전부입니다. `audit`, 수동 `recall`, 피드백 명령은
+CI와 문제 해결용이므로 일반 사용자가 기억할 필요는 없습니다.
+
 ## 만들게 된 이유
 
 저는 Oriveo라는 BYOK 멀티모델 AI 클라이언트를 만들고 있습니다. iOS, Android, Web, 데스크톱에 걸친 큰 코드베이스를 매일 Claude Code와 Codex를 오가며 coding agent와 함께 개발합니다. 저장소마다 어렵게 얻은 교훈이 쌓여 갔습니다. 디버깅 근본 원인, 툴체인의 함정, 타이밍 경합 같은 것들입니다. 하지만 그 교훈은 한 도구의 메모리, 한 기계 안에만 있었고, agent나 기계, 동료가 바뀔 때마다 조용히 사라졌습니다.
@@ -180,51 +234,6 @@ cd ownmem && npm ci && npm run benchmark
 > 임계값은 잠겨 있으며, 주제 순서를 뒤집어 다시 실행해 결정성을 증명합니다.
 > 이 합성 지표는 회귀 증거일 뿐, 실사용자 정확도를 주장하지 않습니다.
 
-## 빠른 시작
-
-OwnMem은 Node.js 20 이상이 필요합니다. 자신의 엔지니어링 맥락을 기억해야 할
-저장소에 엔진을 설치하세요:
-
-```bash
-npm install --save-dev ownmem
-```
-
-Claude Code 사용자:
-
-```bash
-npx ownmem init --locale auto --hosts claude --layers compiler --hook --command "npx ownmem"
-```
-
-Codex 사용자:
-
-```bash
-npx ownmem init --locale auto --hosts codex --layers compiler --command "npx ownmem"
-```
-
-두 도구를 함께, 로컬 웹 콘솔까지 사용하려면:
-
-```bash
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
-```
-
-초기화는 `.ownmem/`을 생성하고 호스트의 프로젝트 지침 파일에 경계 표시가 있는
-OwnMem 블록을 기록합니다. `ownmem-generated` 경계 밖의 모든 텍스트는 그대로
-보존됩니다. Claude Code에는 `/ownmem` 명령이 추가되고, `--hook` 활성화 시
-`PreToolUse` 가드도 설치됩니다. Codex는 `AGENTS.md`와 저장소 수준 skill
-`.agents/skills/ownmem/`을 통해 같은 규율을 받으며, Cursor와 Grok CLI도 같은
-경로에서 이를 자동으로 발견합니다. Gemini CLI와 Cursor 규칙도 지원되며
-(`--hosts gemini,cursor`), `--hosts generic`은 다른 모든 agent를 위한 일반
-`MEMORY_INSTRUCTIONS.md`를 작성합니다.
-
-배포 전 소스 체크아웃에서 작업할 때는 동등한 로컬 진입점
-`node memory.mjs init --locale auto`를 사용하세요.
-
-> **참고:** 슬래시 명령은 두 곳에서 나옵니다. `init`가 쓰는 것은 방금
-> 설치한 저장소 단위 명령(Claude Code의 `/ownmem`, 그리고 Codex·Cursor·
-> Grok CLI가 공유하는 `.agents/skills/ownmem/` skill)입니다. 다음 섹션의
-> 선택형 플러그인은 머신 전역 `/ownmem:recall`과 `/ownmem:init`를
-> 추가합니다 — 아직 `.ownmem/`가 없는 저장소에서도 유용합니다.
-
 ## agent 플러그인 설치(선택, 머신마다 한 번)
 
 **꼭 설치해야 하나요? 아니요 — 설치하지 않아도 모든 것이 동작합니다.**
@@ -294,51 +303,6 @@ npx ownmem audit
 
 프로덕션 저장소에서 버전이 떠다니는 `npx ownmem@latest`는 피하세요. 처음
 살펴볼 때는 편리하지만 실행 재현성이 사라집니다.
-
-## 일상 사용
-
-**교훈을 가르치세요.** staging 배포가 타임아웃되는 원인이 커넥션 풀
-상한 5였다는 걸 알아내는 데 한 시간을 날렸습니다. agent에게 말하세요:
-
-> "기억해 둬 — 타임아웃의 원인은 풀 상한이지 worker 수가 아니야. 풀을
-> 늘리지 않고 worker를 늘리면 안 돼."
-
-agent는 `.ownmem/` 아래에 작은 topic 파일 하나를 씁니다 — 증상은
-`triggers`에, 증거는 `evidence`에 — 그리고 게이트가 그 정직함을
-지킵니다:
-
-```bash
-npx ownmem audit
-```
-
-**필요한 순간에 recall하세요.** 다음 주, 다른 머신, 다른 agent, 같은
-증상:
-
-```bash
-npx ownmem recall -- "staging deploy timeout"
-```
-
-교훈이 약 2밀리초 만에 증거와 함께 돌아옵니다 — 모델 호출도, 네트워크
-요청도, token 소비도 없습니다.
-
-**돌아온 답을 채점하세요.** 명시적 피드백은 git이 무시하는 로컬
-수신함에 남습니다 — 업로드되지 않고, 벤치마크로 자동 승격되지도
-않습니다:
-
-```bash
-npx ownmem recall --feedback correct -- "staging deploy timeout"
-npx ownmem recall --feedback miss --expected pool_cap_timeout -- "why do deploys hang"
-```
-
-**전체를 살펴보세요.** OwnMem Console은 이 저장소의 채택률·recall
-품질·지연·거버넌스를 보여줍니다 — 127.0.0.1에서만 제공(`--status`와
-`--stop`으로 관리):
-
-```bash
-npx ownmem dashboard --open
-```
-
-<img alt="OwnMem Console — 채택 퍼널, recall 품질, 코퍼스와 거버넌스, 전부 로컬" src="./assets/console.png" width="100%">
 
 ## 레이어
 

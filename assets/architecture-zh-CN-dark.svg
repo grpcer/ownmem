@@ -1,115 +1,105 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 872" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
   <title id="title">OwnMem 如何把一个问题变成可信上下文</title>
-  <desc id="description">OwnMem 的两阶段流程：精选 Markdown 记忆经过本地治理后编译成可信快照；用户问题被展开为多种查询措辞，经六路候选、确定性排序和可信度门，最终选择弃权，或向 Agent 交付带证据的上下文信封。Agent 复核全文、权威文档与活代码后再回答，本地反馈闭合改进循环。</desc>
+  <desc id="description">三个信任域：仓库持有精选 Markdown，经治理闸门编译为不可变快照；确定性引擎经六条候选通道、排序、可信度门与 400 token 信封作答；coding agent 提问、对照活代码复核，并把新教训经 audit 与 compile 写回仓库。</desc>
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#8b949e"/>
-    </marker>
-    <marker id="accent-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#58a6ff"/>
-    </marker>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#8b949e"/></marker>
+    <marker id="accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#58a6ff"/></marker>
   </defs>
-  <rect width="1600" height="700" rx="18" fill="#0d1117"/>
-
-  <text x="40" y="44" text-anchor="start" font-size="24" font-weight="700" fill="#f0f6fc"><tspan x="40" dy="0">OwnMem 如何把一个问题变成可信上下文</tspan></text>
-  <text x="40" y="70" text-anchor="start" font-size="13.5" font-weight="400" fill="#8b949e"><tspan x="40" dy="0">记忆属于仓库 · 默认确定性 · 先核证据，再回答</tspan></text>
-  <rect x="1115" y="27" width="445" height="30" rx="15" fill="#0d2740" stroke="#58a6ff"/>
-  <text x="1337.5" y="47" text-anchor="middle" font-size="12.5" font-weight="600" fill="#58a6ff">默认：0 次模型调用 · 0 次网络请求</text>
-
-  <text x="40" y="112" text-anchor="start" font-size="12.5" font-weight="700" fill="#58a6ff"><tspan x="40" dy="0">1 · 筛选与编译</tspan></text>
-  <g>
-    <rect x="40" y="130" width="250" height="104" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
-    <text x="58" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#f0f6fc"><tspan x="58" dy="0">精选 Markdown 记忆</tspan></text>
-    <text x="58" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#8b949e"><tspan x="58" dy="0">教训 · 触发词 · 证据</tspan><tspan x="58" dy="18">.ownmem/ 随 git 流转</tspan></text>
-  </g>
-  <path d="M 290 182 L 320 182" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="320" y="130" width="230" height="104" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
-    <text x="338" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#f0f6fc"><tspan x="338" dy="0">本地治理</tspan></text>
-    <text x="338" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#8b949e"><tspan x="338" dy="0">schema · 配额 · 去重</tspan><tspan x="338" dy="18">可在 pull request 中审阅</tspan></text>
-  </g>
-  <path d="M 550 182 L 580 182" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="580" y="130" width="250" height="104" rx="12" fill="#102b1c" stroke="#3fb950" stroke-width="1.4"/>
-    <text x="598" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#f0f6fc"><tspan x="598" dy="0">一次编译</tspan></text>
-    <text x="598" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#8b949e"><tspan x="598" dy="0">不可变、已校验的快照</tspan><tspan x="598" dy="18">可安全回退上一份快照</tspan></text>
-  </g>
-
-  <rect x="1115" y="104" width="445" height="130" rx="12" fill="#161b22" stroke="#30363d"/>
-  <text x="1337.5" y="140" text-anchor="middle" font-size="16" font-weight="650" fill="#f0f6fc"><tspan x="1337.5" dy="0">一份记忆，服务所有 coding agent</tspan></text>
-  <text x="1337.5" y="180" text-anchor="middle" font-size="13" font-weight="400" fill="#8b949e"><tspan x="1337.5" dy="0">Claude Code · Codex · Gemini CLI</tspan><tspan x="1337.5" dy="20">Cursor · Grok CLI</tspan></text>
-  <path d="M 830 182 C 930 182 980 169 1100 169" fill="none" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
-
-  <text x="40" y="284" text-anchor="start" font-size="12.5" font-weight="700" fill="#58a6ff"><tspan x="40" dy="0">2 · 召回与复核</tspan></text>
-  <g>
-    <rect x="40" y="315" width="170" height="104" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
-    <text x="58" y="346" text-anchor="start" font-size="14.5" font-weight="650" fill="#f0f6fc"><tspan x="58" dy="0">用户提问</tspan></text>
-    <text x="58" y="373" text-anchor="start" font-size="12" font-weight="400" fill="#8b949e"><tspan x="58" dy="0">用日常语言</tspan><tspan x="58" dy="18">描述症状</tspan></text>
-  </g>
-  <path d="M 210 367 L 235 367" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="235" y="315" width="210" height="104" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
-    <text x="253" y="341" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc"><tspan x="253" dy="0">Agent 准备</tspan><tspan x="253" dy="18">2–3 种查询措辞</tspan></text>
-    <text x="253" y="381" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e"><tspan x="253" dy="0">原话 · 可能根因 · 相关符号</tspan></text>
-  </g>
-
-  <rect x="475" y="290" width="910" height="288" rx="16" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
-  <rect x="495" y="276" width="154" height="28" rx="14" fill="#0d2740" stroke="#58a6ff"/>
-  <text x="572" y="295" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#58a6ff">OWNMEM 引擎</text>
-  <path d="M 445 367 L 505 367" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
-
-  <g>
-    <rect x="505" y="330" width="145" height="112" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
-    <text x="523" y="361" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc"><tspan x="523" dy="0">查询规划器</tspan></text>
-    <text x="523" y="388" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e"><tspan x="523" dy="0">识别查询类型</tspan><tspan x="523" dy="18">设置通道上限</tspan></text>
-  </g>
-  <path d="M 650 386 L 680 386" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="680" y="330" width="240" height="146" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
-    <text x="700" y="356" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc"><tspan x="700" dy="0">候选通道</tspan></text>
-    <rect x="700" y="378" width="98" height="26" rx="7" fill="#161b22" stroke="#30363d"/>
-      <text x="749" y="396" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">Exact</text>
-      <rect x="808" y="378" width="98" height="26" rx="7" fill="#161b22" stroke="#30363d"/>
-      <text x="857" y="396" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">BM25F</text>
-      <rect x="700" y="413" width="98" height="26" rx="7" fill="#161b22" stroke="#30363d"/>
-      <text x="749" y="431" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">n-gram</text>
-      <rect x="808" y="413" width="98" height="26" rx="7" fill="#161b22" stroke="#30363d"/>
-      <text x="857" y="431" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">Fuzzy</text>
-      <rect x="700" y="448" width="98" height="26" rx="7" fill="#161b22" stroke="#30363d"/>
-      <text x="749" y="466" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">Graph</text>
-      <rect x="808" y="448" width="98" height="26" rx="7" fill="#2d240f" stroke="#d29922" stroke-dasharray="4 3"/>
-      <text x="857" y="466" text-anchor="middle" font-size="11.5" font-weight="600" fill="#d29922">Embedding*</text>
-  </g>
-  <path d="M 920 403 L 950 403" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="950" y="347" width="185" height="112" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
-    <text x="968" y="378" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc"><tspan x="968" dy="0">融合与裁决</tspan></text>
-    <text x="968" y="405" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e"><tspan x="968" dy="0">RRF · 权威 · 范围</tspan><tspan x="968" dy="18">证据 · 冲突 · MMR</tspan></text>
-  </g>
-  <path d="M 1135 403 L 1145 403" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
-
-  <polygon points="1195,348 1245,403 1195,458 1145,403" fill="#2d240f" stroke="#d29922" stroke-width="1.5"/>
-  <text x="1195" y="407" text-anchor="middle" font-size="12.5" font-weight="650" fill="#f0f6fc"><tspan x="1195" dy="0">足够可信？</tspan></text>
-  <path d="M 1195 458 L 1195 500 L 1118 500" fill="none" stroke="#ff7b72" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="950" y="480" width="168" height="72" rx="11" fill="#321d1c" stroke="#ff7b72"/>
-  <text x="1034" y="508" text-anchor="middle" font-size="13.5" font-weight="650" fill="#ff7b72"><tspan x="1034" dy="0">否 → 弃权</tspan></text>
-  <text x="1034" y="531" text-anchor="middle" font-size="11.5" font-weight="400" fill="#8b949e"><tspan x="1034" dy="0">不注入任何记忆</tspan></text>
-  <path d="M 1245 403 L 1260 403" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
-  <rect x="1260" y="357" width="125" height="92" rx="11" fill="#102b1c" stroke="#3fb950" stroke-width="1.4"/>
-  <text x="1322.5" y="382" text-anchor="middle" font-size="11.5" font-weight="650" fill="#3fb950"><tspan x="1322.5" dy="0">是 → 上下文</tspan><tspan x="1322.5" dy="16">信封</tspan></text>
-  <text x="1322.5" y="427" text-anchor="middle" font-size="10.5" font-weight="400" fill="#8b949e"><tspan x="1322.5" dy="0">≤400 tokens · 1 条记忆</tspan></text>
-
-  <path d="M 1385 403 L 1400 403" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
-  <rect x="1400" y="315" width="180" height="176" rx="12" fill="#0d2740" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="1490" y="348" text-anchor="middle" font-size="13.5" font-weight="650" fill="#f0f6fc"><tspan x="1490" dy="0">Agent 复核后</tspan><tspan x="1490" dy="18">再回答</tspan></text>
-  <text x="1490" y="414" text-anchor="middle" font-size="10.5" font-weight="400" fill="#8b949e"><tspan x="1490" dy="0">记忆全文</tspan><tspan x="1490" dy="17">权威文档</tspan><tspan x="1490" dy="17">活代码 / 测试</tspan></text>
-
-  <rect x="1115" y="608" width="445" height="52" rx="12" fill="#0d1117" stroke="#30363d"/>
-  <text x="1136" y="630" text-anchor="start" font-size="12.5" font-weight="650" fill="#f0f6fc"><tspan x="1136" dy="0">正确 · 错误 · 漏召回</tspan></text>
-  <text x="1136" y="649" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e"><tspan x="1136" dy="0">本地反馈持续改进触发词与评测</tspan></text>
-  <path d="M 1490 491 L 1490 597" fill="none" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
-  <path d="M 1115 634 L 24 634 L 24 182 L 40 182" fill="none" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
-
-  <rect x="40" y="608" width="620" height="30" rx="15" fill="#2d240f" stroke="#d29922"/>
-  <text x="350" y="628" text-anchor="middle" font-size="11.5" font-weight="600" fill="#d29922">可选 embedding 完全隔离；失败仍保留词法结果</text>
+  <rect x="0" y="0" width="1600" height="872" rx="18" fill="#0d1117"/>
+  <text x="40" y="54" text-anchor="start" font-size="24" font-weight="700" fill="#f0f6fc">OwnMem 如何把一个问题变成可信上下文</text>
+  <text x="40" y="80" text-anchor="start" font-size="13.5" font-weight="400" fill="#8b949e">记忆属于仓库 · 默认确定性 · 先核证据，再回答</text>
+  <rect x="1140" y="36" width="420" height="32" rx="16" fill="#0d2740" stroke="#58a6ff" stroke-width="1.4"/>
+  <text x="1350" y="57" text-anchor="middle" font-size="12.5" font-weight="600" fill="#58a6ff">默认：0 次模型调用 · 0 次网络请求</text>
+  <rect x="40" y="120" width="370" height="560" rx="16" fill="#161b22" stroke="#30363d" stroke-width="1.4"/>
+  <rect x="470" y="120" width="660" height="560" rx="16" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <rect x="1190" y="120" width="370" height="560" rx="16" fill="#161b22" stroke="#30363d" stroke-width="1.4"/>
+  <rect x="60" y="106" width="82" height="28" rx="14" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="101" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#f0f6fc">你的仓库</text>
+  <rect x="490" y="106" width="117" height="28" rx="14" fill="#0d2740" stroke="#58a6ff" stroke-width="1.4"/>
+  <text x="548.5" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#58a6ff">OWNMEM 引擎</text>
+  <rect x="1210" y="106" width="168" height="28" rx="14" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="1294" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#f0f6fc">你的 CODING AGENT</text>
+  <text x="60" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">纯 Markdown · 随 git 流转</text>
+  <text x="490" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">确定性 · 同样的问题，同样的答案</text>
+  <text x="1210" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">判断只发生在这里</text>
+  <rect x="60" y="170" width="330" height="92" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="78" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc">精选记忆条目</text>
+  <text x="78" y="224" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">教训 · 触发词 · 证据</text>
+  <text x="78" y="242" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">L1 索引 · L2 分区 · L3 条目</text>
+  <path d="M 225 262 L 225 286" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <text x="235" y="281" text-anchor="start" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#8b949e">ownmem audit</text>
+  <rect x="60" y="292" width="330" height="92" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="78" y="322" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc">治理闸门</text>
+  <text x="78" y="346" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">schema · 体积上限 · 增长配额</text>
+  <text x="78" y="364" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">SimHash + MinHash 查重</text>
+  <path d="M 225 384 L 225 408" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <text x="235" y="403" text-anchor="start" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#8b949e">ownmem compile</text>
+  <rect x="60" y="414" width="330" height="92" rx="12" fill="#102b1c" stroke="#3fb950" stroke-width="1.4"/>
+  <text x="78" y="444" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc">不可变快照</text>
+  <text x="78" y="468" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">postings · exact map · graph · ranking</text>
+  <text x="78" y="486" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">可安全回退上一份快照</text>
+  <rect x="60" y="545" width="330" height="70" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="78" y="573" text-anchor="start" font-size="12.5" font-weight="600" fill="#f0f6fc">像代码一样被评审</text>
+  <text x="78" y="595" text-anchor="start" font-size="11" font-weight="400" fill="#8b949e">diff · pull request · 回滚</text>
+  <text x="440" y="448" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#8b949e">读取</text>
+  <path d="M 394 460 L 466 460" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="490" y="170" width="620" height="74" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="510" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc">查询理解</text>
+  <text x="510" y="226" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">识别查询类型 · 文字系统感知分词 · 40 种语言</text>
+  <path d="M 800 244 L 800 262" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="490" y="268" width="620" height="118" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="510" y="296" text-anchor="start" font-size="13.5" font-weight="650" fill="#f0f6fc">六条候选通道</text>
+  <rect x="510" y="312" width="88" height="30" rx="7" fill="#161b22" stroke="#30363d" stroke-width="1.4"/>
+  <text x="554" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">Exact</text>
+  <rect x="606" y="312" width="88" height="30" rx="7" fill="#161b22" stroke="#30363d" stroke-width="1.4"/>
+  <text x="650" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">BM25F</text>
+  <rect x="702" y="312" width="88" height="30" rx="7" fill="#161b22" stroke="#30363d" stroke-width="1.4"/>
+  <text x="746" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">n-gram</text>
+  <rect x="798" y="312" width="88" height="30" rx="7" fill="#161b22" stroke="#30363d" stroke-width="1.4"/>
+  <text x="842" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">Fuzzy</text>
+  <rect x="894" y="312" width="88" height="30" rx="7" fill="#161b22" stroke="#30363d" stroke-width="1.4"/>
+  <text x="938" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#f0f6fc">Graph</text>
+  <rect x="990" y="312" width="88" height="30" rx="7" fill="#2d240f" stroke="#d29922" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <text x="1034" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#d29922">Embedding*</text>
+  <text x="800" y="370" text-anchor="middle" font-size="10.5" font-weight="400" fill="#8b949e">每条通道独立给出候选排名</text>
+  <path d="M 800 386 L 800 404" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="490" y="410" width="620" height="74" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="510" y="440" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc">融合与裁决</text>
+  <text x="510" y="466" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">RRF · 权威 · 新鲜度 · 证据 · 冲突 · MMR</text>
+  <path d="M 800 484 L 800 500" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <polygon points="800,506 872,558 800,610 728,558" fill="#2d240f" stroke="#d29922" stroke-width="1.5"/>
+  <text x="800" y="563" text-anchor="middle" font-size="12.5" font-weight="650" fill="#f0f6fc">足够可信？</text>
+  <rect x="500" y="518" width="200" height="80" rx="11" fill="#321d1c" stroke="#ff7b72" stroke-width="1.4"/>
+  <text x="600" y="548" text-anchor="middle" font-size="13" font-weight="650" fill="#ff7b72">否 → 弃权</text>
+  <text x="600" y="572" text-anchor="middle" font-size="11" font-weight="400" fill="#8b949e">不注入任何记忆</text>
+  <path d="M 724 558 L 706 558" fill="none" stroke="#8b949e" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="900" y="518" width="210" height="80" rx="11" fill="#102b1c" stroke="#3fb950" stroke-width="1.4"/>
+  <text x="1005" y="548" text-anchor="middle" font-size="13" font-weight="650" fill="#3fb950">是 → 上下文信封</text>
+  <text x="1005" y="574" text-anchor="middle" font-size="11" font-weight="400" fill="#8b949e">≤400 tokens · 1 条记忆</text>
+  <path d="M 876 558 L 894 558" fill="none" stroke="#58a6ff" stroke-width="1.7" marker-end="url(#accent)"/>
+  <path d="M 1110 558 L 1160 558 L 1160 338 L 1204 338" fill="none" stroke="#58a6ff" stroke-width="1.7" marker-end="url(#accent)"/>
+  <rect x="1210" y="170" width="330" height="92" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="1228" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc">用日常语言提问</text>
+  <text x="1228" y="224" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">描述症状即可</text>
+  <text x="1228" y="242" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">2–3 种说法，由引擎融合</text>
+  <rect x="1210" y="292" width="330" height="92" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="1228" y="322" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc">先复核再采信</text>
+  <text x="1228" y="346" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">打开记忆全文</text>
+  <text x="1228" y="364" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">对照活代码验证</text>
+  <rect x="1210" y="414" width="330" height="64" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="1228" y="440" text-anchor="start" font-size="12.5" font-weight="650" fill="#f0f6fc">正确 · 错误 · 漏召回</text>
+  <text x="1228" y="462" text-anchor="start" font-size="11" font-weight="400" fill="#8b949e">本地反馈持续改进触发词</text>
+  <rect x="1210" y="508" width="330" height="92" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1.4"/>
+  <text x="1228" y="538" text-anchor="start" font-size="14" font-weight="650" fill="#f0f6fc">沉淀新教训</text>
+  <text x="1228" y="562" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">文档、闸门、测试都装不下才写</text>
+  <text x="1228" y="580" text-anchor="start" font-size="11.5" font-weight="400" fill="#8b949e">纯 Markdown，随 PR 评审</text>
+  <text x="1160" y="192" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#8b949e">ownmem</text>
+  <text x="1160" y="205" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#8b949e">recall</text>
+  <path d="M 1204 216 L 1136 216 " fill="none" stroke="#58a6ff" stroke-width="1.7" marker-end="url(#accent)"/>
+  <path d="M 1375 600 L 1375 716 L 225 716 L 225 688" fill="none" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
+  <text x="800" y="706" text-anchor="middle" font-size="11" font-weight="400" fill="#8b949e">新教训 / 反馈 → audit → compile → 服务下一次召回</text>
+  <rect x="40" y="744" width="1520" height="64" rx="12" fill="#161b22" stroke="#30363d" stroke-width="1.4"/>
+  <text x="800" y="770" text-anchor="middle" font-size="14" font-weight="650" fill="#f0f6fc">一份记忆，服务所有 coding agent</text>
+  <text x="800" y="792" text-anchor="middle" font-size="12" font-weight="400" fill="#8b949e">Claude Code · Codex · Gemini CLI · Cursor · Grok CLI</text>
+  <text x="40" y="840" text-anchor="start" font-size="11" font-weight="400" fill="#8b949e">* 可选 embedding 通道完全隔离；失败仍保留词法结果。</text>
 </svg>

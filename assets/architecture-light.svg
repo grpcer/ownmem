@@ -1,115 +1,105 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 872" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
   <title id="title">How OwnMem turns a question into trusted context</title>
-  <desc id="description">A two-stage OwnMem workflow: curated Markdown is governed and compiled into a verified snapshot; a user question becomes query variants, passes through six candidate lanes, deterministic ranking and a confidence gate, then either abstains or gives an evidence-bearing context envelope to the agent for verification. Local feedback closes the loop.</desc>
+  <desc id="description">Three trust domains: the repository holds curated Markdown that passes governance gates and compiles into an immutable snapshot; the deterministic engine answers through six candidate lanes, ranking, a confidence gate and a 400-token envelope; the coding agent asks, verifies against live code, and writes new lessons that flow back through audit and compile.</desc>
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/>
-    </marker>
-    <marker id="accent-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/>
-    </marker>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/></marker>
+    <marker id="accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/></marker>
   </defs>
-  <rect width="1600" height="700" rx="18" fill="#ffffff"/>
-
-  <text x="40" y="44" text-anchor="start" font-size="24" font-weight="700" fill="#0f172a"><tspan x="40" dy="0">How OwnMem turns a question into trusted context</tspan></text>
-  <text x="40" y="70" text-anchor="start" font-size="13.5" font-weight="400" fill="#57606a"><tspan x="40" dy="0">Repository-owned memory · deterministic by default · evidence before answers</tspan></text>
-  <rect x="1115" y="27" width="445" height="30" rx="15" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="1337.5" y="47" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">Default: 0 model calls · 0 network calls</text>
-
-  <text x="40" y="112" text-anchor="start" font-size="12.5" font-weight="700" fill="#2563eb"><tspan x="40" dy="0">1 · CURATE &amp; COMPILE</tspan></text>
-  <g>
-    <rect x="40" y="130" width="250" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="58" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="58" dy="0">Curated Markdown memory</tspan></text>
-    <text x="58" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="58" dy="0">lesson · triggers · evidence</tspan><tspan x="58" dy="18">.ownmem/ travels with git</tspan></text>
-  </g>
-  <path d="M 290 182 L 320 182" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="320" y="130" width="230" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="338" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="338" dy="0">Govern locally</tspan></text>
-    <text x="338" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="338" dy="0">schema · quota · dedup</tspan><tspan x="338" dy="18">reviewable in pull requests</tspan></text>
-  </g>
-  <path d="M 550 182 L 580 182" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="580" y="130" width="250" height="104" rx="12" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
-    <text x="598" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="598" dy="0">Compile once</tspan></text>
-    <text x="598" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="598" dy="0">immutable verified snapshot</tspan><tspan x="598" dy="18">safe previous-snapshot fallback</tspan></text>
-  </g>
-
-  <rect x="1115" y="104" width="445" height="130" rx="12" fill="#f6f8fa" stroke="#d0d7de"/>
-  <text x="1337.5" y="140" text-anchor="middle" font-size="16" font-weight="650" fill="#0f172a"><tspan x="1337.5" dy="0">One memory, every coding agent</tspan></text>
-  <text x="1337.5" y="180" text-anchor="middle" font-size="13" font-weight="400" fill="#57606a"><tspan x="1337.5" dy="0">Claude Code · Codex · Gemini CLI</tspan><tspan x="1337.5" dy="20">Cursor · Grok CLI</tspan></text>
-  <path d="M 830 182 C 930 182 980 169 1100 169" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
-
-  <text x="40" y="284" text-anchor="start" font-size="12.5" font-weight="700" fill="#2563eb"><tspan x="40" dy="0">2 · RECALL &amp; VERIFY</tspan></text>
-  <g>
-    <rect x="40" y="315" width="170" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="58" y="346" text-anchor="start" font-size="14.5" font-weight="650" fill="#0f172a"><tspan x="58" dy="0">User question</tspan></text>
-    <text x="58" y="373" text-anchor="start" font-size="12" font-weight="400" fill="#57606a"><tspan x="58" dy="0">a symptom in</tspan><tspan x="58" dy="18">ordinary words</tspan></text>
-  </g>
-  <path d="M 210 367 L 235 367" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="235" y="315" width="210" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="253" y="341" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="253" dy="0">Agent prepares</tspan><tspan x="253" dy="18">2–3 query variants</tspan></text>
-    <text x="253" y="381" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="253" dy="0">original · root cause · symbol</tspan></text>
-  </g>
-
-  <rect x="475" y="290" width="910" height="288" rx="16" fill="#f6f8fa" stroke="#2563eb" stroke-width="1.5"/>
-  <rect x="495" y="276" width="154" height="28" rx="14" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="572" y="295" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#2563eb">OWNMEM ENGINE</text>
-  <path d="M 445 367 L 505 367" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
-
-  <g>
-    <rect x="505" y="330" width="145" height="112" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="523" y="361" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="523" dy="0">Query planner</tspan></text>
-    <text x="523" y="388" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="523" dy="0">classifies intent</tspan><tspan x="523" dy="18">sets channel limits</tspan></text>
-  </g>
-  <path d="M 650 386 L 680 386" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="680" y="330" width="240" height="146" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="700" y="356" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="700" dy="0">Candidate lanes</tspan></text>
-    <rect x="700" y="378" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
-      <text x="749" y="396" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Exact</text>
-      <rect x="808" y="378" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
-      <text x="857" y="396" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">BM25F</text>
-      <rect x="700" y="413" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
-      <text x="749" y="431" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">n-gram</text>
-      <rect x="808" y="413" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
-      <text x="857" y="431" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Fuzzy</text>
-      <rect x="700" y="448" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
-      <text x="749" y="466" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Graph</text>
-      <rect x="808" y="448" width="98" height="26" rx="7" fill="#fffbeb" stroke="#a16207" stroke-dasharray="4 3"/>
-      <text x="857" y="466" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">Embedding*</text>
-  </g>
-  <path d="M 920 403 L 950 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <g>
-    <rect x="950" y="347" width="185" height="112" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="968" y="378" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="968" dy="0">Fuse &amp; judge</tspan></text>
-    <text x="968" y="405" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="968" dy="0">RRF · authority · scope</tspan><tspan x="968" dy="18">evidence · conflicts · MMR</tspan></text>
-  </g>
-  <path d="M 1135 403 L 1145 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-
-  <polygon points="1195,348 1245,403 1195,458 1145,403" fill="#fffbeb" stroke="#a16207" stroke-width="1.5"/>
-  <text x="1195" y="407" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a"><tspan x="1195" dy="0">Confident?</tspan></text>
-  <path d="M 1195 458 L 1195 500 L 1118 500" fill="none" stroke="#b42318" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="950" y="480" width="168" height="72" rx="11" fill="#fff1f0" stroke="#b42318"/>
-  <text x="1034" y="508" text-anchor="middle" font-size="13.5" font-weight="650" fill="#b42318"><tspan x="1034" dy="0">No → abstain</tspan></text>
-  <text x="1034" y="531" text-anchor="middle" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="1034" dy="0">inject nothing</tspan></text>
-  <path d="M 1245 403 L 1260 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
-  <rect x="1260" y="357" width="125" height="92" rx="11" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
-  <text x="1322.5" y="382" text-anchor="middle" font-size="11.5" font-weight="650" fill="#15803d"><tspan x="1322.5" dy="0">Yes → context</tspan><tspan x="1322.5" dy="16">envelope</tspan></text>
-  <text x="1322.5" y="427" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a"><tspan x="1322.5" dy="0">≤400 tokens · 1 topic</tspan></text>
-
-  <path d="M 1385 403 L 1400 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
-  <rect x="1400" y="315" width="180" height="176" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-  <text x="1490" y="348" text-anchor="middle" font-size="13.5" font-weight="650" fill="#0f172a"><tspan x="1490" dy="0">Agent verifies,</tspan><tspan x="1490" dy="18">then answers</tspan></text>
-  <text x="1490" y="414" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a"><tspan x="1490" dy="0">full memory</tspan><tspan x="1490" dy="17">authority docs</tspan><tspan x="1490" dy="17">live code / tests</tspan></text>
-
-  <rect x="1115" y="608" width="445" height="52" rx="12" fill="#ffffff" stroke="#d0d7de"/>
-  <text x="1136" y="630" text-anchor="start" font-size="12.5" font-weight="650" fill="#0f172a"><tspan x="1136" dy="0">correct · wrong · miss</tspan></text>
-  <text x="1136" y="649" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="1136" dy="0">local feedback improves triggers and evaluations</tspan></text>
-  <path d="M 1490 491 L 1490 597" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
-  <path d="M 1115 634 L 24 634 L 24 182 L 40 182" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
-
-  <rect x="40" y="608" width="620" height="30" rx="15" fill="#fffbeb" stroke="#a16207"/>
-  <text x="350" y="628" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">Optional embedding is isolated; failure keeps lexical results</text>
+  <rect x="0" y="0" width="1600" height="872" rx="18" fill="#ffffff"/>
+  <text x="40" y="54" text-anchor="start" font-size="24" font-weight="700" fill="#0f172a">How OwnMem turns a question into trusted context</text>
+  <text x="40" y="80" text-anchor="start" font-size="13.5" font-weight="400" fill="#57606a">Repository-owned memory · deterministic by default · evidence before answers</text>
+  <rect x="1140" y="36" width="420" height="32" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1350" y="57" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">Default: 0 model calls · 0 network calls</text>
+  <rect x="40" y="120" width="370" height="560" rx="16" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
+  <rect x="470" y="120" width="660" height="560" rx="16" fill="#f6f8fa" stroke="#2563eb" stroke-width="1.5"/>
+  <rect x="1190" y="120" width="370" height="560" rx="16" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
+  <rect x="60" y="106" width="166" height="28" rx="14" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="143" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#0f172a">YOUR REPOSITORY</text>
+  <rect x="490" y="106" width="148" height="28" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="564" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#2563eb">OWNMEM ENGINE</text>
+  <rect x="1210" y="106" width="180" height="28" rx="14" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="1300" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#0f172a">YOUR CODING AGENT</text>
+  <text x="60" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">plain Markdown · travels with git</text>
+  <text x="490" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">deterministic · same query, same answer</text>
+  <text x="1210" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">the only place judgment happens</text>
+  <rect x="60" y="170" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="78" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Curated memory topics</text>
+  <text x="78" y="224" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">lesson · triggers · evidence</text>
+  <text x="78" y="242" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">L1 index · L2 areas · L3 topics</text>
+  <path d="M 225 262 L 225 286" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <text x="235" y="281" text-anchor="start" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem audit</text>
+  <rect x="60" y="292" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="78" y="322" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Governance gates</text>
+  <text x="78" y="346" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">schema · size caps · growth quota</text>
+  <text x="78" y="364" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">SimHash + MinHash dedup</text>
+  <path d="M 225 384 L 225 408" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <text x="235" y="403" text-anchor="start" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem compile</text>
+  <rect x="60" y="414" width="330" height="92" rx="12" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
+  <text x="78" y="444" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Immutable snapshot</text>
+  <text x="78" y="468" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">postings · exact map · graph · ranking</text>
+  <text x="78" y="486" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">safe previous-snapshot fallback</text>
+  <rect x="60" y="545" width="330" height="70" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="78" y="573" text-anchor="start" font-size="12.5" font-weight="600" fill="#0f172a">Reviewed like code</text>
+  <text x="78" y="595" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">diff · pull request · rollback</text>
+  <text x="440" y="448" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">loads</text>
+  <path d="M 394 460 L 466 460" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="490" y="170" width="620" height="74" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="510" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Query understanding</text>
+  <text x="510" y="226" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">intent classified · script-aware tokenizer · 40 languages</text>
+  <path d="M 800 244 L 800 262" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="490" y="268" width="620" height="118" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="510" y="296" text-anchor="start" font-size="13.5" font-weight="650" fill="#0f172a">Six candidate lanes</text>
+  <rect x="510" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="554" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Exact</text>
+  <rect x="606" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="650" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">BM25F</text>
+  <rect x="702" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="746" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">n-gram</text>
+  <rect x="798" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="842" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Fuzzy</text>
+  <rect x="894" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="938" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Graph</text>
+  <rect x="990" y="312" width="88" height="30" rx="7" fill="#fffbeb" stroke="#a16207" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <text x="1034" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">Embedding*</text>
+  <text x="800" y="370" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a">each lane ranks candidates independently</text>
+  <path d="M 800 386 L 800 404" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="490" y="410" width="620" height="74" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="510" y="440" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Fuse &amp; judge</text>
+  <text x="510" y="466" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">RRF · authority · freshness · evidence · conflicts · MMR</text>
+  <path d="M 800 484 L 800 500" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <polygon points="800,506 872,558 800,610 728,558" fill="#fffbeb" stroke="#a16207" stroke-width="1.5"/>
+  <text x="800" y="563" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Confident?</text>
+  <rect x="500" y="518" width="200" height="80" rx="11" fill="#fff1f0" stroke="#b42318" stroke-width="1.4"/>
+  <text x="600" y="548" text-anchor="middle" font-size="13" font-weight="650" fill="#b42318">No → abstain</text>
+  <text x="600" y="572" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">inject nothing</text>
+  <path d="M 724 558 L 706 558" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="900" y="518" width="210" height="80" rx="11" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
+  <text x="1005" y="548" text-anchor="middle" font-size="13" font-weight="650" fill="#15803d">Yes → context envelope</text>
+  <text x="1005" y="574" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">≤400 tokens · 1 topic</text>
+  <path d="M 876 558 L 894 558" fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
+  <path d="M 1110 558 L 1160 558 L 1160 338 L 1204 338" fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
+  <rect x="1210" y="170" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="1228" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Asks in plain words</text>
+  <text x="1228" y="224" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">a symptom in ordinary words</text>
+  <text x="1228" y="242" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">2–3 phrasings, fused by the engine</text>
+  <rect x="1210" y="292" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="1228" y="322" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Verifies before trusting</text>
+  <text x="1228" y="346" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">opens the full topic file</text>
+  <text x="1228" y="364" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">checks against live code</text>
+  <rect x="1210" y="414" width="330" height="64" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="1228" y="440" text-anchor="start" font-size="12.5" font-weight="650" fill="#0f172a">correct · wrong · miss</text>
+  <text x="1228" y="462" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">local feedback tunes triggers</text>
+  <rect x="1210" y="508" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="1228" y="538" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Writes new lessons</text>
+  <text x="1228" y="562" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">only when no doc, gate, or test fits</text>
+  <text x="1228" y="580" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">plain Markdown, reviewed in PRs</text>
+  <text x="1160" y="192" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem</text>
+  <text x="1160" y="205" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">recall</text>
+  <path d="M 1204 216 L 1136 216 " fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
+  <path d="M 1375 600 L 1375 716 L 225 716 L 225 688" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
+  <text x="800" y="706" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">new lesson or feedback → audit → compile → ready for the next recall</text>
+  <rect x="40" y="744" width="1520" height="64" rx="12" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
+  <text x="800" y="770" text-anchor="middle" font-size="14" font-weight="650" fill="#0f172a">One memory, every coding agent</text>
+  <text x="800" y="792" text-anchor="middle" font-size="12" font-weight="400" fill="#57606a">Claude Code · Codex · Gemini CLI · Cursor · Grok CLI</text>
+  <text x="40" y="840" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">* Optional embedding lane is isolated; failure keeps lexical results.</text>
 </svg>

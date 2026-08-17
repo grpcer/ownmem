@@ -6,6 +6,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -192,6 +193,24 @@ async function main() {
       'recall', '--root', project, '--json', '--', '.ownmem/example_repository_memory.md',
     ], project).stdout);
     assert(recalledByTopicPath.results[0]?.memory_id === 'example_repository_memory', 'compiled topic source path was not recalled exactly');
+
+    // The consumer install must observe itself: recalls, deliveries, feedback, and gates all land
+    // as local events, and the report reads them back. This is exactly the loop that a bundled
+    // optional-adapter import once silently disabled.
+    run(['audit', '--root', project, '--skip-benchmark'], project);
+    const observabilityDirectory = path.join(project, '.local-test', 'memory-observability');
+    const events = readdirSync(observabilityDirectory)
+      .filter(name => name.startsWith('events-'))
+      .flatMap(name => readFileSync(path.join(observabilityDirectory, name), 'utf8').trim().split('\n'))
+      .map(line => JSON.parse(line));
+    assert(events.every(event => event.schema === 'ownmem-observability.event/v1'), 'a local observability event failed its schema identity');
+    for (const expected of ['recall.completed', 'recall.delivered', 'feedback.recorded', 'gate.completed']) {
+      assert(events.some(event => event.event === expected), `consumer usage did not produce a local ${expected} event`);
+    }
+    assert(existsSync(path.join(observabilityDirectory, 'recent-recalls.jsonl')), 'delivered recalls were not remembered for consumption pairing');
+    const reported = run(['report', '--root', project, '--since', '7d'], project).stdout;
+    assert(reported.includes('install local-'), 'report did not attribute the initialized local install');
+    assert(!reported.includes('scripts/memory-'), 'report referenced a private repository script');
 
     if (process.platform !== 'win32') {
       const linked = path.join(fixture, 'memory bin');

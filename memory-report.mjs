@@ -63,7 +63,7 @@ function parseArgs(args) {
 }
 
 function usage() {
-  return `Usage: node scripts/memory-report.mjs [options]
+  return `Usage: npx ownmem report [options]
 
 Summarize local engineering-memory runtime evidence. The report never uploads data or prints raw queries.
 
@@ -776,7 +776,7 @@ function formatRuntimeCohorts(cohorts) {
 // backlog to report -- printing zeros there would claim a clean queue nobody ever looked at.
 function formatMaintenanceBacklog(maintenance) {
   if (maintenance.runs === 0) {
-    return `backlog unavailable (no maintenance run in this window; run \`node scripts/memory-maintenance.mjs\` to measure it)`;
+    return `backlog unavailable (no maintenance run in this window)`;
   }
   return `proposal=${maintenance.proposals}, orphan=${maintenance.orphans}, drift=${maintenance.drift}`;
 }

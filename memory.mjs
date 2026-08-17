@@ -56,8 +56,8 @@ function formatRecall(result) {
   return `${result.results.map((item, index) => `${index + 1}. ${item.memory_id} — ${item.excerpt?.text || item.path}`).join('\n')}\n`;
 }
 
-function recall(args) {
-  const options = parseShared(args, { limit: 3, multi: false, feedback: null, expected: null });
+async function recall(args) {
+  const options = parseShared(args, { limit: 3, multi: false, feedback: null, expected: null, observability: true });
   const queries = [];
   for (let index = 0; index < options.rest.length; index += 1) {
     const argument = options.rest[index];
@@ -65,6 +65,7 @@ function recall(args) {
       options.limit = Number(takeValue(options.rest, index, argument));
       index += 1;
     } else if (argument === '--multi') options.multi = true;
+    else if (argument === '--no-observability') options.observability = false;
     else if (argument === '--feedback' || argument === '--expected') {
       const value = takeValue(options.rest, index, argument);
       index += 1;
@@ -80,7 +81,10 @@ function recall(args) {
   if (options.feedback && (options.multi || queries.length !== 1)) throw new Error('--feedback requires exactly one non-multi query');
   if (['wrong', 'miss'].includes(options.feedback) && !options.expected) throw new Error(`--feedback ${options.feedback} requires --expected <memory-name>`);
   if (queries.length === 0 || queries.some(query => !query.trim())) throw new Error('recall requires a non-empty query');
+  const loadStarted = performance.now();
   const index = loadMemoryIndex({ root: options.root, memoryDir: options.memoryDir });
+  const loadMs = performance.now() - loadStarted;
+  const rankStarted = performance.now();
   const aggregate = new Map();
   queries.forEach((query) => {
     searchMemory(index, query, { limit: Math.max(options.limit, 5) }).forEach((candidate, rank) => {
@@ -104,6 +108,7 @@ function recall(args) {
     matched_fields: item.candidate.fields,
     excerpt: item.candidate.excerpt,
   }));
+  const rankMs = performance.now() - rankStarted;
   const output = {
     schema: 'ownmem-core-recall/v1',
     trace_id: randomUUID(),
@@ -133,7 +138,66 @@ function recall(args) {
     })}\n`, { encoding: 'utf8', mode: 0o600 });
   }
   process.stdout.write(options.json ? `${JSON.stringify(output, null, 2)}\n` : formatRecall(output));
+  // Delivery follows a successful stdout write, mirroring the runtime CLI's ordering.
+  if (options.observability) {
+    await recordCoreRecallEvents({ options, queries, output, loadMs, rankMs, rrfCandidates: aggregate.size });
+  }
   return 0;
+}
+
+// Core recall ranks Markdown directly, so it reports its own recall/delivery/feedback events; the
+// adapters are optional and a failed local write only costs telemetry, never the recall itself.
+async function recordCoreRecallEvents({ options, queries, output, loadMs, rankMs, rrfCandidates }) {
+  const warnings = [];
+  let recorder;
+  try {
+    recorder = await import('./lib/memory-runtime-observability.mjs');
+  } catch {
+    return;
+  }
+  let classifications = null;
+  try {
+    const { classifyMemoryQuery } = await import('./lib/memory-query-classifier.mjs');
+    classifications = [...new Set(queries.flatMap(query => classifyMemoryQuery(query)))];
+  } catch {
+    classifications = null;
+  }
+  const returned = output.results.map(result => result.memory_id);
+  const expected = options.feedback
+    ? options.expected || output.results[0]?.memory_id || null
+    : null;
+  const recorded = recorder.recordCoreCliRecall({
+    root: options.root,
+    traceId: output.trace_id,
+    query: queries.join('␞'),
+    classifications,
+    returnedTopics: returned,
+    abstained: output.abstained,
+    rrfCandidates,
+    loadMs,
+    rankMs,
+    totalMs: loadMs + rankMs,
+    feedback: options.feedback,
+    expectedInTopK: options.feedback ? (expected ? returned.includes(expected) : null) : null,
+  });
+  warnings.push(...(recorded.warnings || []));
+  if (recorded.written && returned.length > 0) {
+    try {
+      const { rememberMemoryRecall } = await import('./lib/memory-recall-ledger.mjs');
+      const remembered = rememberMemoryRecall({
+        root: options.root,
+        traceId: output.trace_id,
+        returnedTopics: returned,
+        source: 'cli',
+      });
+      if (!remembered.written && remembered.reason) warnings.push(remembered.reason);
+    } catch {
+      // Without the ledger a later full-text open simply cannot pair with this recall.
+    }
+  }
+  if (warnings.length > 0) {
+    process.stderr.write(`ownmem recall: local observability skipped: ${[...new Set(warnings)].join('; ')}\n`);
+  }
 }
 
 function init(args) {

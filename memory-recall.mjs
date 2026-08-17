@@ -38,21 +38,29 @@ let DEFAULT_MEMORY_OBSERVABILITY_DIRECTORY = '.local-test/memory-observability';
 let rememberMemoryRecall = () => ({ written: false, reason: 'recall ledger is not installed' });
 // Public packages may omit host telemetry; without it, retain the legacy mode-only component split.
 let recallComponent = source => (source?.mode === 'snapshot' ? 'memory-recall-snapshot' : 'memory-recall-fallback');
+// Each adapter degrades independently: bundling these imports once disabled every event writer
+// whenever a single optional module was absent, which silently blanked report and dashboard.
 try {
-  const [runtimeObservability, observability, ledger] = await Promise.all([
-    import('./lib/memory-runtime-observability.mjs'),
-    import('./lib/memory-observability.mjs'),
-    import('./lib/memory-recall-ledger.mjs'),
-  ]);
-  createMemoryRuntimeObserver = runtimeObservability.createMemoryRuntimeObserver;
+  const observability = await import('./lib/memory-observability.mjs');
   createMemoryObservabilityEvent = observability.createMemoryObservabilityEvent;
   recordMemoryObservabilityEvent = observability.recordMemoryObservabilityEvent;
   recordMemoryDelivery = observability.recordMemoryDelivery;
   DEFAULT_MEMORY_OBSERVABILITY_DIRECTORY = observability.DEFAULT_MEMORY_OBSERVABILITY_DIRECTORY;
-  rememberMemoryRecall = ledger.rememberMemoryRecall;
+} catch {
+  // A build without the observability adapter keeps recall itself fully functional.
+}
+try {
+  const runtimeObservability = await import('./lib/memory-runtime-observability.mjs');
+  createMemoryRuntimeObserver = runtimeObservability.createMemoryRuntimeObserver;
   recallComponent = runtimeObservability.recallComponent;
 } catch {
-  // Public core/compiler packages intentionally omit the OwnMem-local observability adapter.
+  // Without the observer no trace IDs are issued, so delivery and feedback events stay silent too.
+}
+try {
+  const ledger = await import('./lib/memory-recall-ledger.mjs');
+  rememberMemoryRecall = ledger.rememberMemoryRecall;
+} catch {
+  // Without the ledger a full-text open simply cannot pair with the recall that produced it.
 }
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -166,7 +174,7 @@ function parseArgs(rawArgs) {
 }
 
 function usage() {
-  return `Usage: bash scripts/memory-recall.sh [options] <keyword|path|natural-language question> [...]
+  return `Usage: node node_modules/ownmem/memory-recall.mjs [options] <keyword|path|natural-language question> [...]
 
 Reads the compiled snapshot and runs a deterministic recall. An unusable snapshot is rebuilt, and
 only a failed rebuild falls back to Markdown BM25F.
@@ -187,13 +195,13 @@ Options:
   --usage-file PATH      compatibility SHA-256 usage file; written only when passed explicitly
   --no-usage-log         do not write the compatibility usage file (default)
 
-Examples:
-  bash scripts/memory-recall.sh notifyContentDidChange
-  bash scripts/memory-recall.sh 'history shows an empty page right after login'
-  bash scripts/memory-recall.sh --multi 'body text is clipped on mobile' 'implicit grid track overflow' 'grid-cols-1'
-  bash scripts/memory-recall.sh --stdio
-  bash scripts/memory-recall.sh --feedback correct 'never stash in a shared worktree'
-  bash scripts/memory-recall.sh --feedback miss --expected feedback_no_stash 'do not tuck my changes away'`;
+Examples (replace the entry with \`npx ownmem recall --\` for everyday use):
+  node node_modules/ownmem/memory-recall.mjs notifyContentDidChange
+  node node_modules/ownmem/memory-recall.mjs 'history shows an empty page right after login'
+  node node_modules/ownmem/memory-recall.mjs --multi 'body text is clipped on mobile' 'implicit grid track overflow' 'grid-cols-1'
+  node node_modules/ownmem/memory-recall.mjs --stdio
+  node node_modules/ownmem/memory-recall.mjs --feedback correct 'never stash in a shared worktree'
+  node node_modules/ownmem/memory-recall.mjs --feedback miss --expected feedback_no_stash 'do not tuck my changes away'`;
 }
 
 function resultMemoryId(result) {
@@ -451,19 +459,14 @@ function writeCliHuman(runtime, options, searches, feedback, usageEntries) {
   process.stdout.write(`${totalHits} hit(s); ${sourceLabel}; at most ${deliveredLimit} per query, ${options.tier === 'default' ? 400 : 1200} tokens in the first pass. Read authority_docs first, then verify against live code.\n`);
   // Show this hint only in the CLI; hook envelopes must preserve their strict token budget.
   if (totalHits > 0) {
-    process.stdout.write('Full text: node scripts/memory-read.mjs <name> (it also records a confirmed full-text open, so do not use cat; opening is not the same as the answer using it)\n');
-    for (const { envelope, observationTraceId } of searches) {
-      if (!observationTraceId || envelope.results.length === 0) continue;
-      const candidates = envelope.results.map((result) => result.memory_id).join(',');
-      process.stdout.write(`If the envelope summary was used as is: node scripts/memory-observe.mjs consume --trace-id ${observationTraceId} --topic <memory-name-actually-used> (candidates: ${candidates})\n`);
-    }
+    process.stdout.write('Full text: open the topic file listed above; a Claude Code Read routed through the hook records the confirmed open automatically. Opening is not the same as the answer using it.\n');
   }
   // Offer feedback only on abstention or empty results, and never repeat it after feedback was supplied.
   if (!options.feedback) {
     const abstained = searches.find(({ envelope }) => envelope.abstain.abstained || envelope.results.length === 0);
     if (abstained) {
       const sample = options.multi ? '<original-query>' : String(abstained.query).replaceAll("'", "'\\''");
-      process.stdout.write(`Should have been recalled but was not? Log it: bash scripts/memory-recall.sh --feedback miss --expected <memory-name> '${sample}'\n`);
+      process.stdout.write(`Should have been recalled but was not? Log it: npx ownmem recall --feedback miss --expected <memory-name> -- '${sample}'\n`);
     }
   }
   if (feedback) process.stdout.write(`Feedback recorded to ${path.relative(options.root, feedback.file)}.\n`);

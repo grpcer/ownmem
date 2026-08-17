@@ -37,7 +37,7 @@ const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_ROOT = path.resolve(SCRIPT_DIR, '..');
 
 function usage() {
-  return `Usage: node scripts/memory-embed.mjs <command> [options]
+  return `Usage: node node_modules/ownmem/memory-embed.mjs <command> [options]
 
 Commands:
   config   Write a private local provider configuration

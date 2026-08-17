@@ -5,6 +5,42 @@ Versioning.
 
 ## [Unreleased]
 
+### Added
+
+- The local observability write path now ships in the public package:
+  `lib/memory-runtime-observability.mjs` (recall/build events and trace IDs),
+  `lib/memory-recall-ledger.mjs` (recent-recall ledger for consumption
+  pairing), and `lib/memory-hook-observability.mjs` (hook delivery and
+  consumption sinks). `report` and the dashboard finally have producers for
+  the events they read in consumer repositories.
+- `ownmem recall` records `recall.completed`, `recall.delivered`, and
+  `feedback.recorded` events and a ledger entry under
+  `.local-test/memory-observability/`, so the adoption funnel works without
+  the compiler layer. A new `--no-observability` flag skips the writes.
+- `ownmem audit` emits a `gate.completed` event; the previously accepted
+  `--no-observability` flag now actually controls it, and
+  `recordMemoryAuditObservability` is a real recorder instead of an empty
+  stub.
+- The public self-test asserts the full loop: consumer usage produces
+  schema-valid local events, the ledger file exists, and `report` attributes
+  the local install.
+
+### Fixed
+
+- `memory-recall.mjs` loaded its three optional adapters through one
+  `Promise.all`, so a single missing module silently disabled every event
+  writer — the root cause of `report` showing "observed no local events"
+  forever in consumer installs. Each adapter now degrades independently.
+- The hook's Read-consumption detector only recognized the historical
+  `.claude/memory` layout; it now resolves the installation's configured
+  memory directory, so full-text opens in `.ownmem` repositories pair with
+  their recalls (`recall.consumed`).
+- CLI and report texts no longer point at private-repository scripts that do
+  not ship in the package (`scripts/memory-maintenance.mjs`,
+  `scripts/memory-recall.sh`, `scripts/memory-read.mjs`,
+  `scripts/memory-observe.mjs`, `scripts/memory-dashboard.mjs`, and the
+  schema-check hint); they reference `npx ownmem` commands instead.
+
 ## [0.1.1] - 2026-08-16
 
 ### Added

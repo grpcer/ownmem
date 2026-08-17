@@ -80,7 +80,13 @@ export async function runPreToolHook({ root, input = process.stdin, output = pro
     const hookInput = await readHookInput(input);
     resolvedRoot = path.resolve(root || process.env.CLAUDE_PROJECT_DIR || hookInput.cwd || process.cwd());
     if (isMemoryHookDisabled(resolvedRoot)) return 0;
-    const consumed = resolveReadMemoryTopic(hookInput, resolvedRoot);
+    // A Read of a topic file is only recognizable under the installation's configured memory dir;
+    // the historical `.claude/memory` default silently missed every `.ownmem` installation.
+    const consumed = resolveReadMemoryTopic(
+      hookInput,
+      resolvedRoot,
+      resolveConfiguredMemoryDir(resolvedRoot) || undefined,
+    );
     if (consumed) {
       const request = {
         schema: MEMORY_HOOK_CONSUME_REQUEST_SCHEMA,
@@ -110,21 +116,24 @@ export async function runPreToolHook({ root, input = process.stdin, output = pro
   }
 }
 
-async function runServer(root) {
-  let memoryDir = '.claude/memory';
-  let indexDirectory = '.local-test/memory-index';
+function resolveConfiguredMemoryDir(root) {
   for (const directory of ['.ownmem', '.memory']) {
     try {
       const config = JSON.parse(readFileSync(path.join(root, directory, 'config.json'), 'utf8'));
       if (['ownmem.config/v1', 'oriveo.memory.config/v1'].includes(config.schema)) {
-        memoryDir = config.memory_dir;
-        indexDirectory = `${config.memory_dir}/index`;
-        break;
+        return config.memory_dir;
       }
     } catch {
       // Legacy installations keep the historical .claude/.local-test defaults.
     }
   }
+  return null;
+}
+
+async function runServer(root) {
+  const configuredMemoryDir = resolveConfiguredMemoryDir(root);
+  const memoryDir = configuredMemoryDir || '.claude/memory';
+  const indexDirectory = configuredMemoryDir ? `${configuredMemoryDir}/index` : '.local-test/memory-index';
   const runtime = new StdioMemoryRuntimeClient({
     root,
     recallScript: path.join(path.dirname(ENTRY_PATH), 'memory-recall.mjs'),

@@ -9,7 +9,7 @@ import {
 } from './lib/memory-audit.mjs';
 
 function parseArgs(args) {
-  const options = { root: process.cwd(), memoryDir: '.ownmem', writeLock: false, json: false };
+  const options = { root: process.cwd(), memoryDir: '.ownmem', writeLock: false, json: false, observability: true };
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
     if (argument === '--root' || argument === '--memory-dir') {
@@ -19,7 +19,8 @@ function parseArgs(args) {
       else options.memoryDir = value;
     } else if (argument === '--write-lock') options.writeLock = true;
     else if (argument === '--json') options.json = true;
-    else if (argument === '--skip-benchmark' || argument === '--no-observability') continue;
+    else if (argument === '--no-observability') options.observability = false;
+    else if (argument === '--skip-benchmark') continue;
     else if (argument === '--help' || argument === '-h') options.help = true;
     else throw new Error(`unknown option: ${argument}`);
   }
@@ -44,8 +45,18 @@ export function runCli(args = process.argv.slice(2)) {
     process.stdout.write(`${usage()}\n`);
     return 0;
   }
+  const started = performance.now();
   const report = collectMemoryAudit(options);
-  recordMemoryAuditObservability({ root: options.root, report });
+  if (options.observability) {
+    const recorded = recordMemoryAuditObservability({
+      root: options.root,
+      report,
+      durationMs: performance.now() - started,
+    });
+    if (!recorded.written && recorded.error) {
+      process.stderr.write(`memory-audit: local observability skipped: ${recorded.error}\n`);
+    }
+  }
   if (options.json) process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   else {
     const formatted = formatMemoryAudit(report);

@@ -77,7 +77,7 @@ function parseArgs(args) {
 }
 
 function usage() {
-  return `Usage: node scripts/memory-public-benchmark.mjs [options]
+  return `Usage: npm run benchmark [-- options] (node memory-public-benchmark.mjs)
 
 Run a locked multilingual/script retrieval bake-off. The embedding lane is absent unless an explicit zero-call adapter is supplied.
 

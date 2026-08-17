@@ -29,7 +29,7 @@ const INSTANCE_SCHEMA = 'ownmem-dashboard-instance/v1';
 const PROBE_TIMEOUT_MS = 1500;
 
 function usage() {
-  return `Usage: node scripts/memory-dashboard.mjs [options]
+  return `Usage: npx ownmem dashboard [options]
 
 Serve OwnMem Console locally. It binds 127.0.0.1 only. Default
 metrics stay local; an optional embedding provider is contacted only after explicit setup.
@@ -223,7 +223,7 @@ export async function runCli(rawArgs = process.argv.slice(2), io = { stdout: pro
     if (options.open) openInBrowser(existing.url);
     emit(options, io, { schema: INSTANCE_SCHEMA, reused: true, ...existing }, [
       `ownmem dashboard: reusing instance at ${existing.url}`,
-      `pid ${existing.pid} · stop with: node scripts/memory-dashboard.mjs --stop`,
+      `pid ${existing.pid} · stop with: npx ownmem dashboard --stop`,
     ]);
     return 0;
   }
@@ -258,7 +258,7 @@ export async function runCli(rawArgs = process.argv.slice(2), io = { stdout: pro
   emit(options, io, { schema: INSTANCE_SCHEMA, reused: false, ...instance }, [
     `ownmem dashboard: ${url}`,
     'local control plane · 127.0.0.1 only · token stays in the URL fragment',
-    'stop with Ctrl-C, or: node scripts/memory-dashboard.mjs --stop',
+    'stop with Ctrl-C, or: npx ownmem dashboard --stop',
   ]);
   return 0;
 }

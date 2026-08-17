@@ -34,8 +34,8 @@ guiando você pela configuração por repositório.
 > não importa como você chegou lá. Comece por qualquer uma das duas partes.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="Arquitetura do OwnMem: a memória em Markdown e o motor BM25F vivem dentro do seu repositório; Claude Code, Codex, Gemini CLI, Cursor e Grok CLI recuperam dos mesmos arquivos, e a memória viaja com o git" src="./assets/architecture-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-pt-BR-dark.svg">
+  <img alt="Arquitetura ponta a ponta do OwnMem: o Markdown curado é governado e compilado em um snapshot verificado; cada pergunta passa por variações, seis canais candidatos, ranking determinístico, portão de confiança, orçamento de contexto, verificação do Agent e feedback local" src="./assets/architecture-pt-BR-light.svg" width="100%">
 </picture>
 
 ## Por que isso existe

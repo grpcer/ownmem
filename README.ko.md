@@ -32,8 +32,8 @@ OwnMem은 두 부분으로 구성됩니다. **npm 패키지**는 엔진입니다
 > 준비 완료입니다. 어느 쪽에서 시작해도 좋습니다.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="OwnMem 아키텍처: Markdown 메모리와 BM25F 엔진이 저장소 안에 살고, Claude Code·Codex·Gemini CLI·Cursor·Grok CLI가 같은 파일에서 recall하며, 메모리는 git과 함께 이동합니다" src="./assets/architecture-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-ko-dark.svg">
+  <img alt="OwnMem 엔드투엔드 아키텍처: 선별된 Markdown을 거버넌스와 컴파일을 거쳐 검증된 snapshot으로 만들고, 각 질문을 여러 query 표현, 6개 후보 channel, 결정적 랭킹, 신뢰도 게이트, context 예산, Agent 검증, 로컬 feedback으로 연결합니다" src="./assets/architecture-ko-light.svg" width="100%">
 </picture>
 
 ## 만들게 된 이유

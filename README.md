@@ -34,7 +34,7 @@ you through the per-repository setup.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="OwnMem architecture: Markdown memory and the BM25F engine live inside your repository; Claude Code, Codex, Gemini CLI, Cursor, and Grok CLI recall from the same files, and the memory travels with git" src="./assets/architecture-light.svg" width="100%">
+  <img alt="OwnMem end-to-end architecture: curated Markdown is governed and compiled into a verified snapshot; each question passes through query variants, six candidate lanes, deterministic ranking, confidence gating, context budgeting, agent verification, and local feedback" src="./assets/architecture-light.svg" width="100%">
 </picture>
 
 ## Why this exists

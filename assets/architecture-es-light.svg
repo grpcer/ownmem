@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
+  <title id="title">Cómo OwnMem convierte una pregunta en contexto fiable</title>
+  <desc id="description">Flujo de OwnMem en dos etapas: el Markdown curado se gobierna y compila en un snapshot verificado; una pregunta se transforma en variantes, pasa por seis canales candidatos, ranking determinista y una puerta de confianza, y termina en abstención o en un sobre de contexto con evidencia que el Agent verifica. El feedback local cierra el ciclo.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/>
+    </marker>
+    <marker id="accent-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="700" rx="18" fill="#ffffff"/>
+
+  <text x="40" y="44" text-anchor="start" font-size="24" font-weight="700" fill="#0f172a"><tspan x="40" dy="0">Cómo OwnMem convierte una pregunta en contexto fiable</tspan></text>
+  <text x="40" y="70" text-anchor="start" font-size="13.5" font-weight="400" fill="#57606a"><tspan x="40" dy="0">Memoria del repositorio · determinista por defecto · evidencia antes de responder</tspan></text>
+  <rect x="1115" y="27" width="445" height="30" rx="15" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="1337.5" y="47" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">Por defecto: 0 llamadas a modelos · 0 llamadas de red</text>
+
+  <text x="40" y="112" text-anchor="start" font-size="12.5" font-weight="700" fill="#2563eb"><tspan x="40" dy="0">1 · CURAR Y COMPILAR</tspan></text>
+  <g>
+    <rect x="40" y="130" width="250" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+    <text x="58" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="58" dy="0">Memoria Markdown curada</tspan></text>
+    <text x="58" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="58" dy="0">lección · triggers · evidencia</tspan><tspan x="58" dy="18">.ownmem/ viaja con git</tspan></text>
+  </g>
+  <path d="M 290 182 L 320 182" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="320" y="130" width="230" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+    <text x="338" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="338" dy="0">Gobierno local</tspan></text>
+    <text x="338" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="338" dy="0">schema · cuota · deduplicación</tspan><tspan x="338" dy="18">revisable en pull requests</tspan></text>
+  </g>
+  <path d="M 550 182 L 580 182" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="580" y="130" width="250" height="104" rx="12" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
+    <text x="598" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="598" dy="0">Compilar una vez</tspan></text>
+    <text x="598" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="598" dy="0">snapshot inmutable y verificado</tspan><tspan x="598" dy="18">respaldo seguro al anterior</tspan></text>
+  </g>
+
+  <rect x="1115" y="104" width="445" height="130" rx="12" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="1337.5" y="140" text-anchor="middle" font-size="16" font-weight="650" fill="#0f172a"><tspan x="1337.5" dy="0">Una memoria para todos los coding agents</tspan></text>
+  <text x="1337.5" y="180" text-anchor="middle" font-size="13" font-weight="400" fill="#57606a"><tspan x="1337.5" dy="0">Claude Code · Codex · Gemini CLI</tspan><tspan x="1337.5" dy="20">Cursor · Grok CLI</tspan></text>
+  <path d="M 830 182 C 930 182 980 169 1100 169" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
+
+  <text x="40" y="284" text-anchor="start" font-size="12.5" font-weight="700" fill="#2563eb"><tspan x="40" dy="0">2 · RECUPERAR Y VERIFICAR</tspan></text>
+  <g>
+    <rect x="40" y="315" width="170" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+    <text x="58" y="346" text-anchor="start" font-size="14.5" font-weight="650" fill="#0f172a"><tspan x="58" dy="0">Pregunta del usuario</tspan></text>
+    <text x="58" y="373" text-anchor="start" font-size="12" font-weight="400" fill="#57606a"><tspan x="58" dy="0">un síntoma en</tspan><tspan x="58" dy="18">lenguaje cotidiano</tspan></text>
+  </g>
+  <path d="M 210 367 L 235 367" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="235" y="315" width="210" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+    <text x="253" y="341" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="253" dy="0">El Agent prepara</tspan><tspan x="253" dy="18">2–3 variantes de consulta</tspan></text>
+    <text x="253" y="381" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="253" dy="0">original · causa raíz · símbolo</tspan></text>
+  </g>
+
+  <rect x="475" y="290" width="910" height="288" rx="16" fill="#f6f8fa" stroke="#2563eb" stroke-width="1.5"/>
+  <rect x="495" y="276" width="154" height="28" rx="14" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="572" y="295" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#2563eb">MOTOR OWNMEM</text>
+  <path d="M 445 367 L 505 367" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
+
+  <g>
+    <rect x="505" y="330" width="145" height="112" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+    <text x="523" y="361" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="523" dy="0">Planificador</tspan></text>
+    <text x="523" y="388" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="523" dy="0">clasifica la intención</tspan><tspan x="523" dy="18">limita cada canal</tspan></text>
+  </g>
+  <path d="M 650 386 L 680 386" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="680" y="330" width="240" height="146" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+    <text x="700" y="356" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="700" dy="0">Canales candidatos</tspan></text>
+    <rect x="700" y="378" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
+      <text x="749" y="396" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Exact</text>
+      <rect x="808" y="378" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
+      <text x="857" y="396" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">BM25F</text>
+      <rect x="700" y="413" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
+      <text x="749" y="431" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">n-gram</text>
+      <rect x="808" y="413" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
+      <text x="857" y="431" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Fuzzy</text>
+      <rect x="700" y="448" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
+      <text x="749" y="466" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Graph</text>
+      <rect x="808" y="448" width="98" height="26" rx="7" fill="#fffbeb" stroke="#a16207" stroke-dasharray="4 3"/>
+      <text x="857" y="466" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">Embedding*</text>
+  </g>
+  <path d="M 920 403 L 950 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="950" y="347" width="185" height="112" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
+    <text x="968" y="378" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="968" dy="0">Fusionar y decidir</tspan></text>
+    <text x="968" y="405" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="968" dy="0">RRF · autoridad · alcance</tspan><tspan x="968" dy="18">evidencia · conflictos · MMR</tspan></text>
+  </g>
+  <path d="M 1135 403 L 1145 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
+
+  <polygon points="1195,348 1245,403 1195,458 1145,403" fill="#fffbeb" stroke="#a16207" stroke-width="1.5"/>
+  <text x="1195" y="407" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a"><tspan x="1195" dy="0">¿Es fiable?</tspan></text>
+  <path d="M 1195 458 L 1195 500 L 1118 500" fill="none" stroke="#b42318" stroke-width="1.7" marker-end="url(#arrow)"/>
+  <rect x="950" y="480" width="168" height="72" rx="11" fill="#fff1f0" stroke="#b42318"/>
+  <text x="1034" y="508" text-anchor="middle" font-size="13.5" font-weight="650" fill="#b42318"><tspan x="1034" dy="0">No → abstenerse</tspan></text>
+  <text x="1034" y="531" text-anchor="middle" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="1034" dy="0">no inyectar nada</tspan></text>
+  <path d="M 1245 403 L 1260 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
+  <rect x="1260" y="357" width="125" height="92" rx="11" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
+  <text x="1322.5" y="382" text-anchor="middle" font-size="11.5" font-weight="650" fill="#15803d"><tspan x="1322.5" dy="0">Sí → sobre</tspan><tspan x="1322.5" dy="16">de contexto</tspan></text>
+  <text x="1322.5" y="427" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a"><tspan x="1322.5" dy="0">≤400 tokens · 1 tema</tspan></text>
+
+  <path d="M 1385 403 L 1400 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
+  <rect x="1400" y="315" width="180" height="176" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="1490" y="348" text-anchor="middle" font-size="13.5" font-weight="650" fill="#0f172a"><tspan x="1490" dy="0">El Agent verifica</tspan><tspan x="1490" dy="18">y responde</tspan></text>
+  <text x="1490" y="414" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a"><tspan x="1490" dy="0">memoria completa</tspan><tspan x="1490" dy="17">docs oficiales</tspan><tspan x="1490" dy="17">código / tests actuales</tspan></text>
+
+  <rect x="1115" y="608" width="445" height="52" rx="12" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="1136" y="630" text-anchor="start" font-size="12.5" font-weight="650" fill="#0f172a"><tspan x="1136" dy="0">correcto · erróneo · omitido</tspan></text>
+  <text x="1136" y="649" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="1136" dy="0">el feedback local mejora triggers y evaluaciones</tspan></text>
+  <path d="M 1490 491 L 1490 597" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
+  <path d="M 1115 634 L 24 634 L 24 182 L 40 182" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
+
+  <rect x="40" y="608" width="620" height="30" rx="15" fill="#fffbeb" stroke="#a16207"/>
+  <text x="350" y="628" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">El embedding opcional está aislado; un fallo conserva lo léxico</text>
+</svg>

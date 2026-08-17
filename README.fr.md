@@ -34,8 +34,8 @@ moteur, y compris en vous guidant dans la configuration par dépôt.
 > importe le chemin suivi. Commencez par l'une ou l'autre pièce.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="Architecture d'OwnMem : la mémoire Markdown et le moteur BM25F vivent dans votre dépôt ; Claude Code, Codex, Gemini CLI, Cursor et Grok CLI rappellent depuis les mêmes fichiers, et la mémoire voyage avec git" src="./assets/architecture-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-fr-dark.svg">
+  <img alt="Architecture de bout en bout d’OwnMem : le Markdown sélectionné est gouverné puis compilé en snapshot vérifié ; chaque question traverse des variantes, six canaux candidats, un classement déterministe, un seuil de confiance, un budget de contexte, la vérification de l’Agent et le feedback local" src="./assets/architecture-fr-light.svg" width="100%">
 </picture>
 
 ## Pourquoi ce projet existe

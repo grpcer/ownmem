@@ -33,8 +33,8 @@ OwnMem は 2 つの部品から成ります。**npm パッケージ**はエン�
 > 経路は問いません——どちらの部品から始めても構いません。
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="OwnMem アーキテクチャ:Markdown メモリと BM25F エンジンはリポジトリの中に住み、Claude Code・Codex・Gemini CLI・Cursor・Grok CLI が同じファイルから recall し、メモリは git とともに移動する" src="./assets/architecture-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-ja-dark.svg">
+  <img alt="OwnMem のエンドツーエンド構成：選別された Markdown を統制して検証済み snapshot にコンパイルし、各質問を複数の query 表現、6 つの候補 channel、決定的ランキング、信頼度ゲート、context 予算、Agent の検証、ローカル feedback へ通す" src="./assets/architecture-ja-light.svg" width="100%">
 </picture>
 
 ## なぜ作ったのか

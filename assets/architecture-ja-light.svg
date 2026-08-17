@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
-  <title id="title">How OwnMem turns a question into trusted context</title>
-  <desc id="description">A two-stage OwnMem workflow: curated Markdown is governed and compiled into a verified snapshot; a user question becomes query variants, passes through six candidate lanes, deterministic ranking and a confidence gate, then either abstains or gives an evidence-bearing context envelope to the agent for verification. Local feedback closes the loop.</desc>
+  <title id="title">OwnMem が質問を信頼できるコンテキストに変えるまで</title>
+  <desc id="description">OwnMem の 2 段階ワークフロー。選別された Markdown は統制とコンパイルを経て検証済み snapshot になります。質問は複数の query 表現から 6 つの候補 channel、決定的ランキング、信頼度ゲートを通り、abstain するか、証拠付き context envelope として Agent に渡されます。ローカル feedback が改善ループを閉じます。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/>
@@ -11,46 +11,46 @@
   </defs>
   <rect width="1600" height="700" rx="18" fill="#ffffff"/>
 
-  <text x="40" y="44" text-anchor="start" font-size="24" font-weight="700" fill="#0f172a"><tspan x="40" dy="0">How OwnMem turns a question into trusted context</tspan></text>
-  <text x="40" y="70" text-anchor="start" font-size="13.5" font-weight="400" fill="#57606a"><tspan x="40" dy="0">Repository-owned memory · deterministic by default · evidence before answers</tspan></text>
+  <text x="40" y="44" text-anchor="start" font-size="24" font-weight="700" fill="#0f172a"><tspan x="40" dy="0">OwnMem が質問を信頼できるコンテキストに変えるまで</tspan></text>
+  <text x="40" y="70" text-anchor="start" font-size="13.5" font-weight="400" fill="#57606a"><tspan x="40" dy="0">リポジトリ所有 · デフォルトは決定的 · 回答より先に証拠を確認</tspan></text>
   <rect x="1115" y="27" width="445" height="30" rx="15" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="1337.5" y="47" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">Default: 0 model calls · 0 network calls</text>
+  <text x="1337.5" y="47" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">デフォルト：モデル呼び出し 0 · ネットワーク 0</text>
 
-  <text x="40" y="112" text-anchor="start" font-size="12.5" font-weight="700" fill="#2563eb"><tspan x="40" dy="0">1 · CURATE &amp; COMPILE</tspan></text>
+  <text x="40" y="112" text-anchor="start" font-size="12.5" font-weight="700" fill="#2563eb"><tspan x="40" dy="0">1 · 選別とコンパイル</tspan></text>
   <g>
     <rect x="40" y="130" width="250" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="58" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="58" dy="0">Curated Markdown memory</tspan></text>
-    <text x="58" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="58" dy="0">lesson · triggers · evidence</tspan><tspan x="58" dy="18">.ownmem/ travels with git</tspan></text>
+    <text x="58" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="58" dy="0">選別された Markdown メモリ</tspan></text>
+    <text x="58" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="58" dy="0">教訓 · trigger · evidence</tspan><tspan x="58" dy="18">.ownmem/ は git とともに移動</tspan></text>
   </g>
   <path d="M 290 182 L 320 182" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
   <g>
     <rect x="320" y="130" width="230" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="338" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="338" dy="0">Govern locally</tspan></text>
-    <text x="338" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="338" dy="0">schema · quota · dedup</tspan><tspan x="338" dy="18">reviewable in pull requests</tspan></text>
+    <text x="338" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="338" dy="0">ローカルで統制</tspan></text>
+    <text x="338" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="338" dy="0">schema · quota · 重複排除</tspan><tspan x="338" dy="18">pull request でレビュー可能</tspan></text>
   </g>
   <path d="M 550 182 L 580 182" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
   <g>
     <rect x="580" y="130" width="250" height="104" rx="12" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
-    <text x="598" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="598" dy="0">Compile once</tspan></text>
-    <text x="598" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="598" dy="0">immutable verified snapshot</tspan><tspan x="598" dy="18">safe previous-snapshot fallback</tspan></text>
+    <text x="598" y="161" text-anchor="start" font-size="15" font-weight="650" fill="#0f172a"><tspan x="598" dy="0">一度だけコンパイル</tspan></text>
+    <text x="598" y="188" text-anchor="start" font-size="12.5" font-weight="400" fill="#57606a"><tspan x="598" dy="0">不変で検証済みの snapshot</tspan><tspan x="598" dy="18">直前の snapshot へ安全に退避</tspan></text>
   </g>
 
   <rect x="1115" y="104" width="445" height="130" rx="12" fill="#f6f8fa" stroke="#d0d7de"/>
-  <text x="1337.5" y="140" text-anchor="middle" font-size="16" font-weight="650" fill="#0f172a"><tspan x="1337.5" dy="0">One memory, every coding agent</tspan></text>
+  <text x="1337.5" y="140" text-anchor="middle" font-size="16" font-weight="650" fill="#0f172a"><tspan x="1337.5" dy="0">1 つのメモリを全 coding agent で共有</tspan></text>
   <text x="1337.5" y="180" text-anchor="middle" font-size="13" font-weight="400" fill="#57606a"><tspan x="1337.5" dy="0">Claude Code · Codex · Gemini CLI</tspan><tspan x="1337.5" dy="20">Cursor · Grok CLI</tspan></text>
   <path d="M 830 182 C 930 182 980 169 1100 169" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
 
-  <text x="40" y="284" text-anchor="start" font-size="12.5" font-weight="700" fill="#2563eb"><tspan x="40" dy="0">2 · RECALL &amp; VERIFY</tspan></text>
+  <text x="40" y="284" text-anchor="start" font-size="12.5" font-weight="700" fill="#2563eb"><tspan x="40" dy="0">2 · RECALL と検証</tspan></text>
   <g>
     <rect x="40" y="315" width="170" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="58" y="346" text-anchor="start" font-size="14.5" font-weight="650" fill="#0f172a"><tspan x="58" dy="0">User question</tspan></text>
-    <text x="58" y="373" text-anchor="start" font-size="12" font-weight="400" fill="#57606a"><tspan x="58" dy="0">a symptom in</tspan><tspan x="58" dy="18">ordinary words</tspan></text>
+    <text x="58" y="346" text-anchor="start" font-size="14.5" font-weight="650" fill="#0f172a"><tspan x="58" dy="0">ユーザーの質問</tspan></text>
+    <text x="58" y="373" text-anchor="start" font-size="12" font-weight="400" fill="#57606a"><tspan x="58" dy="0">日常語で症状を</tspan><tspan x="58" dy="18">説明</tspan></text>
   </g>
   <path d="M 210 367 L 235 367" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
   <g>
     <rect x="235" y="315" width="210" height="104" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="253" y="341" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="253" dy="0">Agent prepares</tspan><tspan x="253" dy="18">2–3 query variants</tspan></text>
-    <text x="253" y="381" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="253" dy="0">original · root cause · symbol</tspan></text>
+    <text x="253" y="341" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="253" dy="0">Agent が用意する</tspan><tspan x="253" dy="18">2〜3 個の query 表現</tspan></text>
+    <text x="253" y="381" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="253" dy="0">原文 · 推定原因 · symbol</tspan></text>
   </g>
 
   <rect x="475" y="290" width="910" height="288" rx="16" fill="#f6f8fa" stroke="#2563eb" stroke-width="1.5"/>
@@ -61,12 +61,12 @@
   <g>
     <rect x="505" y="330" width="145" height="112" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
     <text x="523" y="361" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="523" dy="0">Query planner</tspan></text>
-    <text x="523" y="388" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="523" dy="0">classifies intent</tspan><tspan x="523" dy="18">sets channel limits</tspan></text>
+    <text x="523" y="388" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="523" dy="0">意図を分類</tspan><tspan x="523" dy="18">channel 上限を設定</tspan></text>
   </g>
   <path d="M 650 386 L 680 386" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
   <g>
     <rect x="680" y="330" width="240" height="146" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="700" y="356" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="700" dy="0">Candidate lanes</tspan></text>
+    <text x="700" y="356" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="700" dy="0">候補 channel</tspan></text>
     <rect x="700" y="378" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
       <text x="749" y="396" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Exact</text>
       <rect x="808" y="378" width="98" height="26" rx="7" fill="#f8fafc" stroke="#d0d7de"/>
@@ -83,33 +83,33 @@
   <path d="M 920 403 L 950 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
   <g>
     <rect x="950" y="347" width="185" height="112" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-    <text x="968" y="378" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="968" dy="0">Fuse &amp; judge</tspan></text>
-    <text x="968" y="405" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="968" dy="0">RRF · authority · scope</tspan><tspan x="968" dy="18">evidence · conflicts · MMR</tspan></text>
+    <text x="968" y="378" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a"><tspan x="968" dy="0">統合して判定</tspan></text>
+    <text x="968" y="405" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="968" dy="0">RRF · authority · scope</tspan><tspan x="968" dy="18">evidence · conflict · MMR</tspan></text>
   </g>
   <path d="M 1135 403 L 1145 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
 
   <polygon points="1195,348 1245,403 1195,458 1145,403" fill="#fffbeb" stroke="#a16207" stroke-width="1.5"/>
-  <text x="1195" y="407" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a"><tspan x="1195" dy="0">Confident?</tspan></text>
+  <text x="1195" y="407" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a"><tspan x="1195" dy="0">十分に確か？</tspan></text>
   <path d="M 1195 458 L 1195 500 L 1118 500" fill="none" stroke="#b42318" stroke-width="1.7" marker-end="url(#arrow)"/>
   <rect x="950" y="480" width="168" height="72" rx="11" fill="#fff1f0" stroke="#b42318"/>
-  <text x="1034" y="508" text-anchor="middle" font-size="13.5" font-weight="650" fill="#b42318"><tspan x="1034" dy="0">No → abstain</tspan></text>
-  <text x="1034" y="531" text-anchor="middle" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="1034" dy="0">inject nothing</tspan></text>
+  <text x="1034" y="508" text-anchor="middle" font-size="13.5" font-weight="650" fill="#b42318"><tspan x="1034" dy="0">いいえ → abstain</tspan></text>
+  <text x="1034" y="531" text-anchor="middle" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="1034" dy="0">何も注入しない</tspan></text>
   <path d="M 1245 403 L 1260 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
   <rect x="1260" y="357" width="125" height="92" rx="11" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
-  <text x="1322.5" y="382" text-anchor="middle" font-size="11.5" font-weight="650" fill="#15803d"><tspan x="1322.5" dy="0">Yes → context</tspan><tspan x="1322.5" dy="16">envelope</tspan></text>
+  <text x="1322.5" y="382" text-anchor="middle" font-size="11.5" font-weight="650" fill="#15803d"><tspan x="1322.5" dy="0">はい → context</tspan><tspan x="1322.5" dy="16">envelope</tspan></text>
   <text x="1322.5" y="427" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a"><tspan x="1322.5" dy="0">≤400 tokens · 1 topic</tspan></text>
 
   <path d="M 1385 403 L 1400 403" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#accent-arrow)"/>
   <rect x="1400" y="315" width="180" height="176" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-  <text x="1490" y="348" text-anchor="middle" font-size="13.5" font-weight="650" fill="#0f172a"><tspan x="1490" dy="0">Agent verifies,</tspan><tspan x="1490" dy="18">then answers</tspan></text>
-  <text x="1490" y="414" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a"><tspan x="1490" dy="0">full memory</tspan><tspan x="1490" dy="17">authority docs</tspan><tspan x="1490" dy="17">live code / tests</tspan></text>
+  <text x="1490" y="348" text-anchor="middle" font-size="13.5" font-weight="650" fill="#0f172a"><tspan x="1490" dy="0">Agent が検証して</tspan><tspan x="1490" dy="18">から回答</tspan></text>
+  <text x="1490" y="414" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a"><tspan x="1490" dy="0">メモリ全文</tspan><tspan x="1490" dy="17">authority docs</tspan><tspan x="1490" dy="17">現在の code / tests</tspan></text>
 
   <rect x="1115" y="608" width="445" height="52" rx="12" fill="#ffffff" stroke="#d0d7de"/>
   <text x="1136" y="630" text-anchor="start" font-size="12.5" font-weight="650" fill="#0f172a"><tspan x="1136" dy="0">correct · wrong · miss</tspan></text>
-  <text x="1136" y="649" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="1136" dy="0">local feedback improves triggers and evaluations</tspan></text>
+  <text x="1136" y="649" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a"><tspan x="1136" dy="0">ローカル feedback で trigger と評価を改善</tspan></text>
   <path d="M 1490 491 L 1490 597" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
   <path d="M 1115 634 L 24 634 L 24 182 L 40 182" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
 
   <rect x="40" y="608" width="620" height="30" rx="15" fill="#fffbeb" stroke="#a16207"/>
-  <text x="350" y="628" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">Optional embedding is isolated; failure keeps lexical results</text>
+  <text x="350" y="628" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">任意の embedding は分離；失敗しても語彙結果を維持</text>
 </svg>

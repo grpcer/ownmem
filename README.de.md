@@ -35,8 +35,8 @@ pro Repository.
 > hat — egal, auf welchem Weg. Beginne mit einem der beiden Teile.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="OwnMem-Architektur: Markdown-Gedächtnis und BM25F-Motor leben in deinem Repository; Claude Code, Codex, Gemini CLI, Cursor und Grok CLI rufen aus denselben Dateien ab, und das Gedächtnis reist mit git" src="./assets/architecture-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-de-dark.svg">
+  <img alt="OwnMem-End-to-End-Architektur: Kuratierter Markdown-Speicher wird geprüft und zu einem verifizierten Snapshot kompiliert; jede Frage durchläuft Varianten, sechs Kandidatenkanäle, deterministisches Ranking, Konfidenztor, Kontextbudget, Agent-Prüfung und lokales Feedback" src="./assets/architecture-de-light.svg" width="100%">
 </picture>
 
 ## Wie OwnMem entstanden ist

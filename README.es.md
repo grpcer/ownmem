@@ -34,8 +34,8 @@ motor, incluida la guía por la configuración de cada repositorio.
 > llegases como llegases. Empieza por cualquiera de las dos piezas.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="Arquitectura de OwnMem: la memoria en Markdown y el motor BM25F viven dentro de tu repositorio; Claude Code, Codex, Gemini CLI, Cursor y Grok CLI recuperan desde los mismos archivos, y la memoria viaja con git" src="./assets/architecture-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-es-dark.svg">
+  <img alt="Arquitectura integral de OwnMem: el Markdown curado se gobierna y compila en un snapshot verificado; cada pregunta pasa por variantes, seis canales candidatos, ranking determinista, una puerta de confianza, presupuesto de contexto, verificación del Agent y feedback local" src="./assets/architecture-es-light.svg" width="100%">
 </picture>
 
 ## Por qué existe

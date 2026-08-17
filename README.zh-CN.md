@@ -30,8 +30,8 @@ OwnMem 由两部分组成。**npm 包**是引擎：以可审查的 `devDependenc
 > 开始都可以。
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="OwnMem 架构：Markdown 记忆与 BM25F 引擎住在你的仓库里；Claude Code、Codex、Gemini CLI、Cursor、Grok CLI 从同一批文件召回，记忆随 git 流转" src="./assets/architecture-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-zh-CN-dark.svg">
+  <img alt="OwnMem 端到端架构：精选 Markdown 经本地治理后编译为可信快照；每个问题依次经过多种查询措辞、六路候选、确定性排序、可信度门、上下文预算、Agent 复核和本地反馈闭环" src="./assets/architecture-zh-CN-light.svg" width="100%">
 </picture>
 
 ## 缘起

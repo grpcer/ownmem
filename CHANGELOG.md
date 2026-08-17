@@ -57,6 +57,10 @@ Versioning.
   `.claude/memory` layout; it now resolves the installation's configured
   memory directory, so full-text opens in `.ownmem` repositories pair with
   their recalls (`recall.consumed`).
+- npm 11's publish-time normalization silently dropped the package `bin`
+  entry because its path carried a `./` prefix — every consumer would have
+  lost the `ownmem` executable. The manifest now declares the normalized
+  `memory.mjs` path, and the publish dry run is clean.
 - The public self-test gave its npm steps 60 seconds, which killed the
   cold-cache warm install on slow or proxied registry routes and reported the
   unhelpful `exited null`. Network-bound npm steps now get five minutes, and

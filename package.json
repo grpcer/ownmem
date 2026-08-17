@@ -17,7 +17,7 @@
     "node": ">=20"
   },
   "bin": {
-    "ownmem": "./memory.mjs"
+    "ownmem": "memory.mjs"
   },
   "exports": {
     ".": "./memory.mjs"

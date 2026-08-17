@@ -221,6 +221,22 @@ cd ownmem && npm ci && npm run benchmark
 > 锁定，且每次运行都会以倒序主题重跑一遍以证明确定性。这些合成指标是
 > 回归证据，不代表真实用户准确率。
 
+## 参考文献
+
+排序管线里没有任何自创数学——引擎中的每项技术都是经过实战检验的公开方法，
+OwnMem 的贡献在于把它们组合成一个确定性、零重依赖的引擎：
+
+| OwnMem 中的位置 | 技术 | 文献 |
+| --- | --- | --- |
+| `bm25f` 通道 | 字段加权 BM25 排序 | Robertson & Zaragoza (2009), *[The Probabilistic Relevance Framework: BM25 and Beyond](https://doi.org/10.1561/1500000019)*; Robertson, Zaragoza & Taylor (2004), *[Simple BM25 extension to multiple weighted fields](https://doi.org/10.1145/1031171.1031181)* |
+| 通道与多问法融合 | Reciprocal Rank Fusion | Cormack, Clarke & Büttcher (2009), *[Reciprocal rank fusion outperforms Condorcet and individual rank learning methods](https://doi.org/10.1145/1571941.1572114)* |
+| 结果去冗 | Maximal Marginal Relevance | Carbonell & Goldstein (1998), *[The use of MMR, diversity-based reranking for reordering documents and producing summaries](https://doi.org/10.1145/290941.291025)* |
+| `ngram` 通道 | 字符 n-gram 相似度（Dice） | Dice (1945), *[Measures of the amount of ecologic association between species](https://doi.org/10.2307/1932409)* |
+| `fuzzy` 通道 | 有界编辑距离 | Levenshtein (1966), *Binary codes capable of correcting deletions, insertions, and reversals*, Soviet Physics Doklady 10(8) |
+| 近重复闸门 | SimHash | Charikar (2002), *[Similarity estimation techniques from rounding algorithms](https://doi.org/10.1145/509907.509965)*; Manku, Jain & Das Sarma (2007), *[Detecting near-duplicates for web crawling](https://doi.org/10.1145/1242572.1242592)* |
+| 近重复闸门 | MinHash | Broder (1997), *[On the resemblance and containment of documents](https://doi.org/10.1109/SEQUEN.1997.666900)* |
+| 分词器 | 文字系统感知切分 | *[UAX #24: Unicode Script Property](https://unicode.org/reports/tr24/)*; *[UAX #29: Unicode Text Segmentation](https://unicode.org/reports/tr29/)* |
+
 ## 安装 agent 插件（可选，每台机器一次）
 
 **到底要不要装？不装也一切正常。** `ownmem init` 已经把纪律写进了仓库的

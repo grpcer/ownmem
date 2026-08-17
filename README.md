@@ -241,6 +241,23 @@ cd ownmem && npm ci && npm run benchmark
 > topic order to prove determinism. These synthetic metrics are regression
 > evidence, not a claim of real-user accuracy.
 
+## References
+
+None of the ranking math is homemade — every technique in the engine is a
+published, battle-tested method. OwnMem's contribution is composing them into
+a deterministic, dependency-free engine:
+
+| In OwnMem | Technique | Literature |
+| --- | --- | --- |
+| `bm25f` lane | Field-weighted BM25 ranking | Robertson & Zaragoza (2009), *[The Probabilistic Relevance Framework: BM25 and Beyond](https://doi.org/10.1561/1500000019)*; Robertson, Zaragoza & Taylor (2004), *[Simple BM25 extension to multiple weighted fields](https://doi.org/10.1145/1031171.1031181)* |
+| Lane & multi-query fusion | Reciprocal Rank Fusion | Cormack, Clarke & Büttcher (2009), *[Reciprocal rank fusion outperforms Condorcet and individual rank learning methods](https://doi.org/10.1145/1571941.1572114)* |
+| Result diversity | Maximal Marginal Relevance | Carbonell & Goldstein (1998), *[The use of MMR, diversity-based reranking for reordering documents and producing summaries](https://doi.org/10.1145/290941.291025)* |
+| `ngram` lane | Character n-gram similarity (Dice) | Dice (1945), *[Measures of the amount of ecologic association between species](https://doi.org/10.2307/1932409)* |
+| `fuzzy` lane | Bounded edit distance | Levenshtein (1966), *Binary codes capable of correcting deletions, insertions, and reversals*, Soviet Physics Doklady 10(8) |
+| Near-duplicate gate | SimHash | Charikar (2002), *[Similarity estimation techniques from rounding algorithms](https://doi.org/10.1145/509907.509965)*; Manku, Jain & Das Sarma (2007), *[Detecting near-duplicates for web crawling](https://doi.org/10.1145/1242572.1242592)* |
+| Near-duplicate gate | MinHash | Broder (1997), *[On the resemblance and containment of documents](https://doi.org/10.1109/SEQUEN.1997.666900)* |
+| Tokenizer | Script-aware segmentation | *[UAX #24: Unicode Script Property](https://unicode.org/reports/tr24/)*; *[UAX #29: Unicode Text Segmentation](https://unicode.org/reports/tr29/)* |
+
 ## Install the agent plugin (optional, once per machine)
 
 **Do you have to install it? No — skip it and everything still works.**

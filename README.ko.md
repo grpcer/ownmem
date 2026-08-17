@@ -237,6 +237,23 @@ cd ownmem && npm ci && npm run benchmark
 > 임계값은 잠겨 있으며, 주제 순서를 뒤집어 다시 실행해 결정성을 증명합니다.
 > 이 합성 지표는 회귀 증거일 뿐, 실사용자 정확도를 주장하지 않습니다.
 
+## 참고 문헌
+
+랭킹 수식에 자체 고안은 없습니다 — 엔진의 모든 기법은 공개되고 검증된
+방법입니다. OwnMem의 기여는 이를 결정적이고 의존성 없는 엔진으로 조합한
+데 있습니다:
+
+| OwnMem에서의 위치 | 기법 | 문헌 |
+| --- | --- | --- |
+| `bm25f` channel | 필드 가중 BM25 랭킹 | Robertson & Zaragoza (2009), *[The Probabilistic Relevance Framework: BM25 and Beyond](https://doi.org/10.1561/1500000019)*; Robertson, Zaragoza & Taylor (2004), *[Simple BM25 extension to multiple weighted fields](https://doi.org/10.1145/1031171.1031181)* |
+| channel·다중 표현 융합 | Reciprocal Rank Fusion | Cormack, Clarke & Büttcher (2009), *[Reciprocal rank fusion outperforms Condorcet and individual rank learning methods](https://doi.org/10.1145/1571941.1572114)* |
+| 결과 다양화 | Maximal Marginal Relevance | Carbonell & Goldstein (1998), *[The use of MMR, diversity-based reranking for reordering documents and producing summaries](https://doi.org/10.1145/290941.291025)* |
+| `ngram` channel | 문자 n-gram 유사도(Dice) | Dice (1945), *[Measures of the amount of ecologic association between species](https://doi.org/10.2307/1932409)* |
+| `fuzzy` channel | 상한 편집 거리 | Levenshtein (1966), *Binary codes capable of correcting deletions, insertions, and reversals*, Soviet Physics Doklady 10(8) |
+| 중복 게이트 | SimHash | Charikar (2002), *[Similarity estimation techniques from rounding algorithms](https://doi.org/10.1145/509907.509965)*; Manku, Jain & Das Sarma (2007), *[Detecting near-duplicates for web crawling](https://doi.org/10.1145/1242572.1242592)* |
+| 중복 게이트 | MinHash | Broder (1997), *[On the resemblance and containment of documents](https://doi.org/10.1109/SEQUEN.1997.666900)* |
+| 토크나이저 | 문자 체계 인식 분할 | *[UAX #24: Unicode Script Property](https://unicode.org/reports/tr24/)*; *[UAX #29: Unicode Text Segmentation](https://unicode.org/reports/tr29/)* |
+
 ## agent 플러그인 설치(선택, 머신마다 한 번)
 
 **꼭 설치해야 하나요? 아니요 — 설치하지 않아도 모든 것이 동작합니다.**

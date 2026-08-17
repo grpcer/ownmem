@@ -243,6 +243,23 @@ cd ownmem && npm ci && npm run benchmark
 > これらの合成指標は回帰の証拠であり、実ユーザーでの精度を主張するものでは
 > ありません。
 
+## 参考文献
+
+ランキングの数学に自己流のものはありません——エンジン内の各技法はすべて公開済みで
+実績のある手法です。OwnMem の貢献は、それらを決定的で依存の少ないエンジンに
+組み上げた点にあります:
+
+| OwnMem での位置 | 技法 | 文献 |
+| --- | --- | --- |
+| `bm25f` channel | フィールド重み付き BM25 | Robertson & Zaragoza (2009), *[The Probabilistic Relevance Framework: BM25 and Beyond](https://doi.org/10.1561/1500000019)*; Robertson, Zaragoza & Taylor (2004), *[Simple BM25 extension to multiple weighted fields](https://doi.org/10.1145/1031171.1031181)* |
+| channel と複数表現の融合 | Reciprocal Rank Fusion | Cormack, Clarke & Büttcher (2009), *[Reciprocal rank fusion outperforms Condorcet and individual rank learning methods](https://doi.org/10.1145/1571941.1572114)* |
+| 結果の多様化 | Maximal Marginal Relevance | Carbonell & Goldstein (1998), *[The use of MMR, diversity-based reranking for reordering documents and producing summaries](https://doi.org/10.1145/290941.291025)* |
+| `ngram` channel | 文字 n-gram 類似度(Dice) | Dice (1945), *[Measures of the amount of ecologic association between species](https://doi.org/10.2307/1932409)* |
+| `fuzzy` channel | 上限付き編集距離 | Levenshtein (1966), *Binary codes capable of correcting deletions, insertions, and reversals*, Soviet Physics Doklady 10(8) |
+| 重複排除ゲート | SimHash | Charikar (2002), *[Similarity estimation techniques from rounding algorithms](https://doi.org/10.1145/509907.509965)*; Manku, Jain & Das Sarma (2007), *[Detecting near-duplicates for web crawling](https://doi.org/10.1145/1242572.1242592)* |
+| 重複排除ゲート | MinHash | Broder (1997), *[On the resemblance and containment of documents](https://doi.org/10.1109/SEQUEN.1997.666900)* |
+| トークナイザ | 文字体系対応の分かち書き | *[UAX #24: Unicode Script Property](https://unicode.org/reports/tr24/)*; *[UAX #29: Unicode Text Segmentation](https://unicode.org/reports/tr29/)* |
+
 ## agent プラグインのインストール(任意、マシンごとに 1 回)
 
 **インストールは必須？——いいえ。入れなくてもすべて動きます。**

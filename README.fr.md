@@ -255,6 +255,23 @@ cd ownmem && npm ci && npm run benchmark
 > synthétiques sont des preuves de régression, pas une prétention de précision
 > en usage réel.
 
+## Références
+
+Rien dans les mathématiques du classement n'est inventé maison : chaque
+technique du moteur est une méthode publiée et éprouvée. L'apport d'OwnMem est
+de les composer en un moteur déterministe et sans dépendances lourdes :
+
+| Dans OwnMem | Technique | Littérature |
+| --- | --- | --- |
+| Canal `bm25f` | BM25 pondéré par champs | Robertson & Zaragoza (2009), *[The Probabilistic Relevance Framework: BM25 and Beyond](https://doi.org/10.1561/1500000019)*; Robertson, Zaragoza & Taylor (2004), *[Simple BM25 extension to multiple weighted fields](https://doi.org/10.1145/1031171.1031181)* |
+| Fusion des canaux et requêtes | Reciprocal Rank Fusion | Cormack, Clarke & Büttcher (2009), *[Reciprocal rank fusion outperforms Condorcet and individual rank learning methods](https://doi.org/10.1145/1571941.1572114)* |
+| Diversité des résultats | Maximal Marginal Relevance | Carbonell & Goldstein (1998), *[The use of MMR, diversity-based reranking for reordering documents and producing summaries](https://doi.org/10.1145/290941.291025)* |
+| Canal `ngram` | Similarité de n-grammes (Dice) | Dice (1945), *[Measures of the amount of ecologic association between species](https://doi.org/10.2307/1932409)* |
+| Canal `fuzzy` | Distance d'édition bornée | Levenshtein (1966), *Binary codes capable of correcting deletions, insertions, and reversals*, Soviet Physics Doklady 10(8) |
+| Porte anti-doublons | SimHash | Charikar (2002), *[Similarity estimation techniques from rounding algorithms](https://doi.org/10.1145/509907.509965)*; Manku, Jain & Das Sarma (2007), *[Detecting near-duplicates for web crawling](https://doi.org/10.1145/1242572.1242592)* |
+| Porte anti-doublons | MinHash | Broder (1997), *[On the resemblance and containment of documents](https://doi.org/10.1109/SEQUEN.1997.666900)* |
+| Tokenizer | Segmentation par écriture | *[UAX #24: Unicode Script Property](https://unicode.org/reports/tr24/)*; *[UAX #29: Unicode Text Segmentation](https://unicode.org/reports/tr29/)* |
+
 ## Installer le plugin d'agent (optionnel, une fois par machine)
 
 **Faut-il l'installer ? Non — sans lui, tout fonctionne déjà.**

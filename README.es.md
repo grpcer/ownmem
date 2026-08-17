@@ -255,6 +255,23 @@ cd ownmem && npm ci && npm run benchmark
 > sintéticas son evidencia de regresión, no una afirmación de precisión con
 > usuarios reales.
 
+## Referencias
+
+Nada de la matemática del ranking es de cosecha propia: cada técnica del motor
+es un método publicado y probado. La aportación de OwnMem es componerlas en un
+motor determinista y sin dependencias pesadas:
+
+| En OwnMem | Técnica | Bibliografía |
+| --- | --- | --- |
+| Canal `bm25f` | BM25 ponderado por campos | Robertson & Zaragoza (2009), *[The Probabilistic Relevance Framework: BM25 and Beyond](https://doi.org/10.1561/1500000019)*; Robertson, Zaragoza & Taylor (2004), *[Simple BM25 extension to multiple weighted fields](https://doi.org/10.1145/1031171.1031181)* |
+| Fusión de canales y consultas | Reciprocal Rank Fusion | Cormack, Clarke & Büttcher (2009), *[Reciprocal rank fusion outperforms Condorcet and individual rank learning methods](https://doi.org/10.1145/1571941.1572114)* |
+| Diversidad de resultados | Maximal Marginal Relevance | Carbonell & Goldstein (1998), *[The use of MMR, diversity-based reranking for reordering documents and producing summaries](https://doi.org/10.1145/290941.291025)* |
+| Canal `ngram` | Similitud de n-gramas (Dice) | Dice (1945), *[Measures of the amount of ecologic association between species](https://doi.org/10.2307/1932409)* |
+| Canal `fuzzy` | Distancia de edición acotada | Levenshtein (1966), *Binary codes capable of correcting deletions, insertions, and reversals*, Soviet Physics Doklady 10(8) |
+| Puerta de duplicados | SimHash | Charikar (2002), *[Similarity estimation techniques from rounding algorithms](https://doi.org/10.1145/509907.509965)*; Manku, Jain & Das Sarma (2007), *[Detecting near-duplicates for web crawling](https://doi.org/10.1145/1242572.1242592)* |
+| Puerta de duplicados | MinHash | Broder (1997), *[On the resemblance and containment of documents](https://doi.org/10.1109/SEQUEN.1997.666900)* |
+| Tokenizador | Segmentación por escritura | *[UAX #24: Unicode Script Property](https://unicode.org/reports/tr24/)*; *[UAX #29: Unicode Text Segmentation](https://unicode.org/reports/tr29/)* |
+
 ## Instalar el plugin de agente (opcional, una vez por máquina)
 
 **¿Hace falta instalarlo? No — si lo omites, todo sigue funcionando.**

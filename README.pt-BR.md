@@ -10,8 +10,9 @@ Um único conjunto de arquivos serve Claude Code · Codex · Gemini CLI · Curso
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
-![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)
-![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)
+[![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
+[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmarks)
+[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmarks)
 
 [English](./README.md) · [简体中文](./README.zh-CN.md) · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · **Português (BR)**
 
@@ -35,7 +36,7 @@ guiando você pela configuração por repositório.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-pt-BR-dark.svg">
-  <img alt="Arquitetura ponta a ponta do OwnMem: o Markdown curado é governado e compilado em um snapshot verificado; cada pergunta passa por variações, seis canais candidatos, ranking determinístico, portão de confiança, orçamento de contexto, verificação do Agent e feedback local" src="./assets/architecture-pt-BR-light.svg" width="100%">
+  <img alt="Arquitetura de ponta a ponta do OwnMem, três domínios de confiança: o repositório guarda Markdown curado que passa por portões de governança e é compilado em um snapshot imutável; o motor determinístico responde por seis canais candidatos, ranking, um portão de confiança e um envelope de 400 tokens; o coding agent pergunta, verifica contra o código atual e registra novas lições que voltam por audit e compile" src="./assets/architecture-pt-BR-light.svg" width="100%">
 </picture>
 
 ## Início rápido
@@ -45,7 +46,7 @@ tenha memória, execute:
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 Essa é a configuração mais simples e recomendada: Claude Code e Codex ficam
@@ -59,9 +60,6 @@ para outros agentes, use `--hosts generic`.
 
 A inicialização cria `.ownmem/` e adiciona uma pequena seção do OwnMem às
 instruções do projeto. O texto fora dos limites marcados nunca é alterado.
-
-Ao trabalhar a partir de um checkout do código antes da publicação, use a
-entrada local equivalente: `node memory.mjs init --locale auto`.
 
 ## Uso diário
 
@@ -202,7 +200,12 @@ escopo de um repositório; se você quer captura automática ou memória no nív
 do usuário entre apps, essas ferramentas realmente servem melhor.
 
 Fatos verificados em agosto de 2026 contra a documentação pública de cada
-projeto — correções são bem-vindas.
+projeto: [Mem0](https://docs.mem0.ai), [Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview),
+[claude-mem](https://github.com/thedotmack/claude-mem),
+[memória automática do Claude Code](https://code.claude.com/docs/en/memory),
+[Codex memories](https://developers.openai.com/codex/memories),
+[Cursor rules](https://cursor.com/docs/context/rules),
+[Windsurf memories](https://docs.devin.ai/desktop/cascade/memories) — correções são bem-vindas.
 
 ## Benchmarks
 
@@ -331,6 +334,15 @@ Todas as camadas usam apenas as dependências de runtime em JavaScript puro
 simplificado e tradicional, japonês, coreano, espanhol, francês, alemão,
 português do Brasil, árabe, híndi, indonésio, russo, tailandês, turco e
 vietnamita.
+
+## Contribuindo
+
+Issues e pull requests são bem-vindos — veja
+[CONTRIBUTING.md](./CONTRIBUTING.md) para as regras básicas: manter o recall
+padrão determinístico, local e sem modelos, adicionar um caso de regressão
+para cada mudança de recuperação, e rodar `npm test` e
+`npm run benchmark:release` antes de pedir revisão. Relatos de segurança vão
+por [SECURITY.md](./SECURITY.md).
 
 ## Segurança e evidência
 

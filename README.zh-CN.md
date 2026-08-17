@@ -10,8 +10,9 @@
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
-![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)
-![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)
+[![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
+[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmark)
+[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmark)
 
 [English](./README.md) · **简体中文** · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
 
@@ -31,7 +32,7 @@ OwnMem 分为两部分。**npm 包**是核心引擎：以可审查的 `devDepend
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-zh-CN-dark.svg">
-  <img alt="OwnMem 端到端架构：精选 Markdown 经本地治理后编译为可信快照；每个问题依次经过多种查询措辞、六路候选、确定性排序、可信度门、上下文预算、Agent 复核和本地反馈闭环" src="./assets/architecture-zh-CN-light.svg" width="100%">
+  <img alt="OwnMem 端到端架构，三个信任域：仓库持有精选 Markdown，经治理闸门编译为不可变快照；确定性引擎经六条候选通道、排序、可信度门与 400 token 信封作答；coding agent 提问、对照活代码复核，并把新教训经 audit 与 compile 写回仓库" src="./assets/architecture-zh-CN-light.svg" width="100%">
 </picture>
 
 ## 快速开始
@@ -40,7 +41,7 @@ OwnMem 需要 Node.js 20 或更新版本。进入你希望“会记事”的项�
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 这是最省心的推荐配置：Claude Code 和 Codex 都能直接使用，同时带本地控制台。
@@ -52,9 +53,6 @@ Agent 可以使用 `--hosts generic`。
 
 初始化会创建 `.ownmem/`，并在 Agent 的项目说明里加入一小段 OwnMem 配置；
 所有标记范围之外的原有内容都不会被改动。
-
-若从源码检出且尚未发布，可使用等价的本地入口：
-`node memory.mjs init --locale auto`。
 
 ## 日常使用
 
@@ -178,7 +176,13 @@ embedding 模型（默认 OpenAI key，或经 Ollama 使用本地模型）。
 ⁷ 设计使然。OwnMem 押注于经筛选、经审阅的写入与单仓库作用域；如果你需要
 全自动捕获或跨应用的用户级记忆，那些工具确实更合适。
 
-以上事实核对于 2026 年 8 月，依据各项目的公开文档——欢迎指正。
+以上事实核对于 2026 年 8 月，依据各项目的公开文档：[Mem0](https://docs.mem0.ai)、
+[Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview)、
+[claude-mem](https://github.com/thedotmack/claude-mem)、
+[Claude Code 自动记忆](https://code.claude.com/docs/en/memory)、
+[Codex memories](https://developers.openai.com/codex/memories)、
+[Cursor rules](https://cursor.com/docs/context/rules)、
+[Windsurf memories](https://docs.devin.ai/desktop/cascade/memories)——欢迎指正。
 
 ## Benchmark
 
@@ -298,6 +302,13 @@ npx ownmem audit
 Console 内置英语、简体中文、繁体中文、日语、韩语、西班牙语、法语、德语、
 巴西葡萄牙语、阿拉伯语、印地语、印尼语、俄语、泰语、土耳其语、越南语的
 完整语言目录。
+
+## 参与贡献
+
+欢迎 issue 和 pull request——基本规则见 [CONTRIBUTING.md](./CONTRIBUTING.md)：
+默认召回必须保持确定性、本地化、不调用模型；每个检索改动都要附回归用例；
+提交评审前先跑 `npm test` 和 `npm run benchmark:release`。安全问题请走
+[SECURITY.md](./SECURITY.md)。
 
 ## 安全与证据
 

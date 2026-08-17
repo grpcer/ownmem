@@ -10,8 +10,9 @@ One set of files serves Claude Code · Codex · Gemini CLI · Cursor · Grok CLI
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
-![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)
-![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)
+[![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
+[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmarks)
+[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmarks)
 
 **English** · [简体中文](./README.zh-CN.md) · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
 
@@ -34,7 +35,7 @@ you through the per-repository setup.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="OwnMem end-to-end architecture: curated Markdown is governed and compiled into a verified snapshot; each question passes through query variants, six candidate lanes, deterministic ranking, confidence gating, context budgeting, agent verification, and local feedback" src="./assets/architecture-light.svg" width="100%">
+  <img alt="OwnMem end-to-end architecture, three trust domains: the repository holds curated Markdown that passes governance gates and compiles into an immutable snapshot; the deterministic engine answers through six candidate lanes, ranking, a confidence gate and a 400-token envelope; the coding agent asks, verifies against live code, and writes new lessons that flow back through audit and compile" src="./assets/architecture-light.svg" width="100%">
 </picture>
 
 ## Quick start
@@ -44,7 +45,7 @@ memory, run:
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 This is the recommended setup: Claude Code and Codex both work out of the box,
@@ -58,9 +59,6 @@ Only use one agent? Change `--hosts claude,codex` to `--hosts claude` or
 Initialization creates `.ownmem/` and adds a small OwnMem section to the
 agent's project instructions. It never changes text outside its marked
 boundaries.
-
-When working from a source checkout before publication, use the equivalent
-local entry: `node memory.mjs init --locale auto`.
 
 ## Daily use
 
@@ -197,7 +195,12 @@ scope; if you want automatic capture or user-level memory across apps, those
 tools genuinely fit better.
 
 Facts checked August 2026 against each project's public documentation —
-corrections welcome.
+[Mem0](https://docs.mem0.ai), [Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview),
+[claude-mem](https://github.com/thedotmack/claude-mem),
+[Claude Code auto memory](https://code.claude.com/docs/en/memory),
+[Codex memories](https://developers.openai.com/codex/memories),
+[Cursor rules](https://cursor.com/docs/context/rules),
+[Windsurf memories](https://docs.devin.ai/desktop/cascade/memories) — corrections welcome.
 
 ## Benchmarks
 
@@ -322,6 +325,14 @@ All layers use only the pure-JavaScript `ajv` and `yaml` runtime dependencies.
 OwnMem Console ships complete catalogs for English, Simplified and Traditional
 Chinese, Japanese, Korean, Spanish, French, German, Brazilian Portuguese,
 Arabic, Hindi, Indonesian, Russian, Thai, Turkish, and Vietnamese.
+
+## Contributing
+
+Issues and pull requests are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md)
+for the ground rules: keep default recall deterministic, local, and model-free,
+add a regression case for every retrieval change, and run `npm test` plus
+`npm run benchmark:release` before requesting review. Security reports go
+through [SECURITY.md](./SECURITY.md).
 
 ## Safety and evidence
 

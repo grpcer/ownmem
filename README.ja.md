@@ -10,8 +10,9 @@ coding agent のための、ローカルで決定的な git ネイティブメ�
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
-![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)
-![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)
+[![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
+[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#ベンチマーク)
+[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#ベンチマーク)
 
 [English](./README.md) · [简体中文](./README.zh-CN.md) · **日本語** · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
 
@@ -34,7 +35,7 @@ OwnMem は 2 つの部品から成ります。**npm パッケージ**はエン�
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-ja-dark.svg">
-  <img alt="OwnMem のエンドツーエンド構成：選別された Markdown を統制して検証済み snapshot にコンパイルし、各質問を複数の query 表現、6 つの候補 channel、決定的ランキング、信頼度ゲート、context 予算、Agent の検証、ローカル feedback へ通す" src="./assets/architecture-ja-light.svg" width="100%">
+  <img alt="OwnMem のエンドツーエンド構成、3 つの信頼ドメイン:リポジトリは選別された Markdown を保持し、ガバナンス関門を経て不変 snapshot にコンパイル。決定的エンジンは 6 つの候補 channel、ランキング、確信度ゲート、400 token の envelope で回答。coding agent は質問し、現在の code と突き合わせて検証し、新しい教訓を audit と compile を通じて書き戻す" src="./assets/architecture-ja-light.svg" width="100%">
 </picture>
 
 ## クイックスタート
@@ -43,7 +44,7 @@ OwnMem には Node.js 20 以降が必要です。記憶を持たせたいリポ�
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 これが最も簡単な推奨設定です。Claude Code と Codex の両方がすぐに使え、
@@ -57,9 +58,6 @@ agent を 1 つしか使わない場合は、`--hosts claude,codex` を `--hosts
 
 初期化では `.ownmem/` を作成し、agent のプロジェクト指示に小さな OwnMem
 セクションを追加します。マークされた範囲外の文章は変更しません。
-
-公開前のソースチェックアウトで作業する場合は、等価なローカルエントリ
-`node memory.mjs init --locale auto` を使ってください。
 
 ## 日常の使い方
 
@@ -198,8 +196,13 @@ Cursor は 2.1 で Memories を廃止して Rules に移行。Windsurf の memor
 1 リポジトリのスコープに賭けています。自動キャプチャやアプリ横断のユーザー
 レベルメモリが必要なら、そうしたツールの方が本当に適しています。
 
-事実関係は 2026 年 8 月時点で各プロジェクトの公開ドキュメントに照らして確認
-しました——訂正を歓迎します。
+事実関係は 2026 年 8 月時点で各プロジェクトの公開ドキュメント（[Mem0](https://docs.mem0.ai)、
+[Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview)、
+[claude-mem](https://github.com/thedotmack/claude-mem)、
+[Claude Code auto memory](https://code.claude.com/docs/en/memory)、
+[Codex memories](https://developers.openai.com/codex/memories)、
+[Cursor rules](https://cursor.com/docs/context/rules)、
+[Windsurf memories](https://docs.devin.ai/desktop/cascade/memories)）に照らして確認しました。訂正を歓迎します。
 
 ## ベンチマーク
 
@@ -326,6 +329,13 @@ npx ownmem audit
 だけです。OwnMem Console は英語・簡体字中国語・繁体字中国語・日本語・韓国語・
 スペイン語・フランス語・ドイツ語・ブラジルポルトガル語・アラビア語・ヒンディー語・
 インドネシア語・ロシア語・タイ語・トルコ語・ベトナム語の完全なカタログを同梱します。
+
+## コントリビュート
+
+issue と pull request を歓迎します。基本ルールは [CONTRIBUTING.md](./CONTRIBUTING.md) を
+参照してください:デフォルトの recall は決定的・ローカル・モデル不使用のまま保つこと、
+検索まわりの変更には回帰ケースを追加すること、レビュー依頼の前に `npm test` と
+`npm run benchmark:release` を実行すること。脆弱性の報告は [SECURITY.md](./SECURITY.md) へ。
 
 ## 安全性と証拠
 

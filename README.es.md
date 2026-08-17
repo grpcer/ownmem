@@ -10,8 +10,9 @@ Un mismo conjunto de archivos sirve a Claude Code · Codex · Gemini CLI · Curs
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
-![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)
-![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)
+[![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
+[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmarks)
+[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmarks)
 
 [English](./README.md) · [简体中文](./README.zh-CN.md) · [日本語](./README.ja.md) · [한국어](./README.ko.md) · **Español** · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
 
@@ -35,7 +36,7 @@ motor, incluida la guía por la configuración de cada repositorio.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-es-dark.svg">
-  <img alt="Arquitectura integral de OwnMem: el Markdown curado se gobierna y compila en un snapshot verificado; cada pregunta pasa por variantes, seis canales candidatos, ranking determinista, una puerta de confianza, presupuesto de contexto, verificación del Agent y feedback local" src="./assets/architecture-es-light.svg" width="100%">
+  <img alt="Arquitectura de extremo a extremo de OwnMem, tres dominios de confianza: el repositorio guarda Markdown curado que pasa puertas de gobierno y se compila en un snapshot inmutable; el motor determinista responde con seis canales candidatos, ranking, una puerta de confianza y un sobre de 400 tokens; el coding agent pregunta, verifica contra el código actual y escribe nuevas lecciones que vuelven por audit y compile" src="./assets/architecture-es-light.svg" width="100%">
 </picture>
 
 ## Inicio rápido
@@ -45,7 +46,7 @@ memoria, ejecuta:
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 Esta es la configuración recomendada y más sencilla: Claude Code y Codex
@@ -60,9 +61,6 @@ para otros agentes puedes usar `--hosts generic`.
 La inicialización crea `.ownmem/` y añade una pequeña sección de OwnMem a las
 instrucciones del proyecto. Nunca modifica el texto que queda fuera de sus
 límites marcados.
-
-Si trabajas desde un checkout del código fuente antes de la publicación, usa
-la entrada local equivalente: `node memory.mjs init --locale auto`.
 
 ## Uso diario
 
@@ -208,7 +206,12 @@ nivel de usuario entre aplicaciones, esas herramientas encajan genuinamente
 mejor.
 
 Datos verificados en agosto de 2026 contra la documentación pública de cada
-proyecto — las correcciones son bienvenidas.
+proyecto: [Mem0](https://docs.mem0.ai), [Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview),
+[claude-mem](https://github.com/thedotmack/claude-mem),
+[memoria automática de Claude Code](https://code.claude.com/docs/en/memory),
+[Codex memories](https://developers.openai.com/codex/memories),
+[Cursor rules](https://cursor.com/docs/context/rules),
+[Windsurf memories](https://docs.devin.ai/desktop/cascade/memories) — se agradecen correcciones.
 
 ## Benchmarks
 
@@ -340,6 +343,15 @@ y `yaml`. OwnMem Console incluye catálogos completos para inglés, chino
 simplificado y tradicional, japonés, coreano, español, francés, alemán,
 portugués de Brasil, árabe, hindi, indonesio, ruso, tailandés, turco y
 vietnamita.
+
+## Contribuir
+
+Los issues y pull requests son bienvenidos — consulta
+[CONTRIBUTING.md](./CONTRIBUTING.md) para las reglas básicas: mantener el
+recall por defecto determinista, local y sin modelos, añadir un caso de
+regresión por cada cambio de recuperación, y ejecutar `npm test` y
+`npm run benchmark:release` antes de pedir revisión. Los reportes de
+seguridad van por [SECURITY.md](./SECURITY.md).
 
 ## Seguridad y evidencia
 

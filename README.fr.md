@@ -10,8 +10,9 @@ Un même jeu de fichiers sert Claude Code · Codex · Gemini CLI · Cursor · Gr
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
-![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)
-![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)
+[![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
+[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmarks)
+[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmarks)
 
 [English](./README.md) · [简体中文](./README.zh-CN.md) · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · **Français** · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
 
@@ -35,7 +36,7 @@ moteur, y compris en vous guidant dans la configuration par dépôt.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-fr-dark.svg">
-  <img alt="Architecture de bout en bout d’OwnMem : le Markdown sélectionné est gouverné puis compilé en snapshot vérifié ; chaque question traverse des variantes, six canaux candidats, un classement déterministe, un seuil de confiance, un budget de contexte, la vérification de l’Agent et le feedback local" src="./assets/architecture-fr-light.svg" width="100%">
+  <img alt="Architecture de bout en bout d'OwnMem, trois domaines de confiance : le dépôt contient du Markdown sélectionné qui passe des portes de gouvernance et se compile en snapshot immuable ; le moteur déterministe répond via six canaux candidats, un classement, une porte de confiance et une enveloppe de 400 tokens ; le coding agent interroge, vérifie contre le code actuel et écrit de nouvelles leçons qui reviennent par audit et compile" src="./assets/architecture-fr-light.svg" width="100%">
 </picture>
 
 ## Démarrage rapide
@@ -45,7 +46,7 @@ donner une mémoire, exécutez :
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 C'est la configuration recommandée et la plus simple : Claude Code et Codex
@@ -60,9 +61,6 @@ Vous n'utilisez qu'un seul agent ? Remplacez `--hosts claude,codex` par
 L'initialisation crée `.ownmem/` et ajoute une petite section OwnMem aux
 instructions du projet. Elle ne modifie jamais le texte situé en dehors de ses
 limites balisées.
-
-Si vous travaillez depuis un checkout des sources avant publication, utilisez
-l'entrée locale équivalente : `node memory.mjs init --locale auto`.
 
 ## Usage quotidien
 
@@ -208,8 +206,13 @@ une portée limitée à un dépôt ; si vous voulez une capture automatique ou u
 mémoire au niveau utilisateur partagée entre applications, ces outils
 conviennent sincèrement mieux.
 
-Faits vérifiés en août 2026 sur la documentation publique de chaque projet —
-corrections bienvenues.
+Faits vérifiés en août 2026 sur la documentation publique de chaque projet :
+[Mem0](https://docs.mem0.ai), [Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview),
+[claude-mem](https://github.com/thedotmack/claude-mem),
+[mémoire automatique de Claude Code](https://code.claude.com/docs/en/memory),
+[Codex memories](https://developers.openai.com/codex/memories),
+[Cursor rules](https://cursor.com/docs/context/rules),
+[Windsurf memories](https://docs.devin.ai/desktop/cascade/memories) — corrections bienvenues.
 
 ## Benchmarks
 
@@ -342,6 +345,15 @@ Toutes les couches n'utilisent que les dépendances runtime en JavaScript pur
 l'anglais, le chinois simplifié et traditionnel, le japonais, le coréen,
 l'espagnol, le français, l'allemand, le portugais du Brésil, l'arabe, l'hindi,
 l'indonésien, le russe, le thaï, le turc et le vietnamien.
+
+## Contribuer
+
+Les issues et pull requests sont les bienvenues — voir
+[CONTRIBUTING.md](./CONTRIBUTING.md) pour les règles de base : garder le
+recall par défaut déterministe, local et sans modèle, ajouter un cas de
+régression pour chaque changement de recherche, et lancer `npm test` puis
+`npm run benchmark:release` avant de demander une revue. Les signalements de
+sécurité passent par [SECURITY.md](./SECURITY.md).
 
 ## Sécurité et preuves
 

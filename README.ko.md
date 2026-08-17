@@ -10,8 +10,9 @@ Coding agent를 위한 로컬 · 결정적 · git 네이티브 메모리.<br>
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
-![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)
-![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)
+[![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
+[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#벤치마크)
+[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#벤치마크)
 
 [English](./README.md) · [简体中文](./README.zh-CN.md) · [日本語](./README.ja.md) · **한국어** · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
 
@@ -33,7 +34,7 @@ OwnMem은 두 부분으로 구성됩니다. **npm 패키지**는 엔진입니다
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-ko-dark.svg">
-  <img alt="OwnMem 엔드투엔드 아키텍처: 선별된 Markdown을 거버넌스와 컴파일을 거쳐 검증된 snapshot으로 만들고, 각 질문을 여러 query 표현, 6개 후보 channel, 결정적 랭킹, 신뢰도 게이트, context 예산, Agent 검증, 로컬 feedback으로 연결합니다" src="./assets/architecture-ko-light.svg" width="100%">
+  <img alt="OwnMem 엔드투엔드 아키텍처, 세 가지 신뢰 도메인: 저장소는 선별된 Markdown을 보유하고 거버넌스 게이트를 거쳐 불변 snapshot으로 컴파일됩니다. 결정적 엔진은 6개 후보 channel, 랭킹, 확신도 게이트, 400 token envelope로 답합니다. coding agent는 질문하고 현재 code와 대조해 검증하며 새 교훈을 audit과 compile을 통해 되돌려 씁니다" src="./assets/architecture-ko-light.svg" width="100%">
 </picture>
 
 ## 빠른 시작
@@ -43,7 +44,7 @@ OwnMem은 Node.js 20 이상이 필요합니다. 기억을 추가하고 싶은 �
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 가장 간단한 권장 설정입니다. Claude Code와 Codex를 바로 사용할 수 있고 로컬
@@ -56,9 +57,6 @@ agent 하나만 사용하나요? `--hosts claude,codex`를 `--hosts claude` 또�
 
 초기화는 `.ownmem/`을 만들고 agent의 프로젝트 지침에 작은 OwnMem 섹션을
 추가합니다. 표시된 경계 밖의 기존 내용은 변경하지 않습니다.
-
-배포 전 소스 체크아웃에서 작업할 때는 동등한 로컬 진입점
-`node memory.mjs init --locale auto`를 사용하세요.
 
 ## 일상 사용
 
@@ -193,8 +191,13 @@ recall이 무료일 수 있는 이유가 바로 이 구조입니다. 색인은 �
 베팅합니다. 자동 캡처나 앱을 가로지르는 사용자 수준 메모리가 필요하다면,
 그런 도구들이 정말로 더 맞습니다.
 
-사실 관계는 2026년 8월, 각 프로젝트의 공개 문서를 기준으로 확인했습니다 —
-정정 제안을 환영합니다.
+사실 관계는 2026년 8월, 각 프로젝트의 공개 문서([Mem0](https://docs.mem0.ai),
+[Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview),
+[claude-mem](https://github.com/thedotmack/claude-mem),
+[Claude Code auto memory](https://code.claude.com/docs/en/memory),
+[Codex memories](https://developers.openai.com/codex/memories),
+[Cursor rules](https://cursor.com/docs/context/rules),
+[Windsurf memories](https://docs.devin.ai/desktop/cascade/memories))를 기준으로 확인했습니다 — 정정 제안을 환영합니다.
 
 ## 벤치마크
 
@@ -319,6 +322,13 @@ npx ownmem audit
 OwnMem Console은 영어, 중국어 간체·번체, 일본어, 한국어, 스페인어, 프랑스어,
 독일어, 브라질 포르투갈어, 아랍어, 힌디어, 인도네시아어, 러시아어, 태국어,
 터키어, 베트남어의 완전한 카탈로그를 포함합니다.
+
+## 기여하기
+
+issue와 pull request를 환영합니다. 기본 규칙은 [CONTRIBUTING.md](./CONTRIBUTING.md)를
+참고하세요: 기본 recall은 결정적·로컬·모델 미사용으로 유지하고, 검색 관련 변경마다
+회귀 케이스를 추가하며, 리뷰 요청 전에 `npm test`와 `npm run benchmark:release`를
+실행합니다. 보안 제보는 [SECURITY.md](./SECURITY.md)를 통해 주세요.
 
 ## 안전과 증거
 

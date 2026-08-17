@@ -306,7 +306,9 @@ One plugin, three skills, one set of names:
 | `init` | `/ownmem:init` | `ownmem:init` | Set up or update OwnMem in a repository |
 | `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | Open the local console |
 
-Claude Code:
+**Claude Code** — run both commands, in order: the first registers this
+repository as a plugin marketplace (needed once), the second installs the
+plugin from it:
 
 ```
 /plugin marketplace add grpcer/ownmem
@@ -318,7 +320,8 @@ appear in the next session, not the one that installed them. Enable
 auto-update for the marketplace under `/plugin` → Marketplaces to receive new
 versions automatically.
 
-Codex CLI:
+**Codex CLI** — the same two steps in order: register the marketplace, then
+add the plugin:
 
 ```
 codex plugin marketplace add grpcer/ownmem
@@ -329,7 +332,9 @@ Skills load at session start here too; find them in the `$` skill picker.
 Refresh later with `codex plugin marketplace upgrade ownmem` followed by
 `codex plugin add ownmem@ownmem`.
 
-Grok CLI:
+**Grok CLI** — again both commands in order: register the marketplace, then
+install (Grok requires the explicit `--trust`). Skip the first command if
+Grok already imported your Claude Code marketplaces:
 
 ```
 grok plugin marketplace add grpcer/ownmem
@@ -340,7 +345,7 @@ This installs the same three skills. When a bare skill name is already
 taken, Grok namespaces it — its built-in dashboard makes ours
 `/ownmem:dashboard`. Update with `grok plugin update ownmem`.
 
-Antigravity:
+**Antigravity** — a single command, no marketplace step:
 
 ```
 agy plugin install https://github.com/grpcer/ownmem
@@ -355,7 +360,7 @@ with `gemini extensions install https://github.com/grpcer/ownmem`.)
 
 OwnMem is designed for reviewable dependency updates, not silent background
 rewrites. Enable Dependabot or Renovate for npm dependencies. When it opens an
-OwnMem upgrade pull request, CI should run:
+OwnMem upgrade pull request, CI should run these three commands in order:
 
 ```bash
 npx ownmem init --update
@@ -367,7 +372,7 @@ npx ownmem audit
 memory. `init --check` fails when generated adapters drift. Committing
 `package-lock.json` keeps every agent and CI job on the reviewed version.
 
-For a manual update:
+For a manual update, run all four in order:
 
 ```bash
 npm install --save-dev ownmem@latest

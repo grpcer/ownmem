@@ -310,7 +310,9 @@ init skill が agent をエンジンのセットアップへ案内します。�
 | `init` | `/ownmem:init` | `ownmem:init` | リポジトリに OwnMem をセットアップ・更新する |
 | `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | ローカルコンソールを開く |
 
-Claude Code:
+**Claude Code** —— 両方のコマンドを順番に実行します。1 つ目はこのリポジトリを
+プラグイン marketplace として登録し(一度だけ必要)、2 つ目はそこから
+プラグインをインストールします:
 
 ```
 /plugin marketplace add grpcer/ownmem
@@ -322,7 +324,8 @@ Claude Code:
 セッションです。`/plugin` → Marketplaces でこの marketplace の自動更新を
 有効にすると、新バージョンを自動的に受け取れます。
 
-Codex CLI:
+**Codex CLI** —— 同じ 2 ステップを順番に実行します:marketplace を登録し、
+続けてプラグインを追加します:
 
 ```
 codex plugin marketplace add grpcer/ownmem
@@ -333,7 +336,10 @@ codex plugin add ownmem@ownmem
 見つけられます。更新は `codex plugin marketplace upgrade ownmem` に続けて
 `codex plugin add ownmem@ownmem` を実行してください。
 
-Grok CLI:
+**Grok CLI** —— ここでも両方のコマンドを順番に実行します:marketplace を登録
+してからインストールします(Grok では明示的な `--trust` が必須です)。Grok が
+すでに Claude Code の marketplace をインポート済みなら、1 つ目のコマンドは
+省略できます:
 
 ```
 grok plugin marketplace add grpcer/ownmem
@@ -344,7 +350,7 @@ grok plugin install ownmem@ownmem --trust
 いる場合、Grok は名前空間を付けます——組み込みの dashboard があるため、こちらは
 `/ownmem:dashboard` になります。更新は `grok plugin update ownmem` です。
 
-Antigravity:
+**Antigravity** —— コマンドは 1 つだけ、marketplace のステップは不要です:
 
 ```
 agy plugin install https://github.com/grpcer/ownmem
@@ -360,7 +366,8 @@ API key、Vertex AI、エンタープライズライセンス——では、引�
 
 OwnMem はサイレントなバックグラウンド書き換えではなく、レビュー可能な依存更新を
 前提に設計されています。npm 依存に Dependabot か Renovate を有効化してください。
-OwnMem のアップグレード PR が開かれたら、CI で次を実行します:
+OwnMem のアップグレード PR が開かれたら、CI で次の 3 つのコマンドを順番に
+実行します:
 
 ```bash
 npx ownmem init --update
@@ -373,7 +380,7 @@ npx ownmem audit
 `package-lock.json` をコミットしておけば、すべての agent と CI ジョブがレビュー
 済みバージョンに留まります。
 
-手動更新の場合:
+手動更新の場合は、4 つすべてを順番に実行します:
 
 ```bash
 npm install --save-dev ownmem@latest

@@ -324,7 +324,9 @@ Ein Plugin, drei Skills, ein Satz Namen:
 | `init` | `/ownmem:init` | `ownmem:init` | OwnMem in einem Repository einrichten oder aktualisieren |
 | `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | Die lokale Konsole öffnen |
 
-Claude Code:
+**Claude Code** — führe beide Befehle in dieser Reihenfolge aus: der erste
+registriert dieses Repository als Plugin-Marketplace (einmalig nötig), der
+zweite installiert das Plugin daraus:
 
 ```
 /plugin marketplace add grpcer/ownmem
@@ -336,7 +338,8 @@ erscheinen daher erst in der nächsten Sitzung, nicht in der, die sie
 installiert hat. Aktiviere die automatische Aktualisierung des Marketplace
 unter `/plugin` → Marketplaces, um neue Versionen automatisch zu erhalten.
 
-Codex CLI:
+**Codex CLI** — dieselben zwei Schritte in dieser Reihenfolge: Marketplace
+registrieren, dann das Plugin hinzufügen:
 
 ```
 codex plugin marketplace add grpcer/ownmem
@@ -348,7 +351,10 @@ Auch hier laden Skills beim Sitzungsstart; du findest sie im
 `codex plugin marketplace upgrade ownmem`, gefolgt von
 `codex plugin add ownmem@ownmem`.
 
-Grok CLI:
+**Grok CLI** — wieder beide Befehle in dieser Reihenfolge: Marketplace
+registrieren, dann installieren (Grok verlangt das explizite `--trust`).
+Überspringe den ersten Befehl, wenn Grok deine Claude-Code-Marketplaces
+bereits importiert hat:
 
 ```
 grok plugin marketplace add grpcer/ownmem
@@ -360,7 +366,7 @@ vergeben, versieht Grok ihn mit einem Namespace — sein eingebautes Dashboard
 macht unseres zu `/ownmem:dashboard`. Aktualisieren mit
 `grok plugin update ownmem`.
 
-Antigravity:
+**Antigravity** — ein einzelner Befehl, kein Marketplace-Schritt:
 
 ```
 agy plugin install https://github.com/grpcer/ownmem
@@ -377,7 +383,7 @@ dasselbe Repository weiterhin mit
 OwnMem ist für überprüfbare Abhängigkeits-Updates gebaut, nicht für stilles
 Umschreiben im Hintergrund. Aktiviere Dependabot oder Renovate für
 npm-Abhängigkeiten. Öffnet eines davon einen OwnMem-Upgrade-Pull-Request,
-sollte die CI Folgendes ausführen:
+sollte die CI diese drei Befehle in dieser Reihenfolge ausführen:
 
 ```bash
 npx ownmem init --update
@@ -390,7 +396,7 @@ das Projektgedächtnis. `init --check` schlägt fehl, wenn generierte Adapter
 abdriften. Das Committen von `package-lock.json` hält jeden Agent und jeden
 CI-Job auf der geprüften Version.
 
-Für ein manuelles Update:
+Für ein manuelles Update führe alle vier in dieser Reihenfolge aus:
 
 ```bash
 npm install --save-dev ownmem@latest

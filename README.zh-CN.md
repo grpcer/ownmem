@@ -280,7 +280,8 @@ agent 指令文件，任何打开这个仓库的 agent 都会遵守。插件解�
 | `init` | `/ownmem:init` | `ownmem:init` | 在仓库中安装或更新 OwnMem |
 | `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | 打开本地控制台 |
 
-Claude Code：
+**Claude Code** —— 按顺序运行这两条命令：第一条把本仓库注册为 plugin
+marketplace（只需一次），第二条从这个 marketplace 安装插件：
 
 ```
 /plugin marketplace add grpcer/ownmem
@@ -291,7 +292,7 @@ Claude Code：
 会话里，而不是安装它们的那个会话。在 `/plugin` → Marketplaces 里为该
 marketplace 开启自动更新，即可自动收到新版本。
 
-Codex CLI：
+**Codex CLI** —— 同样两步、按顺序执行：先注册 marketplace，再添加插件：
 
 ```
 codex plugin marketplace add grpcer/ownmem
@@ -302,7 +303,9 @@ codex plugin add ownmem@ownmem
 之后可用 `codex plugin marketplace upgrade ownmem` 加
 `codex plugin add ownmem@ownmem` 刷新。
 
-Grok CLI：
+**Grok CLI** —— 依然是两条命令按顺序执行：先注册 marketplace，再安装
+（Grok 要求显式加 `--trust`）。如果 Grok 已经导入了你的 Claude Code
+marketplace，可跳过第一条命令：
 
 ```
 grok plugin marketplace add grpcer/ownmem
@@ -313,7 +316,7 @@ grok plugin install ownmem@ownmem --trust
 它内置的 dashboard 会让我们的变成 `/ownmem:dashboard`。用
 `grok plugin update ownmem` 更新。
 
-Antigravity：
+**Antigravity** —— 只需一条命令，没有 marketplace 步骤：
 
 ```
 agy plugin install https://github.com/grpcer/ownmem
@@ -327,7 +330,7 @@ agy plugin install https://github.com/grpcer/ownmem
 ## 安全的自动更新
 
 OwnMem 面向可审查的依赖更新设计，而非静默的后台改写。为 npm 依赖启用
-Dependabot 或 Renovate；当它提出 OwnMem 升级 PR 时，CI 应运行：
+Dependabot 或 Renovate；当它提出 OwnMem 升级 PR 时，CI 应按顺序运行这三条命令：
 
 ```bash
 npx ownmem init --update
@@ -339,7 +342,7 @@ npx ownmem audit
 在生成的适配文件漂移时报错。提交 `package-lock.json` 可让每个 agent 和 CI
 任务都停留在经过审查的版本上。
 
-手动更新：
+手动更新时，请按顺序运行全部四条命令：
 
 ```bash
 npm install --save-dev ownmem@latest

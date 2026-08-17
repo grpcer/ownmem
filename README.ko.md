@@ -301,7 +301,9 @@ skill이 agent를 엔진 설치로 안내합니다. 이 저장소는 플러그�
 | `init` | `/ownmem:init` | `ownmem:init` | 저장소에 OwnMem을 설치하거나 업데이트 |
 | `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | 로컬 콘솔 열기 |
 
-Claude Code:
+**Claude Code** — 두 명령을 순서대로 실행하세요. 첫 번째는 이 저장소를
+플러그인 marketplace로 등록하고(한 번만 필요), 두 번째는 거기서 플러그인을
+설치합니다:
 
 ```
 /plugin marketplace add grpcer/ownmem
@@ -313,7 +315,8 @@ Claude Code:
 Marketplaces에서 이 marketplace의 자동 업데이트를 켜면 새 버전을 자동으로
 받습니다.
 
-Codex CLI:
+**Codex CLI** — 같은 두 단계를 순서대로: marketplace를 등록한 다음
+플러그인을 추가하세요:
 
 ```
 codex plugin marketplace add grpcer/ownmem
@@ -324,7 +327,9 @@ codex plugin add ownmem@ownmem
 있습니다. 이후 `codex plugin marketplace upgrade ownmem`을 실행한 다음
 `codex plugin add ownmem@ownmem`으로 갱신하세요.
 
-Grok CLI:
+**Grok CLI** — 역시 두 명령을 순서대로: marketplace를 등록한 다음
+설치하세요(Grok은 명시적인 `--trust`가 필요합니다). Grok이 이미 Claude Code
+marketplace를 가져온 상태라면 첫 번째 명령은 건너뛰세요:
 
 ```
 grok plugin marketplace add grpcer/ownmem
@@ -335,7 +340,7 @@ grok plugin install ownmem@ownmem --trust
 namespace를 붙입니다 — 내장 dashboard 때문에 우리 것은
 `/ownmem:dashboard`가 됩니다. 업데이트는 `grok plugin update ownmem`입니다.
 
-Antigravity:
+**Antigravity** — 명령 하나면 됩니다. marketplace 단계는 없습니다:
 
 ```
 agy plugin install https://github.com/grpcer/ownmem
@@ -351,7 +356,8 @@ agy plugin install https://github.com/grpcer/ownmem
 
 OwnMem은 조용한 백그라운드 재작성이 아니라 리뷰 가능한 의존성 업데이트를
 위해 설계되었습니다. npm 의존성에 Dependabot 또는 Renovate를 활성화하세요.
-OwnMem 업그레이드 PR이 열리면 CI에서 다음을 실행해야 합니다:
+OwnMem 업그레이드 PR이 열리면 CI에서 다음 세 명령을 순서대로 실행해야
+합니다:
 
 ```bash
 npx ownmem init --update
@@ -364,7 +370,7 @@ npx ownmem audit
 `package-lock.json`을 커밋해 두면 모든 agent와 CI 작업이 리뷰된 버전에
 머뭅니다.
 
-수동 업데이트:
+수동 업데이트는 네 명령을 모두 순서대로 실행하세요:
 
 ```bash
 npm install --save-dev ownmem@latest

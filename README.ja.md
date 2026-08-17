@@ -48,9 +48,23 @@ npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 これが最も簡単な推奨設定です。Claude Code と Codex の両方がすぐに使え、
-ローカルコンソールも含まれます。初期化が終わったら agent を開き直し、あとは
-いつもどおり作業してください。日常的にセットアップコマンドを実行する必要は
-ありません。
+ローカルコンソールも含まれます。初期化が終わったら agent を開き直して
+ください——agent がコマンドを発見するのはセッション開始時なので、以下の
+内容が現れるのは init を実行したセッションではなく、次のセッションです。
+
+開き直した後に使えるもの:
+
+- **Claude Code** にプロジェクトコマンドが追加されます:
+  `/ownmem <メモリにやってほしいこと>`。
+- **Codex** はリポジトリの `ownmem` skill を自動的に発見します。
+- **すべての agent** が、プロジェクト指示(`CLAUDE.md`、`AGENTS.md`)に
+  書き込まれたメモリの規律に従います。
+- **コンソール**は slash コマンドではなくターミナルコマンドです:
+  `npx ownmem dashboard --open`。(下記の任意プラグインを入れると
+  `/ownmem:dashboard` が追加されます。)
+
+日常的にセットアップコマンドを実行する必要はありません——いつもどおり
+作業するだけです。
 
 agent を 1 つしか使わない場合は、`--hosts claude,codex` を `--hosts claude`
 または `--hosts codex` に変えてください。Gemini CLI と Cursor は
@@ -75,7 +89,9 @@ agent を 1 つしか使わない場合は、`--hosts claude,codex` を `--hosts
 > メモリを確認して」
 
 記憶の書き込み、検証、呼び出しは agent が行います。`.ownmem/` を開いたり、
-自分で `audit` や `recall` を実行したりする必要はありません。
+自分で `audit` や `recall` を実行したりする必要はありません。明示的な
+コマンドを使いたい場合は、`/ownmem <依頼内容>`(Claude Code)と `ownmem`
+skill(Codex)が同じ依頼をメモリ経由で処理します。
 
 **2. 全体を見たいときだけコンソールを開く。** このリポジトリでの利用状況、
 recall 品質、レイテンシ、メモリの状態を確認できます。アクセスできるのは自分の
@@ -265,12 +281,20 @@ cd ownmem && npm ci && npm run benchmark
 **インストールは必須？——いいえ。入れなくてもすべて動きます。**
 `ownmem init` がリポジトリの agent 指示ファイルに規律を書き込み済みなので、
 このリポジトリを開いた agent はそれに従います。プラグインが担うのはマシン
-全体の利便性です。マシン上のすべてのリポジトリに `/ownmem:recall` と
-`/ownmem:init` を追加します——まだ `.ownmem/` の無いリポジトリでも、
+全体の利便性です。マシン上のすべてのリポジトリに同じ 3 つの skill を
+追加します——まだ `.ownmem/` の無いリポジトリでも、
 init skill が agent をエンジンのセットアップへ案内します。このリポジトリは
 プラグイン marketplace を兼ねており、プラグインのコマンドは `npx ownmem`
 へルーティングするだけなので、プラグインの更新があなたのメモリを書き換える
 ことはありません。
+
+1 つのプラグイン、3 つの skill、1 組の名前:
+
+| Skill | Claude Code | Codex CLI | 役割 |
+| --- | --- | --- | --- |
+| `recall` | `/ownmem:recall` | `ownmem:recall` | コードを変更する前にメモリを recall する |
+| `init` | `/ownmem:init` | `ownmem:init` | リポジトリに OwnMem をセットアップ・更新する |
+| `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | ローカルコンソールを開く |
 
 Claude Code:
 
@@ -279,9 +303,10 @@ Claude Code:
 /plugin install ownmem@ownmem
 ```
 
-これで `/ownmem:recall` と `/ownmem:init` のコマンドが、モデルが自動起動する
-skill とともに追加されます。`/plugin` → Marketplaces でこの marketplace の
-自動更新を有効にすると、新バージョンを自動的に受け取れます。
+その後 Claude Code を再起動してください。プラグインのコマンドはセッション
+開始時に読み込まれるため、現れるのはインストールしたセッションではなく次の
+セッションです。`/plugin` → Marketplaces でこの marketplace の自動更新を
+有効にすると、新バージョンを自動的に受け取れます。
 
 Codex CLI:
 
@@ -290,8 +315,9 @@ codex plugin marketplace add grpcer/ownmem
 codex plugin add ownmem@ownmem
 ```
 
-これで `$ownmem` と `$ownmem-init` の skill がインストールされます。以後は
-`codex plugin marketplace upgrade ownmem` で更新できます。
+ここでも skill はセッション開始時に読み込まれます。`$` の skill ピッカーで
+見つけられます。更新は `codex plugin marketplace upgrade ownmem` に続けて
+`codex plugin add ownmem@ownmem` を実行してください。
 
 Gemini CLI:
 
@@ -299,8 +325,8 @@ Gemini CLI:
 gemini extensions install https://github.com/grpcer/ownmem
 ```
 
-これで `/ownmem` コマンドと同じ 2 つの skill が追加されます。更新は
-`gemini extensions update ownmem` です。
+これで `/ownmem` コマンドと `ownmem`、`ownmem-init`、`ownmem-dashboard` の
+skill が追加されます。更新は `gemini extensions update ownmem` です。
 
 ## 安全な自動更新
 

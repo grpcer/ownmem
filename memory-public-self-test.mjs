@@ -38,10 +38,14 @@ function runCommand(command, args, cwd, expected = 0, extra = {}) {
   const result = spawnSync(command, args, {
     cwd,
     encoding: 'utf8',
-    timeout: 60_000,
+    // The npm steps download into a cold fixture-owned cache, so their duration is
+    // set by the registry route, not this machine: a slow or proxied route
+    // legitimately takes minutes. 60s killed the warm install on such networks.
+    timeout: 300_000,
     ...extra,
   });
-  assert(result.status === expected, `${command} ${args.join(' ')} exited ${result.status}: ${result.stderr || result.stdout}`);
+  const outcome = result.status === null ? `was killed (${result.signal || 'timeout'})` : `exited ${result.status}`;
+  assert(result.status === expected, `${command} ${args.join(' ')} ${outcome}: ${result.stderr || result.stdout}`);
   return result;
 }
 

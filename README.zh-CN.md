@@ -45,7 +45,19 @@ npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
 这是最省心的推荐配置：Claude Code 和 Codex 都能直接使用，同时带本地控制台。
-初始化完成后，重新打开 Agent，之后照常聊天和写代码即可，不需要每天再运行命令。
+初始化完成后，重新打开 Agent——Agent 在会话开始时才会发现命令，所以下面
+这些都出现在下一个会话里，而不是运行 init 的那个会话。
+
+重新打开后你将拥有：
+
+- **Claude Code** 获得一个项目命令：`/ownmem <任何你想让记忆做的事>`。
+- **Codex** 会自动发现仓库里的 `ownmem` skill。
+- **每个 Agent** 都遵守写进项目说明（`CLAUDE.md`、`AGENTS.md`）里的
+  记忆纪律。
+- **控制台**是终端命令，不是斜杠命令：`npx ownmem dashboard --open`。
+  （下文的可选插件会额外提供 `/ownmem:dashboard`。）
+
+不需要每天再运行命令——照常工作即可。
 
 只用一种工具？把 `--hosts claude,codex` 改成 `--hosts claude` 或
 `--hosts codex`。Gemini CLI 和 Cursor 使用 `--hosts gemini,cursor`；其他
@@ -68,7 +80,8 @@ Agent 可以使用 `--hosts generic`。
 > “staging 部署又卡住了，先查一下项目记忆里有没有类似问题，再开始改。”
 
 Agent 会自己完成记忆写入、检查和召回。你不需要打开 `.ownmem/`，也不用
-手动运行 `audit` 或 `recall`。
+手动运行 `audit` 或 `recall`。更想用显式命令？`/ownmem <请求>`
+（Claude Code）与 `ownmem` skill（Codex）会把同样的请求路由到记忆。
 
 **2. 想看运行情况时，打开控制台。** 这里可以看到使用情况、召回质量、延迟
 和记忆库健康状态；页面只在你自己的电脑上通过 127.0.0.1 打开：
@@ -241,10 +254,18 @@ OwnMem 的贡献在于把它们组合成一个确定性、零重依赖的引擎�
 
 **到底要不要装？不装也一切正常。** `ownmem init` 已经把纪律写进了仓库的
 agent 指令文件，任何打开这个仓库的 agent 都会遵守。插件解决的是整台机器的
-便利：给机器上每一个仓库加上 `/ownmem:recall` 与 `/ownmem:init`——包括
+便利：给机器上每一个仓库加上同样的三个 skill——包括
 还没有 `.ownmem/` 的仓库，init skill 会引导 agent 完成引擎安装。本仓库
 同时就是插件 marketplace；插件的命令只是路由到 `npx ownmem`，所以插件
 更新永远不会改写你的记忆。
+
+一个插件、三个 skill、一套名字：
+
+| Skill | Claude Code | Codex CLI | 作用 |
+| --- | --- | --- | --- |
+| `recall` | `/ownmem:recall` | `ownmem:recall` | 改代码前先召回记忆 |
+| `init` | `/ownmem:init` | `ownmem:init` | 在仓库中安装或更新 OwnMem |
+| `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | 打开本地控制台 |
 
 Claude Code：
 
@@ -253,9 +274,9 @@ Claude Code：
 /plugin install ownmem@ownmem
 ```
 
-这会添加 `/ownmem:recall` 与 `/ownmem:init` 两个命令及其模型自动触发的
-skill。在 `/plugin` → Marketplaces 里为该 marketplace 开启自动更新，即可
-自动收到新版本。
+然后重启 Claude Code：插件命令在会话开始时加载，所以它们会出现在下一个
+会话里，而不是安装它们的那个会话。在 `/plugin` → Marketplaces 里为该
+marketplace 开启自动更新，即可自动收到新版本。
 
 Codex CLI：
 
@@ -264,8 +285,9 @@ codex plugin marketplace add grpcer/ownmem
 codex plugin add ownmem@ownmem
 ```
 
-这会安装 `$ownmem` 与 `$ownmem-init` 两个 skill。之后可用
-`codex plugin marketplace upgrade ownmem` 刷新。
+这里的 skill 同样在会话开始时加载；可以在 `$` skill 选择器里找到它们。
+之后可用 `codex plugin marketplace upgrade ownmem` 加
+`codex plugin add ownmem@ownmem` 刷新。
 
 Gemini CLI：
 
@@ -273,8 +295,8 @@ Gemini CLI：
 gemini extensions install https://github.com/grpcer/ownmem
 ```
 
-这会添加 `/ownmem` 命令与同样的两个 skill。用
-`gemini extensions update ownmem` 更新。
+这会添加 `/ownmem` 命令与 `ownmem`、`ownmem-init`、`ownmem-dashboard`
+三个 skill。用 `gemini extensions update ownmem` 更新。
 
 ## 安全的自动更新
 

@@ -51,8 +51,23 @@ npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 
 C'est la configuration recommandée et la plus simple : Claude Code et Codex
 sont prêts à l'emploi, et la console locale est incluse. Une fois
-l'initialisation terminée, rouvrez votre agent puis travaillez normalement —
-aucune commande de configuration n'est nécessaire au quotidien.
+l'initialisation terminée, rouvrez votre agent — les agents découvrent les
+commandes au démarrage de session, donc tout ce qui suit apparaît dans la
+session suivante, pas dans celle qui a exécuté init.
+
+Voici ce dont vous disposez après la réouverture :
+
+- **Claude Code** gagne une commande de projet : `/ownmem <tout ce que vous
+  voulez que la mémoire fasse>`.
+- **Codex** découvre automatiquement la skill `ownmem` du dépôt.
+- **Chaque agent** suit la discipline de mémoire écrite dans les instructions
+  du projet (`CLAUDE.md`, `AGENTS.md`).
+- **La console** est une commande de terminal, pas une slash command :
+  `npx ownmem dashboard --open`. (Le plugin optionnel ci-dessous ajoute
+  `/ownmem:dashboard`.)
+
+Aucune commande de configuration n'est nécessaire au quotidien — travaillez
+simplement comme d'habitude.
 
 Vous n'utilisez qu'un seul agent ? Remplacez `--hosts claude,codex` par
 `--hosts claude` ou `--hosts codex`. Gemini CLI et Cursor fonctionnent avec
@@ -78,7 +93,9 @@ Plus tard, posez votre question aussi naturellement que d'habitude :
 > du projet avant de modifier quoi que ce soit. »
 
 L'agent s'occupe de l'écriture, de la validation et du rappel. Vous n'avez pas
-besoin d'ouvrir `.ownmem/` ni d'exécuter vous-même `audit` ou `recall`.
+besoin d'ouvrir `.ownmem/` ni d'exécuter vous-même `audit` ou `recall`. Vous
+préférez une commande explicite ? `/ownmem <requête>` (Claude Code) et la
+skill `ownmem` (Codex) acheminent la même requête à travers la mémoire.
 
 **2. Ouvrez la console quand vous voulez une vue d'ensemble.** Elle affiche
 l'utilisation, la qualité du rappel, la latence et l'état de la mémoire de ce
@@ -277,12 +294,20 @@ de les composer en un moteur déterministe et sans dépendances lourdes :
 **Faut-il l'installer ? Non — sans lui, tout fonctionne déjà.**
 `ownmem init` a déjà écrit la discipline dans les instructions d'agent du
 dépôt : tout agent qui ouvre le dépôt la suit. Le plugin apporte le confort à
-l'échelle de la machine : il ajoute `/ownmem:recall` et `/ownmem:init` à
-tous les dépôts de la machine — y compris ceux qui n'ont pas encore de
+l'échelle de la machine : il ajoute les trois mêmes skills à tous les dépôts
+de la machine — y compris ceux qui n'ont pas encore de
 `.ownmem/`, où la skill d'init guide l'agent dans l'installation du moteur.
 Ce dépôt fait aussi office de marketplace du plugin ; ses commandes ne font
 que router vers `npx ownmem`, donc une mise à jour du plugin ne réécrit
 jamais votre mémoire.
+
+Un plugin, trois skills, un seul jeu de noms :
+
+| Skill | Claude Code | Codex CLI | Rôle |
+| --- | --- | --- | --- |
+| `recall` | `/ownmem:recall` | `ownmem:recall` | Rappeler la mémoire avant de modifier le code |
+| `init` | `/ownmem:init` | `ownmem:init` | Installer ou mettre à jour OwnMem dans un dépôt |
+| `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | Ouvrir la console locale |
 
 Claude Code :
 
@@ -291,8 +316,9 @@ Claude Code :
 /plugin install ownmem@ownmem
 ```
 
-Cela ajoute les commandes `/ownmem:recall` et `/ownmem:init` ainsi que leurs
-skills invoqués par le modèle. Activez la mise à jour automatique du
+Redémarrez ensuite Claude Code : les commandes du plugin se chargent au
+démarrage de session, elles apparaissent donc dans la session suivante, pas
+dans celle qui les a installées. Activez la mise à jour automatique du
 marketplace dans `/plugin` → Marketplaces pour recevoir les nouvelles versions
 automatiquement.
 
@@ -303,8 +329,10 @@ codex plugin marketplace add grpcer/ownmem
 codex plugin add ownmem@ownmem
 ```
 
-Cela installe les skills `$ownmem` et `$ownmem-init`. Rafraîchissez ensuite
-avec `codex plugin marketplace upgrade ownmem`.
+Ici aussi, les skills se chargent au démarrage de session ; retrouvez-les
+dans le sélecteur de skills `$`. Rafraîchissez ensuite avec
+`codex plugin marketplace upgrade ownmem` suivi de
+`codex plugin add ownmem@ownmem`.
 
 Gemini CLI :
 
@@ -312,8 +340,8 @@ Gemini CLI :
 gemini extensions install https://github.com/grpcer/ownmem
 ```
 
-Cela ajoute la commande `/ownmem` et les deux mêmes skills. Mettez à jour avec
-`gemini extensions update ownmem`.
+Cela ajoute la commande `/ownmem` et les skills `ownmem`, `ownmem-init` et
+`ownmem-dashboard`. Mettez à jour avec `gemini extensions update ownmem`.
 
 ## Mises à jour automatiques sûres
 

@@ -52,8 +52,23 @@ npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 
 Das ist die empfohlene, unkomplizierte Einrichtung: Claude Code und Codex
 funktionieren sofort, die lokale Konsole ist ebenfalls dabei. Öffne deinen
-Agenten nach der Initialisierung neu und arbeite danach wie gewohnt — im Alltag
-musst du keinen weiteren Einrichtungsbefehl ausführen.
+Agenten nach der Initialisierung neu — Agenten entdecken Befehle beim
+Sitzungsstart, alles Folgende erscheint daher erst in der nächsten Sitzung,
+nicht in der, die init ausgeführt hat.
+
+Was du nach dem Neustart hast:
+
+- **Claude Code** erhält einen Projekt-Befehl: `/ownmem <alles, was das
+  Gedächtnis tun soll>`.
+- **Codex** entdeckt den `ownmem`-Skill des Repositories automatisch.
+- **Jeder Agent** folgt der Gedächtnis-Disziplin, die in den
+  Projektanweisungen (`CLAUDE.md`, `AGENTS.md`) verankert ist.
+- **Die Konsole** ist ein Terminal-Befehl, kein Slash-Befehl:
+  `npx ownmem dashboard --open`. (Das optionale Plugin weiter unten ergänzt
+  `/ownmem:dashboard`.)
+
+Einen täglichen Einrichtungsbefehl gibt es nicht — arbeite einfach wie
+gewohnt.
 
 Du nutzt nur einen Agenten? Ersetze `--hosts claude,codex` durch
 `--hosts claude` oder `--hosts codex`. Gemini CLI und Cursor werden mit
@@ -80,7 +95,9 @@ Später fragst du so natürlich wie immer:
 > bevor du etwas änderst."
 
 Der Agent kümmert sich um Schreiben, Prüfen und Abrufen. Du musst weder
-`.ownmem/` öffnen noch selbst `audit` oder `recall` ausführen.
+`.ownmem/` öffnen noch selbst `audit` oder `recall` ausführen. Lieber ein
+expliziter Befehl? `/ownmem <Anfrage>` (Claude Code) und der `ownmem`-Skill
+(Codex) leiten dieselbe Anfrage durch das Gedächtnis.
 
 **2. Öffne die Konsole, wenn du einen Überblick möchtest.** Sie zeigt
 Nutzung, Recall-Qualität, Latenz und Zustand des Speichers für dieses
@@ -278,12 +295,20 @@ deterministischen Engine ohne schwere Abhängigkeiten zu komponieren:
 **Musst du es installieren? Nein — auch ohne funktioniert alles.**
 `ownmem init` hat die Disziplin bereits in die Agent-Anweisungen des
 Repositories geschrieben; jeder Agent, der das Repository öffnet, folgt ihr.
-Das Plugin ist Komfort auf Maschinenebene: Es bringt `/ownmem:recall` und
-`/ownmem:init` in jedes Repository der Maschine — auch in solche ohne
+Das Plugin ist Komfort auf Maschinenebene: Es bringt dieselben drei Skills
+in jedes Repository der Maschine — auch in solche ohne
 `.ownmem/`, wo der init-Skill den Agenten durch die Engine-Einrichtung
 führt. Dieses Repository ist zugleich der Plugin-Marketplace; die
 Plugin-Befehle routen nur zu `npx ownmem`, ein Plugin-Update schreibt dein
 Gedächtnis also nie um.
+
+Ein Plugin, drei Skills, ein Satz Namen:
+
+| Skill | Claude Code | Codex CLI | Was er tut |
+| --- | --- | --- | --- |
+| `recall` | `/ownmem:recall` | `ownmem:recall` | Gedächtnis abrufen, bevor Code geändert wird |
+| `init` | `/ownmem:init` | `ownmem:init` | OwnMem in einem Repository einrichten oder aktualisieren |
+| `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | Die lokale Konsole öffnen |
 
 Claude Code:
 
@@ -292,10 +317,10 @@ Claude Code:
 /plugin install ownmem@ownmem
 ```
 
-Das fügt die Befehle `/ownmem:recall` und `/ownmem:init` samt ihrer
-modell-ausgelösten Skills hinzu. Aktiviere die automatische Aktualisierung
-des Marketplace unter `/plugin` → Marketplaces, um neue Versionen automatisch
-zu erhalten.
+Starte Claude Code danach neu: Plugin-Befehle laden beim Sitzungsstart und
+erscheinen daher erst in der nächsten Sitzung, nicht in der, die sie
+installiert hat. Aktiviere die automatische Aktualisierung des Marketplace
+unter `/plugin` → Marketplaces, um neue Versionen automatisch zu erhalten.
 
 Codex CLI:
 
@@ -304,8 +329,10 @@ codex plugin marketplace add grpcer/ownmem
 codex plugin add ownmem@ownmem
 ```
 
-Das installiert die Skills `$ownmem` und `$ownmem-init`. Später aktualisieren
-mit `codex plugin marketplace upgrade ownmem`.
+Auch hier laden Skills beim Sitzungsstart; du findest sie im
+`$`-Skill-Picker. Später aktualisieren mit
+`codex plugin marketplace upgrade ownmem`, gefolgt von
+`codex plugin add ownmem@ownmem`.
 
 Gemini CLI:
 
@@ -313,8 +340,8 @@ Gemini CLI:
 gemini extensions install https://github.com/grpcer/ownmem
 ```
 
-Das fügt den Befehl `/ownmem` und dieselben zwei Skills hinzu. Aktualisieren
-mit `gemini extensions update ownmem`.
+Das fügt den Befehl `/ownmem` sowie die Skills `ownmem`, `ownmem-init` und
+`ownmem-dashboard` hinzu. Aktualisieren mit `gemini extensions update ownmem`.
 
 ## Sichere automatische Updates
 

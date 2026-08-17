@@ -21,6 +21,11 @@ A release is blocked until every item below has fresh evidence:
 - The packed tarball installs with npm's offline mode into a clean consumer,
   then its npm bin initializes and recalls from that consumer.
 - The version, changelog date, tag, and package manifest agree.
+- `npm view ownmem version` matches the latest release heading in
+  `CHANGELOG.md` after publishing. A fix merged to `main` is not shipped
+  until it is on the registry: consumers install the npm artifact, not the
+  git tree, so a commit without a version bump and publish leaves every
+  consumer on the broken build.
 - The GitHub release and npm publish targets are explicitly confirmed by a
   maintainer. Publishing credentials are never stored in this repository.
 

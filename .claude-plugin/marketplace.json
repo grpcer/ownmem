@@ -1,5 +1,6 @@
 {
   "name": "ownmem",
+  "description": "OwnMem: local, deterministic, git-native memory for coding agents. This repository doubles as the plugin marketplace.",
   "owner": {
     "name": "grpcer",
     "url": "https://github.com/grpcer"
@@ -9,7 +10,7 @@
       "name": "ownmem",
       "source": "./plugins/ownmem",
       "description": "Local deterministic memory for coding agents: recall past lessons before changing code, with zero model calls and zero query-time tokens.",
-      "version": "0.1.1"
+      "version": "0.1.2"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "name": "ownmem",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OwnMem gives every codebase its own local, deterministic memory — one set of Markdown files serves Claude Code, Codex, Gemini CLI, Cursor, and Grok CLI.",
   "type": "module",
   "license": "Apache-2.0",

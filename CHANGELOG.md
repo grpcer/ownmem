@@ -5,7 +5,16 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-08-17
+
 ### Added
+
+- A `dashboard` skill in the agent plugin (`/ownmem:dashboard` in Claude
+  Code, `ownmem:dashboard` in Codex) and an `ownmem-dashboard` skill in the
+  Gemini extension: they start OwnMem Console in the background, hand the
+  user the tokenized URL, and summarize the report.
+- The marketplace manifest carries a description, so marketplace listings no
+  longer show an empty summary.
 
 - The local observability write path now ships in the public package:
   `lib/memory-runtime-observability.mjs` (recall/build events and trace IDs),
@@ -25,6 +34,19 @@ Versioning.
   schema-valid local events, the ledger file exists, and `report` attributes
   the local install.
 
+### Changed
+
+- The plugin ships one skill set for every host. The duplicated
+  `codex-skills/` directory is gone; the Codex manifest now points at the
+  same `skills/` directory, so Codex shows `ownmem:init`, `ownmem:recall`,
+  and `ownmem:dashboard` instead of the previous `ownmem:ownmem` and
+  `ownmem:ownmem-init` names.
+- README quick start now states exactly what each host gains after init
+  (`/ownmem` in Claude Code, the `ownmem` skill in Codex, the console as a
+  terminal command) and that commands appear at the next session start; the
+  plugin section gains a per-host command table and restart notes for both
+  Claude Code and Codex, in every locale.
+
 ### Fixed
 
 - `memory-recall.mjs` loaded its three optional adapters through one
@@ -35,6 +57,11 @@ Versioning.
   `.claude/memory` layout; it now resolves the installation's configured
   memory directory, so full-text opens in `.ownmem` repositories pair with
   their recalls (`recall.consumed`).
+- The public self-test gave its npm steps 60 seconds, which killed the
+  cold-cache warm install on slow or proxied registry routes and reported the
+  unhelpful `exited null`. Network-bound npm steps now get five minutes, and
+  a timeout kill is reported as a kill with its signal instead of a null
+  exit.
 - CLI and report texts no longer point at private-repository scripts that do
   not ship in the package (`scripts/memory-maintenance.mjs`,
   `scripts/memory-recall.sh`, `scripts/memory-read.mjs`,

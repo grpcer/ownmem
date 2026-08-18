@@ -9,7 +9,10 @@ Canonical targets:
 
 A release is blocked until every item below has fresh evidence:
 
-- `npm run verify:release` passes on Node 20, 22, and the current Node release.
+- Linux runs `npm run verify:release` on Node 20, 22, and the current Node
+  release. macOS and Windows run the public compatibility suite on the current
+  Node release, so every supported runtime and operating system is covered
+  without repeating the full benchmark for all nine combinations.
 - macOS, Linux, and Windows jobs exercise installation, recall, audit,
   compilation, dashboard lifecycle, Unicode paths, and the npm bin entry.
 - `npm run benchmark:release` meets every global, per-language, and per-script

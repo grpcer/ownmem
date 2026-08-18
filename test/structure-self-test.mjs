@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,6 +16,14 @@ function trackedFiles() {
     .trim()
     .split('\n')
     .filter(Boolean);
+}
+
+function trackedMode(file) {
+  const entry = execFileSync('git', ['ls-files', '--stage', '--', file], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  }).trim();
+  return entry.match(/^(\d{6})\s/)?.[1] ?? null;
 }
 
 function checkRootLayout(files) {
@@ -52,8 +60,8 @@ function checkRootLayout(files) {
 function checkPackageManifest() {
   const manifest = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
   assert(manifest.bin?.ownmem === 'bin/ownmem.mjs', 'package bin must point at bin/ownmem.mjs');
-  assert((statSync(path.join(ROOT, manifest.bin.ownmem)).mode & 0o111) !== 0,
-    'bin/ownmem.mjs must be executable');
+  assert(trackedMode(manifest.bin.ownmem) === '100755',
+    'bin/ownmem.mjs must be tracked by Git as executable (mode 100755)');
   assert(manifest.exports?.['.'] === './lib/index.mjs', 'package root export must point at lib/index.mjs');
   assert(manifest.exports?.['./schemas/*'] === './schemas/*', 'schema subpaths must remain exported');
   const expectedFiles = ['bin/', 'lib/', 'schemas/', 'README.md', 'LICENSE', 'NOTICE', 'CHANGELOG.md'];

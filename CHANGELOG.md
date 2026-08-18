@@ -23,6 +23,15 @@ Versioning.
   and JSON file.
 - Community health files moved to `.github/`; translated READMEs, project docs,
   and media moved to `docs/`, reducing the GitHub root from 67 entries to 22.
+- CI now uses five targeted runtime/platform combinations instead of repeating
+  the full release gate across a nine-job Cartesian matrix. Superseded runs are
+  cancelled, and official Actions are pinned to reviewed release commits.
+
+### Fixed
+
+- The structure gate now reads the executable bit for `bin/ownmem.mjs` from
+  Git's cross-platform index metadata. Windows no longer fails because its
+  filesystem does not expose POSIX execute bits through `fs.stat()`.
 
 ### Migration
 

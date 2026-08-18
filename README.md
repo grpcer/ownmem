@@ -418,3 +418,7 @@ through [SECURITY.md](./SECURITY.md).
 
 OwnMem is licensed under Apache-2.0. See `PRIVACY.md`, `SECURITY.md`, and
 `RELEASE.md` before sharing artifacts or publishing a release.
+
+## Acknowledgements
+
+- [LINUX DO](https://linux.do/)

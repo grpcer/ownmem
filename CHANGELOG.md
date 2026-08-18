@@ -5,6 +5,32 @@ Versioning.
 
 ## [Unreleased]
 
+### Added
+
+- A structural regression gate checks the root allowlist, local documentation
+  links, ESM imports, canonical schema URLs, npm publication boundary, and
+  cross-host skill mirrors.
+- `ownmem embed` exposes the optional embedding workflow through the stable CLI
+  instead of requiring a package-internal script path.
+
+### Changed
+
+- Runtime entry points now have explicit boundaries: `bin/ownmem.mjs` is the
+  executable, `lib/index.mjs` is the package API, feature orchestration lives in
+  `lib/features/`, and runtime contracts live under domain-grouped `schemas/`.
+- Tests and locked benchmark evidence moved to `test/` and `benchmarks/`; npm
+  now publishes an explicit runtime allowlist instead of every root-level MJS
+  and JSON file.
+- Community health files moved to `.github/`; translated READMEs, project docs,
+  and media moved to `docs/`, reducing the GitHub root from 67 entries to 22.
+
+### Migration
+
+- Invoke runtime behavior through `ownmem <command>` and import the supported
+  API from `ownmem`; root-level `memory-*.mjs` package internals no longer ship.
+- Resolve JSON contracts through `ownmem/schemas/*`. The three schemas with
+  canonical GitHub URLs now identify their real paths under `schemas/`.
+
 ## [0.1.2] - 2026-08-17
 
 ### Added

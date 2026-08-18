@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-index.postings/v2",
+  "title": "OwnMem BM25F postings",
+  "description": "v2 interns two heavily repeated values into lookup tables: document ids (232,867 postings referenced only 357 distinct names) and idf (128,344 terms held only 134 distinct values). Measured on a 357-topic corpus this took the file from 18.95 MB to 8.95 MB and read+parse from 81 ms to 45 ms. v1 snapshots stay readable through postings-v1.schema.json and are upgraded in memory on read.",
+  "type": "object",
+  "required": ["schema", "document_count", "field_names", "average_field_lengths", "document_ids", "idf_table", "terms"],
+  "properties": {
+    "schema": { "const": "ownmem-index.postings/v2" },
+    "document_count": { "type": "integer", "minimum": 0 },
+    "field_names": {
+      "type": "array",
+      "prefixItems": [
+        { "const": "name" },
+        { "const": "hooks" },
+        { "const": "description" },
+        { "const": "triggers" },
+        { "const": "codePath" },
+        { "const": "codeSymbol" },
+        { "const": "codeTest" },
+        { "const": "authorityDocs" },
+        { "const": "scopes" },
+        { "const": "body" }
+      ],
+      "items": false,
+      "minItems": 10,
+      "maxItems": 10
+    },
+    "average_field_lengths": { "$ref": "#/$defs/lengths" },
+    "document_ids": {
+      "type": "array",
+      "description": "Sorted topic ids. A posting's first element indexes into this array.",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "idf_table": {
+      "type": "array",
+      "description": "Distinct idf values. A term's idf field indexes into this array.",
+      "minItems": 0,
+      "items": { "type": "number", "minimum": 0 }
+    },
+    "terms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "idf", "postings"],
+        "properties": {
+          "term": { "type": "string", "minLength": 1 },
+          "idf": { "type": "integer", "minimum": 0, "description": "Index into idf_table, not the value itself." },
+          "postings": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                { "type": "integer", "minimum": 0, "description": "Index into document_ids." },
+                {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "array",
+                    "prefixItems": [
+                      { "type": "integer", "minimum": 0, "maximum": 9 },
+                      { "type": "integer", "minimum": 1 }
+                    ],
+                    "items": false,
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              ],
+              "items": false,
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "lengths": {
+      "type": "object",
+      "required": ["name", "hooks", "description", "triggers", "codePath", "codeSymbol", "codeTest", "authorityDocs", "scopes", "body"],
+      "properties": {
+        "name": { "type": "number", "minimum": 0 },
+        "hooks": { "type": "number", "minimum": 0 },
+        "description": { "type": "number", "minimum": 0 },
+        "triggers": { "type": "number", "minimum": 0 },
+        "codePath": { "type": "number", "minimum": 0 },
+        "codeSymbol": { "type": "number", "minimum": 0 },
+        "codeTest": { "type": "number", "minimum": 0 },
+        "authorityDocs": { "type": "number", "minimum": 0 },
+        "scopes": { "type": "number", "minimum": 0 },
+        "body": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

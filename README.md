@@ -14,7 +14,7 @@ One persistent project memory serves Claude Code · Codex · Antigravity · Curs
 [![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmarks)
 [![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmarks)
 
-**English** · [简体中文](./README.zh-CN.md) · [繁體中文](./README.zh-TW.md) · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
+**English** · [简体中文](./docs/i18n/README.zh-CN.md) · [繁體中文](./docs/i18n/README.zh-TW.md) · [日本語](./docs/i18n/README.ja.md) · [한국어](./docs/i18n/README.ko.md) · [Español](./docs/i18n/README.es.md) · [Français](./docs/i18n/README.fr.md) · [Deutsch](./docs/i18n/README.de.md) · [Português (BR)](./docs/i18n/README.pt-BR.md)
 
 </div>
 
@@ -51,9 +51,12 @@ you through the per-repository setup.
 | License | Apache-2.0 |
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
-  <img alt="OwnMem end-to-end architecture, three trust domains: the repository holds curated Markdown that passes governance gates and compiles into an immutable snapshot; the deterministic engine answers through six candidate lanes, ranking, a confidence gate and a 400-token envelope; the coding agent asks, verifies against live code, and writes new lessons that flow back through audit and compile" src="./assets/architecture-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/architecture-dark.svg">
+  <img alt="OwnMem end-to-end architecture, three trust domains: the repository holds curated Markdown that passes governance gates and compiles into an immutable snapshot; the deterministic engine answers through six candidate lanes, ranking, a confidence gate and a 400-token envelope; the coding agent asks, verifies against live code, and writes new lessons that flow back through audit and compile" src="./docs/assets/architecture-light.svg" width="100%">
 </picture>
+
+Implementation and release boundaries are documented in
+[Repository architecture](./docs/ARCHITECTURE.md).
 
 ## Quick start
 
@@ -132,7 +135,7 @@ on your computer at 127.0.0.1:
 npx ownmem dashboard --open
 ```
 
-<img alt="OwnMem Console — adoption funnel, recall quality, corpus and governance, all local" src="./assets/console.png" width="100%">
+<img alt="OwnMem Console — adoption funnel, recall quality, corpus and governance, all local" src="./docs/assets/console.png" width="100%">
 
 That is the whole daily workflow. The `audit`, manual `recall`, and feedback
 commands are for CI and troubleshooting; normal users do not need to remember
@@ -251,8 +254,8 @@ Facts checked August 2026 against each project's public documentation —
 ## Benchmarks
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/benchmark-dark.svg">
-  <img alt="OwnMem benchmark: 100% Recall@1 versus 3.1% for naive grep, and 1.17 ms P50 / 2.46 ms P95 recall latency against a 5 ms release gate" src="./assets/benchmark-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/benchmark-dark.svg">
+  <img alt="OwnMem benchmark: 100% Recall@1 versus 3.1% for naive grep, and 1.17 ms P50 / 2.46 ms P95 recall latency against a 5 ms release gate" src="./docs/assets/benchmark-light.svg" width="100%">
 </picture>
 
 Every release must pass a locked public benchmark: a 40-topic CC0 corpus
@@ -454,11 +457,11 @@ see the [comparison and its sourced limitations](#how-ownmem-compares).
 
 ## Contributing
 
-Issues and pull requests are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md)
+Issues and pull requests are welcome — see [CONTRIBUTING.md](./.github/CONTRIBUTING.md)
 for the ground rules: keep default recall deterministic, local, and model-free,
 add a regression case for every retrieval change, and run `npm test` plus
 `npm run benchmark:release` before requesting review. Security reports go
-through [SECURITY.md](./SECURITY.md).
+through [SECURITY.md](./.github/SECURITY.md).
 
 ## Safety and evidence
 
@@ -468,8 +471,8 @@ through [SECURITY.md](./SECURITY.md).
 - The default installation never downloads or invokes a model.
 - The optional embedding lane stays out of ranking until local A/B evidence passes its safety gate.
 
-OwnMem is licensed under Apache-2.0. See `PRIVACY.md`, `SECURITY.md`, and
-`RELEASE.md` before sharing artifacts or publishing a release.
+OwnMem is licensed under Apache-2.0. See `docs/PRIVACY.md`, `.github/SECURITY.md`, and
+`docs/RELEASE.md` before sharing artifacts or publishing a release.
 
 ## Acknowledgements
 

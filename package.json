@@ -17,30 +17,26 @@
     "node": ">=20"
   },
   "bin": {
-    "ownmem": "memory.mjs"
+    "ownmem": "bin/ownmem.mjs"
   },
   "exports": {
-    ".": "./memory.mjs"
+    ".": "./lib/index.mjs",
+    "./schemas/*": "./schemas/*"
   },
   "files": [
-    "*.mjs",
-    "*.json",
+    "bin/",
     "lib/",
-    "test/",
+    "schemas/",
     "README.md",
     "LICENSE",
     "NOTICE",
-    "SECURITY.md",
-    "CONTRIBUTING.md",
-    "CODE_OF_CONDUCT.md",
-    "PRIVACY.md",
-    "CHANGELOG.md",
-    "RELEASE.md"
+    "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node ./memory-public-self-test.mjs",
-    "benchmark": "node ./memory-public-benchmark.mjs --iterations 20",
-    "benchmark:release": "node ./memory-public-benchmark.mjs --iterations 100",
+    "test": "node ./test/structure-self-test.mjs && node ./test/public-self-test.mjs",
+    "test:structure": "node ./test/structure-self-test.mjs",
+    "benchmark": "node ./benchmarks/public-benchmark.mjs --iterations 20",
+    "benchmark:release": "node ./benchmarks/public-benchmark.mjs --iterations 100",
     "verify:release": "npm test && npm run benchmark:release && npm pack --dry-run --json"
   },
   "dependencies": {

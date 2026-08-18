@@ -13,16 +13,16 @@ metadata:
     - "self-test passes locally but fails in CI"
     - "npm pack exited null on windows"
     - "spawnSync npm ENOENT"
-  last_verified: 2026-08-16
+  last_verified: 2026-08-18
   expires_at: null
   authority: observed
   authority_docs: []
   history_docs: []
   supersedes: []
   code_evidence:
-    - path: memory-public-self-test.mjs
+    - path: test/public-self-test.mjs
       symbols: [packedOfflineInstall, npmCliScript, runNpm]
-      tests: [memory-public-self-test.mjs]
+      tests: [test/public-self-test.mjs]
   evidence:
     - "2026-08-16 run 31948081998: first-ever CI run, all 9 jobs red; macOS/linux ENOTCACHED on the offline tarball install, windows npm spawn returned status null"
 ---

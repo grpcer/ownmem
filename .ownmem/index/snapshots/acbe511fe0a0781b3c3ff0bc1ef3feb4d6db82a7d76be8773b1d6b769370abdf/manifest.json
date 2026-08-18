@@ -1,0 +1,98 @@
+{
+  "artifacts": {
+    "documents": {
+      "bytes": 11278,
+      "file": "documents.json",
+      "records": 4,
+      "schema": "ownmem-index.documents/v1",
+      "sha256": "bb9a90a15655d2615f1ca919e5f17aad9e70417eaeaf996900aebdd051c83bf6"
+    },
+    "exact_map": {
+      "bytes": 8349,
+      "file": "exact-map.json",
+      "records": 52,
+      "schema": "ownmem-index.exact-map/v1",
+      "sha256": "98f57ad3d171f774d487237eb243b896df5c5fcc8a20bc81e56e23fe12691409"
+    },
+    "graph": {
+      "bytes": 3302,
+      "file": "graph.json",
+      "records": 10,
+      "schema": "ownmem-index.graph/v2",
+      "sha256": "da39c7e32f2c57db3343cec8018c9f2086894e637e5ba7f9df08e2c25a316bca"
+    },
+    "postings": {
+      "bytes": 25178,
+      "file": "postings.json",
+      "records": 408,
+      "schema": "ownmem-index.postings/v2",
+      "sha256": "bce380337cfb26111ce13365dbd39cbff99593ada28d382fc2e2bd7d9f29f026"
+    },
+    "ranking": {
+      "bytes": 2482,
+      "file": "ranking.json",
+      "records": 10,
+      "schema": "ownmem-index.ranking/v3",
+      "sha256": "1d29a954724cd6dfec0a7ac00a3c851c03bdd774bb4a1e5f208f31a6fec322c1"
+    }
+  },
+  "compatibility": {
+    "fallback_policy": "rebuild-then-markdown-v1",
+    "minimum_reader_version": 4,
+    "query_result_schema": "ownmem-query-result/v1"
+  },
+  "compiler": {
+    "name": "ownmem-compiler",
+    "version": "0.6.1"
+  },
+  "schema": "ownmem-index/v1",
+  "snapshot": {
+    "content_sha256": "f4495a95e713bc0c65597424d0ce82d59c883a69bc89fda594167c014a3b2891",
+    "created_at": "2026-08-18T09:36:09.763Z",
+    "id": "acbe511fe0a0781b3c3ff0bc1ef3feb4d6db82a7d76be8773b1d6b769370abdf"
+  },
+  "source": {
+    "active_topics": 4,
+    "archive_included": false,
+    "files": [
+      {
+        "bytes": 611,
+        "kind": "l2",
+        "path": ".ownmem/MEMORY-general.md",
+        "sha256": "abbd42d9d17a09fa8012d3273639334e78d7ed0c0bea76a921a3b880fb8470b7"
+      },
+      {
+        "bytes": 41,
+        "kind": "catalog",
+        "path": ".ownmem/MEMORY.md",
+        "sha256": "d4b03e794a3b2f0a0c48e39ef0d9ba061e6ddaa3ecca016748723c9dccfe06fe"
+      },
+      {
+        "bytes": 2176,
+        "kind": "topic",
+        "path": ".ownmem/ci_latency_lock_needs_machine_scaling.md",
+        "sha256": "165829ab0a902aff22c850d0b64cd61d73a16cfde8d802837a873ef327d343c0"
+      },
+      {
+        "bytes": 1661,
+        "kind": "topic",
+        "path": ".ownmem/lockfile_must_pin_canonical_registry.md",
+        "sha256": "f035b148c647a44536e59eb8574f2066d070fcf6118aeb9cb23f1cf793b4d6f6"
+      },
+      {
+        "bytes": 1975,
+        "kind": "topic",
+        "path": ".ownmem/npm_publish_requires_2fa_and_ci_provenance.md",
+        "sha256": "a34a52e87d2e97be4ff07e85917af9bf380784bd8cf6ea6d5da9c531833021ba"
+      },
+      {
+        "bytes": 2063,
+        "kind": "topic",
+        "path": ".ownmem/offline_e2e_requires_fixture_owned_npm_cache.md",
+        "sha256": "22e1eb8cce465467c7838d53f46559e677870ce6e3a62dc543d765e6a7b87524"
+      }
+    ],
+    "memory_dir": ".ownmem",
+    "source_sha256": "9b13ec09e6ee477a72e3679cb805a229b2bedbc4e059b6ca060c69086cb0e064"
+  }
+}

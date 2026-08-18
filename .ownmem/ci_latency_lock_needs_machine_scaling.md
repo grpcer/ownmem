@@ -13,16 +13,16 @@ metadata:
     - "P95 over budget on ubuntu or windows runners"
     - "machine factor"
     - "calibrateMachineSpeed"
-  last_verified: 2026-08-16
+  last_verified: 2026-08-18
   expires_at: null
   authority: observed
   authority_docs: []
   history_docs: []
   supersedes: []
   code_evidence:
-    - path: memory-public-benchmark.mjs
+    - path: benchmarks/public-benchmark.mjs
       symbols: [calibrateMachineSpeed, performanceGate]
-      tests: [memory-public-benchmark-self-test.mjs]
+      tests: [test/public-self-test.mjs]
   evidence:
     - "2026-08-16 run 31949549383: windows factor 2.84, budget 14.19 ms, measured P95 5.09 ms, 9/9 jobs green"
     - "2026-08-16 run 31948376256: fixed 5 ms lock, windows global P95 6.72 ms, every quality and determinism lock green, release blocked"

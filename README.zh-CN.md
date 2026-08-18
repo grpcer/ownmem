@@ -1,27 +1,32 @@
 <div align="center">
 
-# OwnMem
+# OwnMem — 面向 AI 编程 Agent 的 Git 原生项目记忆
 
-**你的项目，拥有自己的记忆。**
+**记忆归仓库所有：本地、确定、可审阅。**
 
-面向编程 Agent 的本地工程记忆：结果确定，随 Git 管理。<br>
-一套记忆，同时供 Claude Code · Codex · Antigravity · Cursor · Grok CLI 使用。
+开源、本地优先的 AI 记忆系统，专为编程 Agent 和代码仓库而设。<br>
+一份持久项目记忆，同时供 Claude Code · Codex · Antigravity · Cursor · Gemini CLI · Grok CLI 使用。
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
-[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmark)
-[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmark)
+[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#基准测试)
+[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#基准测试)
 
-[English](./README.md) · **简体中文** · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
+[English](./README.md) · **简体中文** · [繁體中文](./README.zh-TW.md) · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
 
 </div>
 
-OwnMem 给 Claude Code、Codex 和其他编程 Agent 提供一份随仓库保存的工程记忆。
-记忆以纯 Markdown 存放在 `.ownmem/` 中，由支持多种语言文字的确定性 BM25F
-引擎排序。每次召回都不调用模型、不请求网络，也不消耗 Token；同样的问题会
-得到同样的结果，通常只需两毫秒左右。
+## OwnMem 是什么？
+
+OwnMem 是一个开源的编程 Agent 记忆系统，把项目决策、约束和排障经验以可审阅的
+纯 Markdown 保存在代码仓库的 `.ownmem/` 中。同一份长期项目记忆可以跨 Agent、
+跨会话使用，随 Git 审阅、协作和回滚。
+
+支持多种文字系统的确定性 BM25F 引擎负责排序。在查询、配置和已编译快照相同时，
+默认召回会返回相同排序，不调用模型、不请求网络，也不产生查询时 Token 成本；
+在公开基准上通常只需两毫秒左右。
 
 OwnMem 分为两部分。**npm 包**是核心引擎：以可审查的 `devDependency` 安装在
 每个仓库中，管理该仓库 `.ownmem/` 里的记忆。**Agent 插件**是可选的辅助工具，
@@ -30,9 +35,20 @@ OwnMem 分为两部分。**npm 包**是核心引擎：以可审查的 `devDepend
 > **提示：** 只要仓库中已有 npm 包和 `.ownmem/`，OwnMem 就可以工作；使用
 > 哪种安装入口都不影响结果。
 
+## OwnMem 一览
+
+| 事实 | OwnMem v0.1.2 |
+| --- | --- |
+| 类别 | 归仓库所有的 AI 编程 Agent 项目记忆 |
+| 范围 | 单个代码仓库；保存经筛选的工程知识，而非聊天记录 |
+| 存储 | `.ownmem/` 中可审阅的 Markdown，由 Git 进行版本管理 |
+| 默认召回 | 确定性 BM25F；0 次模型调用，0 次网络请求 |
+| 公开基准 | 锁定合成基准上 Recall@1 为 100%、P95 为 2.46 ms——这是回归证据，不是真实用户准确率 |
+| 许可证 | Apache-2.0 |
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-zh-CN-dark.svg">
-  <img alt="OwnMem 端到端架构，三个信任域：仓库持有精选 Markdown，经治理闸门编译为不可变快照；确定性引擎经六条候选通道、排序、可信度门与 400 token 信封作答；coding agent 提问、对照活代码复核，并把新教训经 audit 与 compile 写回仓库" src="./assets/architecture-zh-CN-light.svg" width="100%">
+  <img alt="OwnMem 端到端架构，三个信任域：仓库保存精选的 Markdown，经治理门禁编译为不可变快照；确定性引擎经六条候选通道、排序、置信门禁与 400 Token 上下文限额作答；编程 Agent 提问、对照当前代码复核，再通过 `audit` 与 `compile` 把新经验写回仓库" src="./assets/architecture-zh-CN-light.svg" width="100%">
 </picture>
 
 ## 快速开始
@@ -85,7 +101,7 @@ npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 
 **1. 直接告诉 Agent。** 遇到值得留下来的经验，用平常说话的方式告诉它：
 
-> “记住：staging 部署超时是因为连接池上限是 5，不是 worker 太少。以后调整
+> “记住：staging 部署超时是因为连接池上限，不是 worker 太少。以后调整
 > worker 时，要一起检查连接池。”
 
 下次再遇到类似问题，照常提问即可：
@@ -110,7 +126,7 @@ npx ownmem dashboard --open
 
 ## 缘起
 
-我在做 Oriveo——一个覆盖 iOS、Android、Web 与桌面端的 BYOK 多模型 AI 客户端。这个不小的代码库每天都靠 coding agent 开发，我在 Claude Code 和 Codex 之间来回切换。每个仓库都在不断沉淀来之不易的教训：调试根因、工具链的坑、时序竞态。可这些教训住在某一个工具的记忆里、某一台机器上——换 agent、换机器、换协作者，它们就悄悄丢了。
+我在做 Oriveo——一个覆盖 iOS、Android、Web 与桌面端的 BYOK 多模型 AI 客户端。这个不小的代码库每天都靠编程 Agent 开发，我在 Claude Code 和 Codex 之间来回切换。每个仓库都在不断沉淀来之不易的教训：调试根因、工具链的坑、时序竞态。可这些教训住在某一个工具的记忆里、某一台机器上——换 Agent、换机器、换协作者，它们就悄悄丢了。
 
 向量与云端记忆服务始终让我觉得不对味：关于一个仓库的知识，不该需要账号、服务器，或者按次付费。于是记忆搬进了仓库本身。OwnMem 就是我每天在 Oriveo 代码库里跑的那套系统——数百条经筛选的记忆，由配额与审计管着——抽出来重写成一个干净的公共引擎。
 
@@ -125,7 +141,7 @@ OwnMem 坚持四个原则，所有设计都围绕它们展开：
   延迟税、没有按次计费：在锁定的公开 benchmark 上 Recall@1 100%，P95 仅
   2.46 ms。
 - **记忆必须比任何单一工具活得久。** 同一批文件同时服务 Claude Code、
-  Codex、Antigravity、Cursor 与 Grok CLI，换 agent 永远不意味着丢掉团队
+  Codex、Antigravity、Cursor、Gemini CLI 与 Grok CLI，换 Agent 永远不意味着丢掉团队
   学到的东西。
 - **记忆库必须控制规模，才能长期可信。** 零净增长配额、纯 Node 审计、
   近重复与防漂移检查让内容保持精简、及时更新，不会变成没人维护的第二个 Wiki。
@@ -180,7 +196,7 @@ the pool, and every deploy waits until it times out. Raise both together.
 | 人类可读、可审阅的 Markdown | ✅ | ❌ | ❌ | ❌ | ⚠️² |
 | 召回不调用模型、不发网络请求 | ✅ | ❌³ | ❌ | ❌ | — |
 | 确定性、可复现的排序 | ✅ | ❌ | ❌ | ❌ | — |
-| 一份记忆通吃 Claude Code、Codex、Antigravity、Cursor、Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
+| 一份记忆同时供 Claude Code、Codex、Antigravity、Cursor、Gemini CLI、Grok CLI 使用 | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
 | 防膨胀治理（增长配额、审计、防漂移门禁） | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
 | 语义级同义改写检索 | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
 | 全自动捕获 | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
@@ -202,7 +218,7 @@ embedding 模型（默认 OpenAI key，或经 Ollama 使用本地模型）。
 ⁷ 设计使然。OwnMem 押注于经筛选、经审阅的写入与单仓库作用域；如果你需要
 全自动捕获或跨应用的用户级记忆，那些工具确实更合适。
 
-以上事实核对于 2026 年 8 月，依据各项目的公开文档：[Mem0](https://docs.mem0.ai)、
+以上事实于 2026 年 8 月核对，依据各项目的公开文档：[Mem0](https://docs.mem0.ai)、
 [Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview)、
 [claude-mem](https://github.com/thedotmack/claude-mem)、
 [Claude Code 自动记忆](https://code.claude.com/docs/en/memory)、
@@ -210,7 +226,7 @@ embedding 模型（默认 OpenAI key，或经 Ollama 使用本地模型）。
 [Cursor rules](https://cursor.com/docs/context/rules)、
 [Windsurf memories](https://docs.devin.ai/desktop/cascade/memories)——欢迎指正。
 
-## Benchmark
+## 基准测试
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/benchmark-dark.svg">
@@ -250,7 +266,8 @@ cd ownmem && npm ci && npm run benchmark
 ## 参考文献
 
 排序管线里没有任何自创数学——引擎中的每项技术都是经过实战检验的公开方法，
-OwnMem 的贡献在于把它们组合成一个确定性、零重依赖的引擎：
+OwnMem 的贡献在于把它们组合成一个确定性引擎，仅含 `ajv` 与 `yaml`
+两个纯 JavaScript 运行时依赖：
 
 | OwnMem 中的位置 | 技术 | 文献 |
 | --- | --- | --- |
@@ -263,12 +280,12 @@ OwnMem 的贡献在于把它们组合成一个确定性、零重依赖的引擎�
 | 近重复闸门 | MinHash | Broder (1997), *[On the resemblance and containment of documents](https://doi.org/10.1109/SEQUEN.1997.666900)* |
 | 分词器 | 文字系统感知切分 | *[UAX #24: Unicode Script Property](https://unicode.org/reports/tr24/)*; *[UAX #29: Unicode Text Segmentation](https://unicode.org/reports/tr29/)* |
 
-## 安装 agent 插件（可选，每台机器一次）
+## 安装 Agent 插件（可选，每台机器一次）
 
 **到底要不要装？不装也一切正常。** `ownmem init` 已经把纪律写进了仓库的
-agent 指令文件，任何打开这个仓库的 agent 都会遵守。插件解决的是整台机器的
+Agent 指令文件，任何打开这个仓库的 Agent 都会遵守。插件解决的是整台机器的
 便利：给机器上每一个仓库加上同样的三个 skill——包括
-还没有 `.ownmem/` 的仓库，init skill 会引导 agent 完成引擎安装。本仓库
+还没有 `.ownmem/` 的仓库，init skill 会引导 Agent 完成引擎安装。本仓库
 同时就是插件 marketplace；插件的命令只是路由到 `npx ownmem`，所以插件
 更新永远不会改写你的记忆。
 
@@ -339,7 +356,7 @@ npx ownmem audit
 ```
 
 `init --update` 只刷新 OwnMem 管理的边界区块并保留项目记忆；`init --check`
-在生成的适配文件漂移时报错。提交 `package-lock.json` 可让每个 agent 和 CI
+在生成的适配文件漂移时报错。提交 `package-lock.json` 可让每个 Agent 和 CI
 任务都停留在经过审查的版本上。
 
 手动更新时，请按顺序运行全部四条命令：
@@ -370,10 +387,39 @@ Console 内置英语、简体中文、繁体中文、日语、韩语、西班牙
 巴西葡萄牙语、阿拉伯语、印地语、印尼语、俄语、泰语、土耳其语、越南语的
 完整语言目录。
 
+## AI Agent 记忆系统常见问题
+
+### 什么是 AI Agent 记忆系统？
+
+AI Agent 记忆系统会保存 Agent 能在不同任务或会话中复用的知识。OwnMem 专注于
+代码仓库：它保存经审阅的工程经验，而不是聊天记录或用户画像。
+
+### 如何让 Claude Code 或 Codex 拥有持久项目记忆？
+
+在每个仓库中完成一次[快速开始](#快速开始)，再重新打开 Agent。Claude Code、Codex、
+Antigravity、Cursor、Gemini CLI 和 Grok CLI 都可以读取同一份 `.ownmem/`
+记忆，无需各自维护信息孤岛。
+
+### 记忆存在哪里，团队如何共享？
+
+记忆是 `.ownmem/` 下的纯 Markdown。把适合共享的记忆提交到 Git，它们就会随仓库的
+clone、pull request、权限管理和回滚流程传递；不要记录本就不应进入仓库的秘密。
+
+### OwnMem 需要 LLM、embedding API、向量数据库或网络吗？
+
+默认召回都不需要：它在本地做词法检索，仅含两个小型纯 JavaScript 运行时依赖。
+安装包可能需要网络；可选的 embedding 通道则要等本地 A/B 证据通过安全门才会启用。
+
+### OwnMem 与 Mem0、Graphiti、claude-mem 或内置记忆有什么不同？
+
+OwnMem 以单个仓库为边界，记忆经筛选、结果确定，并能在 Git 中审阅。如果你需要全自动
+捕获、大规模语义检索、用户级记忆、知识图谱或云同步，那些方案可能更合适；详见
+[带来源与局限说明的对比](#与其他方案的对比)。
+
 ## 参与贡献
 
 欢迎 issue 和 pull request——基本规则见 [CONTRIBUTING.md](./CONTRIBUTING.md)：
-默认召回必须保持确定性、本地化、不调用模型；每个检索改动都要附回归用例；
+默认召回必须保持确定性、在本地运行、不调用模型；每个检索改动都要附回归用例；
 提交评审前先跑 `npm test` 和 `npm run benchmark:release`。安全问题请走
 [SECURITY.md](./SECURITY.md)。
 
@@ -381,9 +427,13 @@ Console 内置英语、简体中文、繁体中文、日语、韩语、西班牙
 
 - 记忆文件始终是仓库内可审阅的 Markdown。
 - Schema、配额、生成边界与近重复检查全部在本地运行。
-- `recall.consumed` 是采用率北极星；Recall@K 只是过程指标。
+- `recall.consumed` 是衡量实际采用的核心指标；Recall@K 只是过程指标。
 - 默认安装永远不下载、不调用任何模型。
 - 可选的 embedding 通道在本地 A/B 证据通过安全门之前，不参与排序。
 
 OwnMem 以 Apache-2.0 许可发布。分享产物或发布版本前，请先阅读
 `PRIVACY.md`、`SECURITY.md` 与 `RELEASE.md`。
+
+## 致谢
+
+- [LINUX DO](https://linux.do/)

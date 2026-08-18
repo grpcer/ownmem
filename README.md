@@ -1,11 +1,11 @@
 <div align="center">
 
-# OwnMem
+# OwnMem — Git-Native Project Memory for AI Coding Agents
 
-**Your project. Its own memory.**
+**Repo-owned. Deterministic. Reviewable.**
 
-Local, deterministic, git-native memory for coding agents.<br>
-One set of files serves Claude Code · Codex · Antigravity · Cursor · Grok CLI.
+An open-source AI memory system for coding agents and software repositories.<br>
+One persistent project memory serves Claude Code · Codex · Antigravity · Cursor · Gemini CLI · Grok CLI.
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -14,15 +14,21 @@ One set of files serves Claude Code · Codex · Antigravity · Cursor · Grok CL
 [![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmarks)
 [![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmarks)
 
-**English** · [简体中文](./README.zh-CN.md) · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
+**English** · [简体中文](./README.zh-CN.md) · [繁體中文](./README.zh-TW.md) · [日本語](./README.ja.md) · [한국어](./README.ko.md) · [Español](./README.es.md) · [Français](./README.fr.md) · [Deutsch](./README.de.md) · [Português (BR)](./README.pt-BR.md)
 
 </div>
 
-OwnMem gives Claude Code, Codex, and other coding agents a memory that lives
-inside the repository: plain Markdown in `.ownmem/`, ranked by a deterministic,
-Unicode-script-aware BM25F engine. Recall never calls a model, never touches
-the network, and never spends a query-time token — the same question returns
-the same answer, in about two milliseconds.
+## What is OwnMem?
+
+OwnMem is an open-source coding agent memory system that keeps curated project
+decisions, constraints, and debugging lessons as reviewable Markdown inside
+your repository. The same long-term project memory works across agents and
+sessions, travels with Git, and rolls back with the code it describes.
+
+Its deterministic, Unicode-script-aware BM25F engine ranks memory in
+`.ownmem/`. For the same query, configuration, and compiled snapshot, default
+recall returns the same ranking without a model call, network request, or
+query-time token cost — in about two milliseconds on the public benchmark.
 
 OwnMem has two pieces. The **npm package** is the engine: it lives in each
 repository as a reviewed `devDependency` and owns that repository's memory in
@@ -32,6 +38,17 @@ you through the per-repository setup.
 
 > **Note:** A repository is ready once it has the package and `.ownmem/`,
 > however you got there. Start from either piece.
+
+## OwnMem at a glance
+
+| Fact | OwnMem v0.1.2 |
+| --- | --- |
+| Category | Repo-owned project memory for AI coding agents |
+| Scope | One software repository; curated engineering knowledge, not chat history |
+| Storage | Reviewable Markdown in `.ownmem/`, versioned with Git |
+| Default recall | Deterministic BM25F; 0 model calls and 0 network calls |
+| Public benchmark | 100% Recall@1 and 2.46 ms P95 on the locked synthetic benchmark — regression evidence, not real-user accuracy |
+| License | Apache-2.0 |
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./assets/architecture-dark.svg">
@@ -138,8 +155,8 @@ OwnMem makes four bets, and every design decision follows from them:
   ranking, with no model call, no latency tax, and no per-question bill:
   100% Recall@1 at a 2.46 ms P95 on the locked public benchmark.
 - **Memory must outlive any single tool.** The same files serve Claude Code,
-  Codex, Antigravity, Cursor, and Grok CLI, so switching agents never means
-  losing what the team learned.
+  Codex, Antigravity, Cursor, Gemini CLI, and Grok CLI, so switching agents
+  never means losing what the team learned.
 - **Memory must stay small to stay trusted.** A zero-net-growth quota, a pure
   Node audit, near-duplicate and drift gates keep it lean and current instead
   of turning into a second wiki that nobody prunes.
@@ -198,7 +215,7 @@ each one makes, including ours.
 | Human-readable, reviewable Markdown | ✅ | ❌ | ❌ | ❌ | ⚠️² |
 | Recall without model or network calls | ✅ | ❌³ | ❌ | ❌ | — |
 | Deterministic, reproducible ranking | ✅ | ❌ | ❌ | ❌ | — |
-| One memory across Claude Code, Codex, Antigravity, Cursor, Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
+| One memory across Claude Code, Codex, Antigravity, Cursor, Gemini CLI, Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
 | Anti-bloat governance (growth quota, audit, drift gates) | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
 | Semantic paraphrase search | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
 | Fully automatic capture | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
@@ -274,7 +291,7 @@ cd ownmem && npm ci && npm run benchmark
 
 None of the ranking math is homemade — every technique in the engine is a
 published, battle-tested method. OwnMem's contribution is composing them into
-a deterministic, dependency-free engine:
+a deterministic engine with two small pure-JavaScript runtime dependencies:
 
 | In OwnMem | Technique | Literature |
 | --- | --- | --- |
@@ -399,6 +416,41 @@ All layers use only the pure-JavaScript `ajv` and `yaml` runtime dependencies.
 OwnMem Console ships complete catalogs for English, Simplified and Traditional
 Chinese, Japanese, Korean, Spanish, French, German, Brazilian Portuguese,
 Arabic, Hindi, Indonesian, Russian, Thai, Turkish, and Vietnamese.
+
+## AI agent memory FAQ
+
+### What is an AI agent memory system?
+
+An AI agent memory system stores knowledge that an agent can reuse across
+tasks or sessions. OwnMem specializes that idea for software repositories: it
+keeps reviewed engineering lessons rather than chat history or user profiles.
+
+### How do I give Claude Code or Codex persistent project memory?
+
+Follow the [quick start](#quick-start) once in each repository, then reopen the
+agent. Claude Code, Codex, Antigravity, Cursor, Gemini CLI, and Grok CLI can
+read the same `.ownmem/` files instead of maintaining separate memory silos.
+
+### Where is the memory stored, and how do teammates share it?
+
+Memory is plain Markdown under `.ownmem/`. Commit appropriate memories to Git
+and they travel through the repository's normal clone, pull request, access
+control, and rollback workflow; do not record secrets that do not belong in
+the repository.
+
+### Does OwnMem require an LLM, embedding API, vector database, or network?
+
+Default recall requires none of them: it is local lexical retrieval with two
+small pure-JavaScript runtime dependencies. Installing packages can require
+network access, and the optional embedding lane stays disabled until local A/B
+evidence passes its safety gate.
+
+### How is OwnMem different from Mem0, Graphiti, claude-mem, or built-in memory?
+
+OwnMem is repository-scoped, curated, deterministic, and reviewable in Git.
+Those alternatives are a better fit when you need automatic capture, semantic
+search over large stores, user-level memory, knowledge graphs, or cloud sync;
+see the [comparison and its sourced limitations](#how-ownmem-compares).
 
 ## Contributing
 

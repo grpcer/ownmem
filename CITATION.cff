@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use OwnMem in research or published work, please cite the software."
+title: "OwnMem: Git-Native Project Memory for AI Coding Agents"
+type: software
+authors:
+  - name: grpcer
+version: 0.1.2
+date-released: 2026-08-17
+repository-code: "https://github.com/grpcer/ownmem"
+url: "https://github.com/grpcer/ownmem"
+license: Apache-2.0

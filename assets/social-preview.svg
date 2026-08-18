@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" role="img" aria-label="OwnMem — your project, its own memory: local, deterministic, git-native memory for coding agents" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" role="img" aria-label="OwnMem — Git-native project memory for AI coding agents" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
   <rect width="1280" height="640" fill="#ffffff"/>
   <rect x="0" y="0" width="1280" height="8" fill="#2563eb"/>
 
   <text x="96" y="150" font-size="30" font-weight="600" letter-spacing="6" fill="#2563eb">OWNMEM</text>
   <text x="96" y="248" font-size="72" font-weight="700" fill="#0f172a">Your project.</text>
   <text x="96" y="332" font-size="72" font-weight="700" fill="#0f172a">Its own memory.</text>
-  <text x="96" y="392" font-size="26" fill="#57606a">Local, deterministic, git-native memory for coding agents.</text>
+  <text x="96" y="392" font-size="26" fill="#57606a">Git-native project memory for AI coding agents.</text>
 
   <g font-size="20" font-weight="650">
     <rect x="96" y="432" width="238" height="52" rx="26" fill="#f0fdf4" stroke="#15803d" stroke-width="1.6"/>
@@ -13,10 +13,10 @@
     <rect x="350" y="432" width="196" height="52" rx="26" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
     <text x="448" y="465" text-anchor="middle" fill="#2563eb">0 model calls</text>
     <rect x="562" y="432" width="192" height="52" rx="26" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.6"/>
-    <text x="658" y="465" text-anchor="middle" fill="#0f172a">40 languages</text>
+    <text x="658" y="465" text-anchor="middle" fill="#0f172a">40 language tags</text>
   </g>
 
-  <text x="96" y="556" font-size="22" fill="#57606a">Claude Code · Codex · Gemini CLI · Cursor · Grok CLI</text>
+  <text x="96" y="556" font-size="18" fill="#57606a">Claude Code · Codex · Antigravity · Cursor · Gemini CLI · Grok CLI</text>
   <text x="96" y="592" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#8b949e">github.com/grpcer/ownmem</text>
 
   <g font-size="19" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">

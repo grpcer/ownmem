@@ -51,7 +51,7 @@ motor, incluida la guía por la configuración de cada repositorio.
 | Alcance | Un repositorio |
 | Almacenamiento | Markdown revisable en `.ownmem/`, versionado con Git |
 | Recuperación predeterminada | BM25F determinista, **0 llamadas a modelos / 0 llamadas de red** |
-| Benchmark público | Benchmark sintético fijado de v0.1.2: **100 % de Recall@1**, **P95 de 2,46 ms**; no mide la precisión con usuarios reales |
+| Benchmark público | Benchmark sintético fijado de v0.2.0: **100 % de Recall@1**, **P95 de 2,46 ms**; no mide la precisión con usuarios reales |
 | Licencia | Apache-2.0 |
 
 <picture>

@@ -41,7 +41,7 @@ you through the per-repository setup.
 
 ## OwnMem at a glance
 
-| Fact | OwnMem v0.1.2 |
+| Fact | OwnMem v0.2.0 |
 | --- | --- |
 | Category | Repo-owned project memory for AI coding agents |
 | Scope | One software repository; curated engineering knowledge, not chat history |

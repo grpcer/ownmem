@@ -50,7 +50,7 @@ guiando você pela configuração por repositório.
 | Escopo | Um repositório |
 | Armazenamento | Markdown revisável em `.ownmem/`, versionado com o Git |
 | Recuperação padrão | BM25F determinístico, **0 chamadas de modelo / 0 chamadas de rede** |
-| Benchmark público | Benchmark sintético fixado da v0.1.2: **100% de Recall@1**, **P95 de 2,46 ms**; não mede a precisão com usuários reais |
+| Benchmark público | Benchmark sintético fixado da v0.2.0: **100% de Recall@1**, **P95 de 2,46 ms**; não mede a precisão com usuários reais |
 | Licença | Apache-2.0 |
 
 <picture>

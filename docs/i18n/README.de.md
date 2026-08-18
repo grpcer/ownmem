@@ -52,7 +52,7 @@ pro Repository.
 | Umfang | Ein Repository |
 | Speicherung | Überprüfbares Markdown in `.ownmem/`, mit Git versioniert |
 | Standardabruf | Deterministisches BM25F, **0 Modell- / 0 Netzwerkaufrufe** |
-| Öffentlicher Benchmark | Festgeschriebener synthetischer Benchmark v0.1.2: **100 % Recall@1**, **P95 2,46 ms**; kein Beleg für Genauigkeit bei echten Nutzern |
+| Öffentlicher Benchmark | Festgeschriebener synthetischer Benchmark v0.2.0: **100 % Recall@1**, **P95 2,46 ms**; kein Beleg für Genauigkeit bei echten Nutzern |
 | Lizenz | Apache-2.0 |
 
 <picture>

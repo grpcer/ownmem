@@ -1,6 +1,6 @@
 {
   "name": "ownmem",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Open-source AI agent memory system: Git-native, repo-owned Markdown project memory with deterministic local recall for Claude Code, Codex, Cursor, and more.",
   "type": "module",
   "license": "Apache-2.0",

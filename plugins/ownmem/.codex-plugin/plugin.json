@@ -1,6 +1,6 @@
 {
   "name": "ownmem",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Local deterministic memory for coding agents: recall past lessons before changing code, with zero model calls and zero query-time tokens.",
   "author": {
     "name": "grpcer",

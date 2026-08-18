@@ -49,7 +49,7 @@ moteur, y compris en vous guidant dans la configuration par dépôt.
 | Portée | Un dépôt |
 | Stockage | Markdown révisable dans `.ownmem/`, versionné avec Git |
 | Recherche par défaut | BM25F déterministe, **0 appel de modèle / 0 appel réseau** |
-| Benchmark public | Benchmark synthétique figé de la v0.1.2 : **100 % de Recall@1**, **P95 de 2,46 ms** ; il ne mesure pas la précision auprès d'utilisateurs réels |
+| Benchmark public | Benchmark synthétique figé de la v0.2.0 : **100 % de Recall@1**, **P95 de 2,46 ms** ; il ne mesure pas la précision auprès d'utilisateurs réels |
 | Licence | Apache-2.0 |
 
 <picture>

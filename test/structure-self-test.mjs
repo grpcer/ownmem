@@ -138,6 +138,40 @@ function checkCanonicalSchemaIds() {
   }
 }
 
+function checkReleaseVersions() {
+  const manifest = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  const lockfile = JSON.parse(readFileSync(path.join(ROOT, 'package-lock.json'), 'utf8'));
+  const claudePlugin = JSON.parse(readFileSync(
+    path.join(ROOT, 'plugins/ownmem/.claude-plugin/plugin.json'),
+    'utf8',
+  ));
+  const codexPlugin = JSON.parse(readFileSync(
+    path.join(ROOT, 'plugins/ownmem/.codex-plugin/plugin.json'),
+    'utf8',
+  ));
+  const geminiExtension = JSON.parse(readFileSync(path.join(ROOT, 'gemini-extension.json'), 'utf8'));
+  const marketplace = JSON.parse(readFileSync(path.join(ROOT, '.claude-plugin/marketplace.json'), 'utf8'));
+  const versions = [
+    ['package-lock.json', lockfile.version],
+    ['package-lock.json packages[""]', lockfile.packages?.['']?.version],
+    ['Claude plugin', claudePlugin.version],
+    ['Codex plugin', codexPlugin.version],
+    ['Gemini extension', geminiExtension.version],
+    ['Claude marketplace', marketplace.plugins?.find(plugin => plugin.name === 'ownmem')?.version],
+  ];
+  for (const [surface, version] of versions) {
+    assert(version === manifest.version,
+      `${surface} version ${version ?? '<missing>'} does not match package version ${manifest.version}`);
+  }
+
+  const citation = readFileSync(path.join(ROOT, 'CITATION.cff'), 'utf8');
+  assert(citation.match(/^version:\s*(\S+)\s*$/m)?.[1] === manifest.version,
+    `CITATION.cff version does not match package version ${manifest.version}`);
+  const changelog = readFileSync(path.join(ROOT, 'CHANGELOG.md'), 'utf8');
+  assert(changelog.includes(`## [${manifest.version}] - `),
+    `CHANGELOG.md has no release heading for ${manifest.version}`);
+}
+
 const files = trackedFiles();
 checkRootLayout(files);
 checkPackageManifest();
@@ -145,4 +179,5 @@ checkMarkdownLinks(files);
 checkModuleImports(files);
 checkSkillMirrors();
 checkCanonicalSchemaIds();
+checkReleaseVersions();
 process.stdout.write('repository structure self-test: passed\n');

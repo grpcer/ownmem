@@ -5,6 +5,8 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-18
+
 ### Added
 
 - A structural regression gate checks the root allowlist, local documentation

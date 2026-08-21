@@ -4,11 +4,14 @@
   "memory_dir": ".ownmem",
   "locale": "en",
   "layers": [
-    "core"
+    "core",
+    "gates",
+    "compiler"
   ],
   "command": "ownmem",
   "adapters": [
+    "claude",
     "generic"
   ],
-  "hook_enabled": false
+  "hook_enabled": true
 }

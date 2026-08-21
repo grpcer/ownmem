@@ -62,7 +62,7 @@ pro Repository.
 
 ## Schnellstart
 
-OwnMem benötigt Node.js 20 oder neuer. Drei Schritte, alle im Repository,
+OwnMem benötigt Node.js 20.6 oder neuer. Drei Schritte, alle im Repository,
 das ein eigenes Gedächtnis bekommen soll.
 
 **Schritt 1 — den Motor installieren.** Er wird zu einer normalen

@@ -12,8 +12,8 @@ the product does not have.
 | `bin/` | Thin executable entry points | Yes |
 | `lib/` | Public API, feature orchestration, and deterministic runtime | Yes |
 | `schemas/` | Versioned runtime and protocol contracts, grouped by domain | Yes |
-| `test/` | End-to-end, packaging, and structural regression gates | No |
-| `benchmarks/` | Locked synthetic corpora and release performance gates | No |
+| `test/` | End-to-end, packaging, and structural regression gates | Yes |
+| `benchmarks/` | Locked synthetic corpora and release performance gates | Yes |
 | `plugins/ownmem/` | Self-contained Claude and Codex plugin package | No |
 | `skills/` and `commands/` | Gemini extension components rooted at this repository | No |
 | `.agents/` and `.claude-plugin/` | Host marketplace discovery manifests | No |
@@ -43,7 +43,9 @@ bodies must otherwise remain identical; `npm test` enforces that invariant.
 ## Change rules
 
 1. Put executable wrappers in `bin/`, reusable behavior in `lib/`, contracts in
-   `schemas/`, and release-only evidence in `test/` or `benchmarks/`.
+   `schemas/`, and release evidence in `test/` or `benchmarks/`. The evidence
+   trees ship with the npm package so a consumer can re-run the self-test and
+   the locked benchmark against the exact released artifact.
 2. Keep npm's `files` field allowlisted. Do not restore root-level `*.mjs` or
    `*.json` globs.
 3. Treat moves under `schemas/`, changes to `lib/index.mjs`, and CLI command

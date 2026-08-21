@@ -60,7 +60,7 @@ Implementation and release boundaries are documented in
 
 ## Quick start
 
-OwnMem requires Node.js 20 or newer. Three steps, all inside the repository
+OwnMem requires Node.js 20.6 or newer. Three steps, all inside the repository
 you want to give a memory.
 
 **Step 1 — install the engine.** It becomes a normal `devDependency`,
@@ -283,6 +283,9 @@ Reproduce it yourself:
 ```bash
 git clone https://github.com/grpcer/ownmem
 cd ownmem && npm ci && npm run benchmark
+
+# or against the exact released npm artifact, no clone needed
+npm install ownmem && npm explore ownmem -- npm run benchmark
 ```
 
 > **Note:** Measured on an Apple M5 Pro with Node 25. The corpus hash,

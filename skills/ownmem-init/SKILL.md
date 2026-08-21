@@ -5,7 +5,7 @@ description: Install or update OwnMem in the current repository. Use when the us
 
 # Set up OwnMem in this repository
 
-OwnMem requires Node.js 20 or newer. Install the reviewed dependency, then
+OwnMem requires Node.js 20.6 or newer. Install the reviewed dependency, then
 generate the host adapters:
 
 ```bash

@@ -1,32 +1,32 @@
 {
   "artifacts": {
     "documents": {
-      "bytes": 11299,
+      "bytes": 15041,
       "file": "documents.json",
-      "records": 4,
+      "records": 5,
       "schema": "ownmem-index.documents/v1",
-      "sha256": "25a7938c0ca7aea9966c1dbd7777aeea5fa68682daf8c1b5c1fba3ed70a0743c"
+      "sha256": "0768534d2b5a97f29d4c27b43263ebbe247727faa9b906531eba015272a9f5f9"
     },
     "exact_map": {
-      "bytes": 8324,
+      "bytes": 9770,
       "file": "exact-map.json",
-      "records": 52,
+      "records": 62,
       "schema": "ownmem-index.exact-map/v1",
-      "sha256": "8cd17ab88c51eb00e4ecd8f40ae17eb10796579af30827ef787eb2df86650632"
+      "sha256": "8a9998368d3bdbf9eaf5330344f18d0890f030f1e0bd63e1326132e91073300c"
     },
     "graph": {
-      "bytes": 3489,
+      "bytes": 3778,
       "file": "graph.json",
-      "records": 10,
+      "records": 12,
       "schema": "ownmem-index.graph/v2",
-      "sha256": "b94e0c9286747f88f092d12d1fd5a5a73a05dfd80748f66899200ac27fa1e2fd"
+      "sha256": "6405f7840f7685bf798c608c8f7d9c3c0cca647a9eb325139af745d988579e55"
     },
     "postings": {
-      "bytes": 25033,
+      "bytes": 33705,
       "file": "postings.json",
-      "records": 405,
+      "records": 549,
       "schema": "ownmem-index.postings/v2",
-      "sha256": "d25e760d94e2c8e7b7076f02a607e25c4867371bb5e4204829c045f4d97f3103"
+      "sha256": "7af0c6841ce5548a2e74b642359fc009bf83346aa0e55a74cf00a512c9385cfc"
     },
     "ranking": {
       "bytes": 2482,
@@ -47,19 +47,19 @@
   },
   "schema": "ownmem-index/v1",
   "snapshot": {
-    "content_sha256": "2dcb1db3a34652f8f989f76b01ad42a0e169a63aff27bd2d8bcd3922906e75c4",
-    "created_at": "2026-08-16T13:45:09.091Z",
-    "id": "2873ca916db4738c21b3fd296ed70a4ae72ec211eb6360f6a074bbf687856f7f"
+    "content_sha256": "91a1aeb2520f9cc2d226265c17354c3b43099b74fed0b1680d33e8c73a1248d3",
+    "created_at": "2026-08-21T15:50:49.751Z",
+    "id": "9f0711b1b54a447feec5d4d7dabede0b131342cf2ccb1a34cbddb59ab8bda5c1"
   },
   "source": {
-    "active_topics": 4,
+    "active_topics": 5,
     "archive_included": false,
     "files": [
       {
-        "bytes": 611,
+        "bytes": 760,
         "kind": "l2",
         "path": ".ownmem/MEMORY-general.md",
-        "sha256": "abbd42d9d17a09fa8012d3273639334e78d7ed0c0bea76a921a3b880fb8470b7"
+        "sha256": "397a2bbd243e59eb4a3a0431edd99606c4555323ed74dde78e73db244aeab5a0"
       },
       {
         "bytes": 41,
@@ -68,10 +68,10 @@
         "sha256": "d4b03e794a3b2f0a0c48e39ef0d9ba061e6ddaa3ecca016748723c9dccfe06fe"
       },
       {
-        "bytes": 2184,
+        "bytes": 2176,
         "kind": "topic",
         "path": ".ownmem/ci_latency_lock_needs_machine_scaling.md",
-        "sha256": "5602bfd52e1a0fac85a9baccd6fc14485bbc5dae85afffe394997851249a104b"
+        "sha256": "165829ab0a902aff22c850d0b64cd61d73a16cfde8d802837a873ef327d343c0"
       },
       {
         "bytes": 1661,
@@ -80,19 +80,25 @@
         "sha256": "f035b148c647a44536e59eb8574f2066d070fcf6118aeb9cb23f1cf793b4d6f6"
       },
       {
-        "bytes": 1757,
+        "bytes": 1975,
         "kind": "topic",
         "path": ".ownmem/npm_publish_requires_2fa_and_ci_provenance.md",
-        "sha256": "f2e89c924519aec3956065e4bee8d61d6dbdf60f534af3529bd991a4174afdf2"
+        "sha256": "a34a52e87d2e97be4ff07e85917af9bf380784bd8cf6ea6d5da9c531833021ba"
       },
       {
-        "bytes": 2067,
+        "bytes": 2589,
+        "kind": "topic",
+        "path": ".ownmem/observation_period_bootstrap.md",
+        "sha256": "da8f8d23487b0573c19b30b5e9dd449f84914d1ebcb73e3d592178b8246ad438"
+      },
+      {
+        "bytes": 2063,
         "kind": "topic",
         "path": ".ownmem/offline_e2e_requires_fixture_owned_npm_cache.md",
-        "sha256": "61ee77b16cc77aabc8b89451e042d40925379a611cc8dfd2005f477384a5925a"
+        "sha256": "22e1eb8cce465467c7838d53f46559e677870ce6e3a62dc543d765e6a7b87524"
       }
     ],
     "memory_dir": ".ownmem",
-    "source_sha256": "3c371be6f0eaa8f9d2e635ebc4926d1e086fea9937a81d0a5b9209a0761ec13b"
+    "source_sha256": "8db15cad574bd0ade0402411d8a2388cecfa2926a17cc176f2fb7da49b04d520"
   }
 }

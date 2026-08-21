@@ -56,13 +56,16 @@ function checkRootLayout(files) {
   const actual = [...new Set(files.map(file => file.split('/')[0]))].sort();
   const expected = [
     '.agents',
+    '.claude',
     '.claude-plugin',
     '.github',
     '.gitignore',
     '.ownmem',
     'CHANGELOG.md',
     'CITATION.cff',
+    'CLAUDE.md',
     'LICENSE',
+    'MEMORY_INSTRUCTIONS.md',
     'NOTICE',
     'README.md',
     'benchmarks',

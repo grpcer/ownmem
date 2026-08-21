@@ -116,6 +116,11 @@ function packedOfflineInstall(fixture) {
     import { readFileSync } from 'node:fs';
     import { classifyIntent } from 'ownmem';
     if (classifyIntent('do you remember this?') !== 'recall') throw new Error('package API export failed');
+    // import.meta.resolve is only unflagged from Node 20.6.0, which is the floor
+    // package.json declares. Say so instead of dying on a bare TypeError below.
+    if (typeof import.meta.resolve !== 'function') {
+      throw new Error('ownmem requires Node 20.6.0 or newer: import.meta.resolve is unavailable on ' + process.version);
+    }
     const schema = JSON.parse(readFileSync(new URL(import.meta.resolve('ownmem/schemas/memory.schema.json')), 'utf8'));
     if (!schema.$id.endsWith('/schemas/memory.schema.json')) throw new Error('schema subpath export failed');
   `], consumer);

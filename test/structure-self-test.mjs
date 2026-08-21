@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,18 +11,44 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function git(args, options = {}) {
+  return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', ...options });
+}
+
+// Git answers for the enclosing repository, which for a package installed under a
+// consumer's node_modules is the consumer's own checkout. Only a checkout whose top
+// level is this package root describes this repository.
+function isRepositoryCheckout() {
+  try {
+    // Outside a checkout this is an expected answer, not an incident, so Git's
+    // "not a repository" complaint stays off the test output.
+    const toplevel = git(['rev-parse', '--show-toplevel'], { stdio: ['ignore', 'pipe', 'ignore'] });
+    return realpathSync(toplevel.trim()) === realpathSync(ROOT);
+  } catch {
+    return false;
+  }
+}
+
+// Only committed files describe the repository: --others lets any stray untracked
+// file fail the layout gate, and -z returns names verbatim instead of the C-quoted
+// octal escapes Git emits for non-ASCII paths.
 function trackedFiles() {
-  return execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], { cwd: ROOT, encoding: 'utf8' })
-    .trim()
-    .split('\n')
-    .filter(Boolean);
+  return git(['ls-files', '--cached', '-z']).split('\0').filter(Boolean);
+}
+
+function walkFiles(directory) {
+  const files = [];
+  for (const entry of readdirSync(path.join(ROOT, directory || '.'), { withFileTypes: true })) {
+    if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+    const relative = directory ? `${directory}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) files.push(...walkFiles(relative));
+    else if (entry.isFile()) files.push(relative);
+  }
+  return files.sort();
 }
 
 function trackedMode(file) {
-  const entry = execFileSync('git', ['ls-files', '--stage', '--', file], {
-    cwd: ROOT,
-    encoding: 'utf8',
-  }).trim();
+  const entry = git(['ls-files', '--stage', '--', file]).trim();
   return entry.match(/^(\d{6})\s/)?.[1] ?? null;
 }
 
@@ -54,19 +80,72 @@ function checkRootLayout(files) {
   ];
   assert(JSON.stringify(actual) === JSON.stringify(expected),
     `root layout drifted:\nexpected ${expected.join(', ')}\nactual   ${actual.join(', ')}`);
-  assert(actual.length <= 24, `repository root has ${actual.length} entries; keep it at or below 24`);
 }
 
-function checkPackageManifest() {
+function checkPackageManifest(withGitIndex) {
   const manifest = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
   assert(manifest.bin?.ownmem === 'bin/ownmem.mjs', 'package bin must point at bin/ownmem.mjs');
-  assert(trackedMode(manifest.bin.ownmem) === '100755',
-    'bin/ownmem.mjs must be tracked by Git as executable (mode 100755)');
+  if (withGitIndex) {
+    assert(trackedMode(manifest.bin.ownmem) === '100755',
+      'bin/ownmem.mjs must be tracked by Git as executable (mode 100755)');
+  }
   assert(manifest.exports?.['.'] === './lib/index.mjs', 'package root export must point at lib/index.mjs');
   assert(manifest.exports?.['./schemas/*'] === './schemas/*', 'schema subpaths must remain exported');
-  const expectedFiles = ['bin/', 'lib/', 'schemas/', 'README.md', 'LICENSE', 'NOTICE', 'CHANGELOG.md'];
+  const expectedFiles = ['benchmarks/', 'bin/', 'lib/', 'schemas/', 'test/', 'README.md', 'LICENSE', 'NOTICE', 'CHANGELOG.md'];
   assert(JSON.stringify(manifest.files) === JSON.stringify(expectedFiles),
     `npm files allowlist drifted: ${JSON.stringify(manifest.files)}`);
+  // Every script must run from an installed copy, so whatever a script executes has
+  // to be inside the whitelist that produces that copy.
+  const packedRoots = new Set(manifest.files.map(entry => entry.replace(/\/$/, '')));
+  for (const [name, script] of Object.entries(manifest.scripts ?? {})) {
+    for (const [, referenced] of script.matchAll(/\.\/([\w.-]+)\//g)) {
+      assert(packedRoots.has(referenced),
+        `script "${name}" runs ./${referenced}/ which the npm files allowlist does not ship`);
+    }
+  }
+}
+
+// Fenced code blocks hold illustrative links that no reader follows, so they are
+// stripped before the real links are collected.
+function stripCodeFences(content) {
+  let fence = null;
+  return content.split('\n').map(line => {
+    const match = line.match(/^\s{0,3}(`{3,}|~{3,})/);
+    if (match) {
+      if (!fence) {
+        fence = match[1][0];
+        return '';
+      }
+      if (fence === match[1][0]) {
+        fence = null;
+        return '';
+      }
+    }
+    return fence ? '' : line;
+  }).join('\n');
+}
+
+// A `[^)]+` capture truncates any destination that contains parentheses, so the
+// link destination is walked with its nesting tracked instead.
+function markdownTargets(content) {
+  const targets = [];
+  for (let index = content.indexOf(']('); index !== -1; index = content.indexOf('](', index + 1)) {
+    let cursor = index + 2;
+    let depth = 1;
+    while (cursor < content.length && depth > 0) {
+      const character = content[cursor];
+      if (character === '\\') {
+        cursor += 2;
+        continue;
+      }
+      if (character === '(') depth += 1;
+      else if (character === ')') depth -= 1;
+      cursor += 1;
+    }
+    if (depth === 0) targets.push(content.slice(index + 2, cursor - 1));
+  }
+  targets.push(...[...content.matchAll(/\b(?:src|srcset)="([^"]+)"/g)].map(match => match[1]));
+  return targets;
 }
 
 function localTarget(source, rawTarget) {
@@ -74,7 +153,14 @@ function localTarget(source, rawTarget) {
   if (!target || /^(?:[a-z]+:|#)/i.test(target)) return null;
   const withoutFragment = target.split('#')[0].split('?')[0];
   if (!withoutFragment) return null;
-  const decoded = decodeURIComponent(withoutFragment);
+  // A literal '%' — or any truncated escape — makes decodeURIComponent throw; the
+  // raw text is then the honest on-disk target.
+  let decoded;
+  try {
+    decoded = decodeURIComponent(withoutFragment);
+  } catch {
+    decoded = withoutFragment;
+  }
   return decoded.startsWith('/')
     ? path.join(ROOT, decoded.slice(1))
     : path.resolve(path.dirname(path.join(ROOT, source)), decoded);
@@ -83,12 +169,8 @@ function localTarget(source, rawTarget) {
 function checkMarkdownLinks(files) {
   const broken = [];
   for (const file of files.filter(file => file.endsWith('.md'))) {
-    const content = readFileSync(path.join(ROOT, file), 'utf8');
-    const targets = [
-      ...[...content.matchAll(/\]\(([^)]+)\)/g)].map(match => match[1]),
-      ...[...content.matchAll(/\b(?:src|srcset)="([^"]+)"/g)].map(match => match[1]),
-    ];
-    for (const target of targets) {
+    const content = stripCodeFences(readFileSync(path.join(ROOT, file), 'utf8'));
+    for (const target of markdownTargets(content)) {
       const resolved = localTarget(file, target);
       if (resolved && !existsSync(resolved)) broken.push(`${file} -> ${target}`);
     }
@@ -96,13 +178,18 @@ function checkMarkdownLinks(files) {
   assert(broken.length === 0, `broken local Markdown links:\n${broken.join('\n')}`);
 }
 
+// Static re-exports, bare side-effect imports, dynamic imports, and helper wrappers
+// such as importLayerModule(...) all have to resolve a real file at runtime, so every
+// quoted relative specifier counts wherever it appears. A wrapper specifier resolves
+// against the calling module, which is how they are written; the wrapper itself
+// forwards a variable and matches nothing.
+const RELATIVE_SPECIFIER = /(?:\bfrom\s+|\bimport\s+|\bimport[A-Za-z0-9_$]*\s*\(\s*)['"](\.{1,2}\/[^'"]+)['"]/g;
+
 function checkModuleImports(files) {
   const broken = [];
   for (const file of files.filter(file => file.endsWith('.mjs'))) {
     const content = readFileSync(path.join(ROOT, file), 'utf8');
-    const imports = [...content.matchAll(/(?:from\s+|import\s*\()\s*['"](\.{1,2}\/[^'"]+)['"]/g)]
-      .map(match => match[1]);
-    for (const specifier of imports) {
+    for (const [, specifier] of content.matchAll(RELATIVE_SPECIFIER)) {
       const resolved = path.resolve(path.dirname(path.join(ROOT, file)), specifier);
       if (!existsSync(resolved)) broken.push(`${file} -> ${specifier}`);
     }
@@ -114,27 +201,38 @@ function normalizedSkill(file) {
   return readFileSync(path.join(ROOT, file), 'utf8').replace(/^name: .*$/m, 'name: <host-specific>');
 }
 
-function checkSkillMirrors() {
-  const pairs = [
-    ['skills/ownmem/SKILL.md', 'plugins/ownmem/skills/recall/SKILL.md'],
-    ['skills/ownmem-init/SKILL.md', 'plugins/ownmem/skills/init/SKILL.md'],
-    ['skills/ownmem-dashboard/SKILL.md', 'plugins/ownmem/skills/dashboard/SKILL.md'],
-  ];
-  for (const [extensionSkill, pluginSkill] of pairs) {
-    assert(normalizedSkill(extensionSkill) === normalizedSkill(pluginSkill),
-      `${extensionSkill} and ${pluginSkill} drifted beyond their host-specific names`);
+function skillManifests(files, directory) {
+  return files.filter(file => file.startsWith(`${directory}/`) && file.endsWith('/SKILL.md')).sort();
+}
+
+function checkSkillMirrors(files) {
+  const extensionSkills = skillManifests(files, 'skills');
+  const pluginSkills = skillManifests(files, 'plugins/ownmem/skills');
+  assert(extensionSkills.length > 0, 'no skill manifests were found under skills/');
+  assert(extensionSkills.length === pluginSkills.length,
+    `skill mirrors drifted: ${extensionSkills.length} under skills/, ${pluginSkills.length} under plugins/ownmem/skills/`);
+  // The two trees name the same skill differently per host, so they are paired by
+  // their host-neutral body rather than by a hardcoded table.
+  const unmatched = [...pluginSkills];
+  for (const extensionSkill of extensionSkills) {
+    const body = normalizedSkill(extensionSkill);
+    const index = unmatched.findIndex(pluginSkill => normalizedSkill(pluginSkill) === body);
+    assert(index !== -1,
+      `${extensionSkill} has no plugin mirror that matches beyond its host-specific name (unmatched: ${unmatched.join(', ')})`);
+    unmatched.splice(index, 1);
   }
 }
 
-function checkCanonicalSchemaIds() {
-  const schemas = [
-    ['schemas/memory.schema.json', '/schemas/memory.schema.json'],
-    ['schemas/observability/events.schema.json', '/schemas/observability/events.schema.json'],
-    ['schemas/observability/report.schema.json', '/schemas/observability/report.schema.json'],
-  ];
-  for (const [file, suffix] of schemas) {
+function checkCanonicalSchemaIds(files) {
+  const schemas = files.filter(file => file.startsWith('schemas/') && file.endsWith('.json'));
+  assert(schemas.length > 0, 'no schemas were found under schemas/');
+  for (const file of schemas) {
     const schema = JSON.parse(readFileSync(path.join(ROOT, file), 'utf8'));
-    assert(schema.$id?.endsWith(suffix), `${file} has a stale canonical $id: ${schema.$id}`);
+    assert(schema.$id, `${file} has no $id`);
+    // Only the published schemas carry a URL $id, and it must address the file at
+    // its own repository path.
+    if (!/^https?:\/\//.test(schema.$id)) continue;
+    assert(schema.$id.endsWith(`/${file}`), `${file} has a stale canonical $id: ${schema.$id}`);
   }
 }
 
@@ -172,12 +270,25 @@ function checkReleaseVersions() {
     `CHANGELOG.md has no release heading for ${manifest.version}`);
 }
 
-const files = trackedFiles();
-checkRootLayout(files);
-checkPackageManifest();
-checkMarkdownLinks(files);
+// The npm tarball ships only the runtime layers, so an installed copy has no
+// repository tree to audit; a checkout always has one.
+const REPOSITORY_TREE = existsSync(path.join(ROOT, 'docs')) && existsSync(path.join(ROOT, 'skills'));
+const CHECKOUT = isRepositoryCheckout();
+assert(REPOSITORY_TREE || !CHECKOUT, 'Git checkout is missing the repository tree (docs/, skills/)');
+
+const files = CHECKOUT ? trackedFiles() : walkFiles('');
+const skipped = [];
+if (CHECKOUT) checkRootLayout(files);
+else skipped.push('root layout (no Git index here)');
+checkPackageManifest(CHECKOUT);
+if (REPOSITORY_TREE) {
+  checkMarkdownLinks(files);
+  checkSkillMirrors(files);
+  checkReleaseVersions();
+} else {
+  skipped.push('Markdown links, skill mirrors and release versions (repository-only trees are not packaged)');
+}
 checkModuleImports(files);
-checkSkillMirrors();
-checkCanonicalSchemaIds();
-checkReleaseVersions();
+checkCanonicalSchemaIds(files);
+if (skipped.length) process.stdout.write(`repository structure self-test: skipped ${skipped.join('; ')}\n`);
 process.stdout.write('repository structure self-test: passed\n');

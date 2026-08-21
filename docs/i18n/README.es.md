@@ -61,7 +61,7 @@ motor, incluida la guía por la configuración de cada repositorio.
 
 ## Inicio rápido
 
-OwnMem requiere Node.js 20 o superior. Tres pasos, todos dentro del
+OwnMem requiere Node.js 20.6 o superior. Tres pasos, todos dentro del
 repositorio al que quieras dar memoria.
 
 **Paso 1 — instala el motor.** Se convierte en una `devDependency` normal,

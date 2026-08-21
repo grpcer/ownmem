@@ -10,7 +10,9 @@ permissions:
 
 concurrency:
   group: release-gates-${{ github.ref }}
-  cancel-in-progress: true
+  # Only supersede pushes to a pull request. On main every commit is a release
+  # candidate, so cancelling its run would leave the tagged commit ungated.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
@@ -21,10 +23,12 @@ jobs:
         include:
           - os: ubuntu-latest
             node: 20
-            gate: release
+            gate: compatibility
           - os: ubuntu-latest
             node: 22
-            gate: release
+            gate: compatibility
+          # The release benchmark is expensive and platform-independent, so one
+          # lane carries the latency evidence for the whole matrix.
           - os: ubuntu-latest
             node: 24
             gate: release
@@ -46,5 +50,10 @@ jobs:
         if: matrix.gate == 'release'
         run: npm run verify:release
       - name: Run platform compatibility tests
-        if: matrix.gate == 'compatibility'
+        if: matrix.gate != 'release'
         run: npm test
+      # Packing is platform-specific — the executable bit and the bin path have
+      # regressed before — so every lane runs the pack gate, not only Linux.
+      - name: Run pack gate
+        if: matrix.gate != 'release'
+        run: npm pack --dry-run --json

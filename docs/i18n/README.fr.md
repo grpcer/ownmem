@@ -59,7 +59,7 @@ moteur, y compris en vous guidant dans la configuration par dépôt.
 
 ## Démarrage rapide
 
-OwnMem nécessite Node.js 20 ou plus récent. Trois étapes, toutes dans le
+OwnMem nécessite Node.js 20.6 ou plus récent. Trois étapes, toutes dans le
 dépôt auquel vous voulez donner une mémoire.
 
 **Étape 1 — installez le moteur.** Il devient une `devDependency` normale,

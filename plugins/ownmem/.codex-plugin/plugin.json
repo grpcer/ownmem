@@ -1,7 +1,7 @@
 {
   "name": "ownmem",
   "version": "0.2.0",
-  "description": "Local deterministic memory for coding agents: recall past lessons before changing code, with zero model calls and zero query-time tokens.",
+  "description": "Repo-owned project memory for AI coding agents: recall reviewed lessons locally and deterministically, with zero model calls and zero query-time tokens.",
   "author": {
     "name": "grpcer",
     "url": "https://github.com/grpcer"
@@ -11,7 +11,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "OwnMem",
-    "shortDescription": "Local deterministic memory for coding agents",
+    "shortDescription": "Repo-owned project memory for AI coding agents",
     "developerName": "grpcer",
     "category": "Engineering",
     "websiteURL": "https://github.com/grpcer/ownmem"

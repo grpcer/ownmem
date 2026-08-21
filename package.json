@@ -14,7 +14,7 @@
     "url": "https://github.com/grpcer/ownmem/issues"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.6.0"
   },
   "bin": {
     "ownmem": "bin/ownmem.mjs"
@@ -24,9 +24,11 @@
     "./schemas/*": "./schemas/*"
   },
   "files": [
+    "benchmarks/",
     "bin/",
     "lib/",
     "schemas/",
+    "test/",
     "README.md",
     "LICENSE",
     "NOTICE",

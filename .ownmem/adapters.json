@@ -2,9 +2,20 @@
   "schema": "ownmem.adapters/v1",
   "version": 1,
   "hosts": [
+    "claude",
     "generic"
   ],
   "files": [
+    {
+      "path": "CLAUDE.md",
+      "host": "claude",
+      "sha256": "fd8f7f8f520476451b1a0b4531f5ffb7727e2b0c751af2ada3bc2e9fa32141b2"
+    },
+    {
+      "path": ".claude/commands/ownmem.md",
+      "host": "claude",
+      "sha256": "ceb676451b1a88018bbc4045be6bc321d3b139f45f7f19b82dd5a932b63cb428"
+    },
     {
       "path": "MEMORY_INSTRUCTIONS.md",
       "host": "generic",

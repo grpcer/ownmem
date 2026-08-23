@@ -35,7 +35,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node ./test/structure-self-test.mjs && node ./test/public-self-test.mjs",
+    "test": "node ./test/structure-self-test.mjs && node ./test/public-self-test.mjs && node ./test/instrumentation-health-self-test.mjs",
     "test:structure": "node ./test/structure-self-test.mjs",
     "benchmark": "node ./benchmarks/public-benchmark.mjs --iterations 20",
     "benchmark:release": "node ./benchmarks/public-benchmark.mjs --iterations 100",

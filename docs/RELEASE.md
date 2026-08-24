@@ -7,6 +7,16 @@ Canonical targets:
 - CLI: `ownmem`
 - Web console: `OwnMem Console`
 
+Canonical publication path:
+
+1. Configure npm Trusted Publishing for repository `grpcer/ownmem` and workflow
+   `npm-publish.yml`.
+2. Publish the GitHub release for the versioned tag. The release event runs the
+   trusted workflow automatically; an existing tag can be recovered with the
+   workflow's manual `tag` input.
+3. Never bypass `publishConfig.provenance`. Local npm credentials are not a
+   substitute for the repository-bound OIDC identity.
+
 A release is blocked until every item below has fresh evidence:
 
 - Linux runs `npm run verify:release` on the current Node release. Linux on

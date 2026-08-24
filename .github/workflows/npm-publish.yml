@@ -1,0 +1,42 @@
+name: npm-publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish, for example v0.3.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish trusted package
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_REF: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.RELEASE_REF }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install trusted-publishing npm client
+        run: npm install --global npm@11.16.0
+      - name: Verify tag matches package version
+        run: node -e "const p=require('./package.json'); if ('v'+p.version !== process.env.RELEASE_REF) throw new Error('release tag and package version differ')"
+      - run: npm ci --ignore-scripts
+      - run: npm run verify:release
+      - name: Publish with OIDC provenance
+        run: npm publish --registry=https://registry.npmjs.org --access public --provenance

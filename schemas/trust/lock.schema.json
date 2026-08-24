@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-trust-lock/v1",
+  "title": "OwnMem content-bound trust receipts",
+  "type": "object",
+  "required": ["schema", "policy", "updated_at", "source", "receipts"],
+  "properties": {
+    "schema": { "const": "ownmem.trust/v1" },
+    "policy": {
+      "type": "object",
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "evidence-governed-v1" },
+        "version": { "$ref": "#/$defs/semver" }
+      },
+      "additionalProperties": false
+    },
+    "updated_at": { "$ref": "#/$defs/isoTimestamp" },
+    "source": {
+      "type": "object",
+      "required": ["repository_head", "working_tree"],
+      "properties": {
+        "repository_head": { "oneOf": [{ "$ref": "#/$defs/gitHash" }, { "type": "null" }] },
+        "working_tree": { "enum": ["clean", "dirty", "unavailable"] }
+      },
+      "additionalProperties": false
+    },
+    "receipts": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "$ref": "#/$defs/receipt" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "gitHash": { "type": "string", "pattern": "^[a-f0-9]{40,64}$" },
+    "semver": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$" },
+    "isoTimestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$" },
+    "stringArray": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "nullablePath": {
+      "oneOf": [
+        { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+        { "type": "null" }
+      ]
+    },
+    "codeFingerprint": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "evidence": {
+      "type": "object",
+      "required": ["kind", "locator", "path", "sha256", "fingerprint", "symbol"],
+      "properties": {
+        "kind": { "enum": ["topic", "path", "symbol", "test", "commit", "document", "user-confirmation", "replay"] },
+        "locator": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "path": { "$ref": "#/$defs/nullablePath" },
+        "sha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "fingerprint": { "oneOf": [{ "$ref": "#/$defs/codeFingerprint" }, { "type": "null" }] },
+        "symbol": { "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 500 }, { "type": "null" }] }
+      },
+      "additionalProperties": false
+    },
+    "receipt": {
+      "type": "object",
+      "required": [
+        "receipt_id", "memory_id", "memory_sha256", "issued_at", "policy_id", "policy_version",
+        "transition", "lifecycle", "logical_type", "action_risk", "authority", "scopes", "change", "valid_for",
+        "preconditions", "postconditions", "counterexamples", "evidence", "evidence_root_sha256",
+        "verifier", "source_commit", "rollback"
+      ],
+      "properties": {
+        "receipt_id": { "$ref": "#/$defs/sha256" },
+        "memory_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+        "memory_sha256": { "$ref": "#/$defs/sha256" },
+        "issued_at": { "$ref": "#/$defs/isoTimestamp" },
+        "policy_id": { "const": "evidence-governed-v1" },
+        "policy_version": { "$ref": "#/$defs/semver" },
+        "transition": {
+          "type": "object",
+          "required": ["from", "to"],
+          "properties": {
+            "from": { "oneOf": [{ "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded"] }, { "type": "null" }] },
+            "to": { "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded"] }
+          },
+          "additionalProperties": false
+        },
+        "lifecycle": { "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded"] },
+        "logical_type": { "enum": ["normative", "procedural", "factual", "diagnostic", "preference", "feedback"] },
+        "action_risk": { "enum": ["R0", "R1", "R2", "R3", "R4", "R5"] },
+        "authority": { "enum": ["observed", "advisory", "normative", "user-confirmed"] },
+        "scopes": { "$ref": "#/$defs/stringArray" },
+        "change": {
+          "type": "object",
+          "required": ["mode", "base_memory_sha256"],
+          "properties": {
+            "mode": { "enum": ["import", "delta", "structured-merge"] },
+            "base_memory_sha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] }
+          },
+          "additionalProperties": false
+        },
+        "valid_for": {
+          "type": "object",
+          "required": ["commit_range", "semver", "platforms", "environments"],
+          "properties": {
+            "commit_range": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["start", "end"],
+                  "properties": {
+                    "start": { "$ref": "#/$defs/gitHash" },
+                    "end": { "oneOf": [{ "$ref": "#/$defs/gitHash" }, { "type": "null" }] }
+                  },
+                  "additionalProperties": false
+                },
+                { "type": "null" }
+              ]
+            },
+            "semver": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["min", "max"],
+                  "properties": {
+                    "min": { "$ref": "#/$defs/semver" },
+                    "max": { "oneOf": [{ "$ref": "#/$defs/semver" }, { "type": "null" }] }
+                  },
+                  "additionalProperties": false
+                },
+                { "type": "null" }
+              ]
+            },
+            "platforms": { "$ref": "#/$defs/stringArray" },
+            "environments": { "$ref": "#/$defs/stringArray" }
+          },
+          "additionalProperties": false
+        },
+        "preconditions": { "$ref": "#/$defs/stringArray" },
+        "postconditions": { "$ref": "#/$defs/stringArray" },
+        "counterexamples": { "$ref": "#/$defs/stringArray" },
+        "evidence": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidence" } },
+        "evidence_root_sha256": { "$ref": "#/$defs/sha256" },
+        "verifier": {
+          "type": "object",
+          "required": ["kind", "id"],
+          "properties": {
+            "kind": { "enum": ["machine", "reviewer"] },
+            "id": { "type": "string", "minLength": 1, "maxLength": 200 }
+          },
+          "additionalProperties": false
+        },
+        "source_commit": { "oneOf": [{ "$ref": "#/$defs/gitHash" }, { "type": "null" }] },
+        "rollback": {
+          "type": "object",
+          "required": ["previous_receipt_id", "previous_memory_sha256"],
+          "properties": {
+            "previous_receipt_id": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+            "previous_memory_sha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

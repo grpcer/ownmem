@@ -1,479 +1,140 @@
 <div align="center">
 
-# OwnMem — Git-Native Project Memory for AI Coding Agents
+# OwnMem
 
-**Repo-owned. Deterministic. Reviewable.**
+**Repository-owned memory for AI coding agents — local, deterministic, reviewable, and safely self-improving.**
 
-An open-source AI memory system for coding agents and software repositories.<br>
-One persistent project memory serves Claude Code · Codex · Antigravity · Cursor · Gemini CLI · Grok CLI.
+`Git-native` · `local recall` · `multi-agent` · `evidence-governed` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
-[![node >= 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
-[![recall P95 2.46 ms](https://img.shields.io/badge/recall%20P95-2.46%20ms-8250df?style=flat-square)](#benchmarks)
-[![model calls 0](https://img.shields.io/badge/model%20calls-0-8250df?style=flat-square)](#benchmarks)
 
 **English** · [简体中文](./docs/i18n/README.zh-CN.md) · [繁體中文](./docs/i18n/README.zh-TW.md) · [日本語](./docs/i18n/README.ja.md) · [한국어](./docs/i18n/README.ko.md) · [Español](./docs/i18n/README.es.md) · [Français](./docs/i18n/README.fr.md) · [Deutsch](./docs/i18n/README.de.md) · [Português (BR)](./docs/i18n/README.pt-BR.md)
 
 </div>
 
-## What is OwnMem?
+## Why OwnMem
 
-OwnMem is an open-source coding agent memory system that keeps curated project
-decisions, constraints, and debugging lessons as reviewable Markdown inside
-your repository. The same long-term project memory works across agents and
-sessions, travels with Git, and rolls back with the code it describes.
+Most memory systems optimize for remembering more. OwnMem starts with a different question: **who owns project knowledge, who may change it, and how can a bad memory be stopped before it changes an agent's actions?**
 
-Its deterministic, Unicode-script-aware BM25F engine ranks memory in
-`.ownmem/`. For the same query, configuration, and compiled snapshot, default
-recall returns the same ranking without a model call, network request, or
-query-time token cost — in about two milliseconds on the public benchmark.
-
-OwnMem has two pieces. The **npm package** is the engine: it lives in each
-repository as a reviewed `devDependency` and owns that repository's memory in
-`.ownmem/`. The **agent plugin** is an optional convenience layer installed
-once per machine: it teaches your agent to run the engine, including walking
-you through the per-repository setup.
-
-> **Note:** A repository is ready once it has the package and `.ownmem/`,
-> however you got there. Start from either piece.
-
-## OwnMem at a glance
-
-| Fact | OwnMem v0.2.0 |
+| Advantage | What it means in practice |
 | --- | --- |
-| Category | Repo-owned project memory for AI coding agents |
-| Scope | One software repository; curated engineering knowledge, not chat history |
-| Storage | Reviewable Markdown in `.ownmem/`, versioned with Git |
-| Default recall | Deterministic BM25F; 0 model calls and 0 network calls |
-| Public benchmark | 100% Recall@1 and 2.46 ms P95 on the locked synthetic benchmark — regression evidence, not real-user accuracy |
-| License | Apache-2.0 |
+| **The repository owns memory** | Readable Markdown in `.ownmem/` travels through clone, review, and rollback with the code. |
+| **One memory serves many agents** | Claude Code, Codex, Cursor, Gemini CLI, Grok CLI, and other hosts share one source of project truth. |
+| **Deterministic local recall** | Default recall makes no model or network call; the same query, config, and snapshot produce the same ranking. |
+| **Evidence before authority** | Content cannot declare itself trusted. Independent receipts and live evidence checks decide delivery. |
+| **Bounded growth** | Schemas, quotas, duplicate gates, lifecycle rules, and audits keep memory from becoming a second abandoned wiki. |
+| **Low-risk automation, review for impact** | Replay-proven R0 retrieval metadata can evolve unattended; prose, policy, and higher-risk changes cannot. |
+
+## Architecture
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/architecture-dark.svg">
-  <img alt="OwnMem end-to-end architecture, three trust domains: the repository holds curated Markdown that passes governance gates and compiles into an immutable snapshot; the deterministic engine answers through six candidate lanes, ranking, a confidence gate and a 400-token envelope; the coding agent asks, verifies against live code, and writes new lessons that flow back through audit and compile" src="./docs/assets/architecture-light.svg" width="100%">
+  <img alt="OwnMem architecture: repository-owned Markdown and independent trust receipts compile into immutable snapshots; deterministic local recall passes four delivery gates, while a bounded evolution coordinator replays, promotes, observes, quarantines, and precisely rolls back low-risk changes." src="./docs/assets/architecture-light.svg" width="100%">
 </picture>
 
-Implementation and release boundaries are documented in
-[Repository architecture](./docs/ARCHITECTURE.md).
+OwnMem separates writing experience from delivering it to an agent:
+
+- **Repository source of truth.** L1 routing, L2 area indexes, and L3 topics remain reviewable Markdown; trust receipts live outside the text they authorize.
+- **Compile, then recall.** Schema, graph, lifecycle, and evidence gates produce a content-addressed immutable snapshot instead of rereading changing prose at query time.
+- **Five deterministic candidate lanes.** exact, BM25F, n-gram, fuzzy, and graph are fused locally. Embeddings are an optional sixth lane and stay at weight 0 until local A/B evidence passes.
+- **Four independent delivery gates.** relevance, epistemic validity, task applicability, and action risk lead to normal delivery, advisory, quarantine, or abstention under a context budget.
+- **Bounded unattended evolution.** The end-of-turn coordinator may promote only replay-proven, quota-bounded, precisely reversible R0 metadata; R1–R5 becomes review material.
+
+## What is different in 0.3
+
+The differentiator is not one ranking formula. OwnMem 0.3 turns agent memory into a verifiable evolution protocol:
+
+| Mechanism | OwnMem 0.3 |
+| --- | --- |
+| **Evidence-carrying memory** | Content hash, evidence root, lifecycle, applicability, risk, and predecessor receipts determine whether text may enter context. |
+| **Counterfactual promotion gate** | Automation must prove baseline miss, candidate-only recovery, and zero regression on the previously passing corpus. |
+| **Risk from change surface** | Risk is derived from what changed and what it can affect; an agent cannot downgrade its own proposal. |
+| **Content-addressed compensating rollback** | Automatic edits carry a verified inverse operation; failures or harmful outcomes restore the exact previous bytes without erasing history. |
+| **Memory-poisoning quarantine** | Candidates, content, authority, and evidence are separate trust domains; retrieval never grants permission to act. |
+| **Selective delivery** | Insufficient evidence produces advisory, quarantine, or abstention instead of invented confidence. |
+| **Immutable compiled snapshots** | Markdown, graph edges, ranking identity, and trust state become one reproducible runtime input. |
+| **Three anti-pollution ledgers** | Retrieval correctness, user/host-confirmed outcomes, and agent self-attribution never impersonate one another. |
+
+Read the detailed [technical design and research mapping](./docs/TECHNICAL.md).
 
 ## Quick start
 
-OwnMem requires Node.js 20 or newer. Three steps, all inside the repository
-you want to give a memory.
-
-**Step 1 — install the engine.** It becomes a normal `devDependency`,
-reviewed and pinned like any other:
+Requires Node.js 20.6 or newer. Run this inside the repository that should own the memory:
 
 ```bash
 npm install --save-dev ownmem
-```
-
-**Step 2 — initialize this repository.** This creates `.ownmem/` and the
-per-agent adapter files:
-
-```bash
 npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
 ```
 
-**Step 3 — reopen your agent.** Agents discover commands at session start,
-so everything below appears in the next session, not the one that ran init.
-
-This is the recommended setup — Claude Code and Codex work out of the box and
-the local console is included. What you have after reopening:
-
-- **Claude Code** gains a project command: `/ownmem <anything you want the
-  memory to do>`.
-- **Codex and Grok CLI** automatically discover the repository's `ownmem`
-  skill.
-- **Antigravity** loads the same project instructions (`AGENTS.md`,
-  `GEMINI.md`), so it follows the memory discipline too — as does every
-  other agent that reads them.
-- **The console** is a terminal command, not a slash command:
-  `npx ownmem dashboard --open`. (The optional plugin below adds
-  `/ownmem:dashboard`.)
-
-There is no daily setup command — just work as usual. Repeat the three steps
-once for each repository that should have its own memory.
-
-Only use one agent? Change `--hosts claude,codex` to `--hosts claude` or
-`--hosts codex`. Antigravity and Grok CLI read the same `AGENTS.md` (and,
-for Grok, `.agents/skills/`) files as Codex, so `--hosts codex` covers both.
-Cursor uses `--hosts cursor`, classic Gemini CLI setups use `--hosts gemini`,
-and `--hosts generic` works with other agents.
-
-Initialization creates `.ownmem/` and adds a small OwnMem section to the
-agent's project instructions. It never changes text outside its marked
-boundaries.
+Reopen the agent after initialization. OwnMem creates `.ownmem/` and edits only managed marker regions in host files. Use `--hosts claude`, `--hosts codex`, `--hosts cursor`, or `--hosts gemini` when only one adapter is needed; preview changes with `npx ownmem init --check`.
 
 ## Daily use
 
-After setup, there are only two things to remember.
+After setup, keep working in plain language:
 
-**1. Talk to your agent.** When you learn something worth keeping, say it in
-plain language:
+> “Remember this: staging deployment timeouts come from the pool cap, not too few workers. Check both together next time.”
 
-> "Remember this — the timeout comes from the pool cap, not the worker
-> count. Never raise workers without raising the pool."
+> “Before changing this, check whether the project memory has seen the same failure.”
 
-Later, ask as naturally as you normally would:
-
-> "The staging deploy is hanging again. Check the project memory before you
-> change anything."
-
-The agent handles writing, validation, and recall. You do not need to open
-`.ownmem/` or run `audit` and `recall` yourself. Prefer an explicit command?
-`/ownmem <request>` (Claude Code) and the `ownmem` skill (Codex) route the
-same request through the memory.
-
-**2. Open the console when you want an overview.** It shows adoption, recall
-quality, latency, and memory health for this repository, and is available only
-on your computer at 127.0.0.1:
+The host recalls before scoped work and schedules one locked, debounced evolution pass at the end of a turn. You normally do not need to chain promotion, trust, audit, or compile commands. Open the local console or inspect the coordinator when you want visibility:
 
 ```bash
 npx ownmem dashboard --open
+npx ownmem evolve status
+npx ownmem evolve run --force
 ```
 
-<img alt="OwnMem Console — adoption funnel, recall quality, corpus and governance, all local" src="./docs/assets/console.png" width="100%">
+## Trust and automation boundary
 
-That is the whole daily workflow. The `audit`, manual `recall`, and feedback
-commands are for CI and troubleshooting; normal users do not need to remember
-them.
+OwnMem automates the part it can prove, not the part that merely sounds plausible.
 
-## Why this exists
+- **Automatic:** deterministic recall, candidate scanning, tripwire checks, counterfactual replay, R0 trigger backfill, machine trust receipt, audit, compile, observation, quarantine, and exact rollback.
+- **Escalated:** new prose knowledge, policy, active-set changes, conflicts, insufficient evidence, R1–R5 changes, and publishing.
+- **Hard boundary:** a candidate is not memory; self-attribution is not user confirmation; retrieved text cannot override host instructions or authorize tools.
+- **Failure behavior:** unsigned content or unverifiable evidence is quarantined; evidence drift becomes advisory; transaction failure restores the prior validated state.
 
-I build Oriveo, a BYOK multi-model AI client shipping on iOS, Android, Web, and desktop — a large codebase I work on every day with coding agents, switching between Claude Code and Codex. Every repository kept accumulating hard-won lessons: debugging root causes, toolchain traps, timing races. And every time the agent, the machine, or a teammate changed, those lessons quietly disappeared, because they lived in one tool's memory on one machine.
+## Where it fits
 
-Vector and cloud memory services never felt right for this: knowledge about a repository should not need an account, a server, or a per-query bill. So the memory moved into the repository itself. OwnMem is the system I run daily inside the Oriveo codebase — hundreds of curated memories, kept honest by quotas and audits — extracted and rebuilt as a clean public engine.
-
-## Why OwnMem
-
-OwnMem makes four bets, and every design decision follows from them:
-
-- **Memory belongs in the repository.** Reviewable Markdown that travels with
-  git, shows up in pull requests, and rolls back like any other code. Clone
-  the repo, get the memory — no account, no sync service, no export step.
-- **Recall must be free and deterministic.** The same query returns the same
-  ranking, with no model call, no latency tax, and no per-question bill:
-  100% Recall@1 at a 2.46 ms P95 on the locked public benchmark.
-- **Memory must outlive any single tool.** The same files serve Claude Code,
-  Codex, Antigravity, Cursor, Gemini CLI, and Grok CLI, so switching agents
-  never means losing what the team learned.
-- **Memory must stay small to stay trusted.** A zero-net-growth quota, a pure
-  Node audit, near-duplicate and drift gates keep it lean and current instead
-  of turning into a second wiki that nobody prunes.
-
-### What OwnMem is not
-
-- **Not a vector database.** If you want fuzzy semantic search over large
-  memory pools, a vector or knowledge-graph memory service fits better.
-- **Not automatic capture.** Writes are deliberate and curated — review is
-  the quality gate. Built-in agent memories are more convenient, at the cost
-  of being tool-locked and unreviewable.
-- **Not cross-repository or cloud-synced.** Memory travels with the
-  repository's own git history — clone the repo and it is there. But it is
-  never shared across repositories, and it never passes through a memory
-  service, by design.
-
-## Inside `.ownmem/`: the three-tier memory
-
-The always-loaded part stays tiny; everything else is read on demand:
-
-| Tier | File | When it is read |
-| --- | --- | --- |
-| **L1** | `MEMORY.md` | The index — loaded at the start of every session |
-| **L2** | `MEMORY-<area>.md` | Area sub-indexes — opened when that area is touched |
-| **L3** | one file per topic | A single lesson each — returned by `recall` when its triggers match |
-
-A topic file is plain Markdown with a strict, schema-checked frontmatter —
-symptoms and phrasings in `triggers`, proof in `evidence` (abridged here;
-`ownmem init` scaffolds a complete example):
-
-```markdown
----
-name: pool_cap_timeout
-description: staging deploys time out when workers exceed the pool cap
-metadata:
-  type: lesson
-  triggers: ["staging deploy timeout", "pool cap exceeded"]
-  evidence: [deploy-2026-08-12.log]
----
-
-Raising the worker count without raising the connection pool cap exhausts
-the pool, and every deploy waits until it times out. Raise both together.
-```
-
-This structure is what makes recall free: the index is small enough to stay
-loaded, and BM25F only has to rank small, well-labeled topic files.
-
-## How OwnMem compares
-
-Every column below solves a real problem — the table shows which trade-offs
-each one makes, including ours.
-
-| | OwnMem | [Mem0 (OSS)](https://github.com/mem0ai/mem0) | [Zep / Graphiti](https://github.com/getzep/graphiti) | [claude-mem](https://github.com/thedotmack/claude-mem) | Built-in auto memory¹ |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Memory lives in your repo, travels with git and PRs | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Human-readable, reviewable Markdown | ✅ | ❌ | ❌ | ❌ | ⚠️² |
-| Recall without model or network calls | ✅ | ❌³ | ❌ | ❌ | — |
-| Deterministic, reproducible ranking | ✅ | ❌ | ❌ | ❌ | — |
-| One memory across Claude Code, Codex, Antigravity, Cursor, Gemini CLI, Grok CLI | ✅ | ⚠️⁴ | ⚠️⁴ | ⚠️⁴ | ❌ |
-| Anti-bloat governance (growth quota, audit, drift gates) | ✅ | ❌ | ❌ | ❌ | ⚠️⁵ |
-| Semantic paraphrase search | ⚠️⁶ | ✅ | ✅ | ✅ | ❌ |
-| Fully automatic capture | ❌⁷ | ✅ | ✅ | ✅ | ✅ |
-| Cross-repository, user-level memory | ❌⁷ | ✅ | ✅ | ⚠️ | ❌ |
-
-¹ Claude Code auto memory and Codex Memories: files under your home
-directory — machine-local, tool-locked, outside the repository. Cursor
-retired Memories in 2.1 in favor of Rules; Windsurf memories stay local to
-one machine and are never committed.
-² Editable Markdown, but it lives outside the repo, so it never appears in a
-pull request.
-³ Mem0's Apache-2.0 library runs locally, yet still requires an LLM and an
-embedding model (an OpenAI key by default, or local models via Ollama) to
-write and query memory.
-⁴ Through an MCP server or its own API — memory is user- or app-scoped, not
-a set of files your repository owns.
-⁵ Claude Code caps its always-loaded index (200 lines / 25 KB); there is no
-quota, audit, or duplicate gate behind it.
-⁶ Optional embedding lane, off by default; it joins ranking only after your
-local A/B evidence passes the safety gate.
-⁷ By design. OwnMem bets on curated, reviewed writes and one-repository
-scope; if you want automatic capture or user-level memory across apps, those
-tools genuinely fit better.
-
-Facts checked August 2026 against each project's public documentation —
-[Mem0](https://docs.mem0.ai), [Zep / Graphiti](https://help.getzep.com/graphiti/getting-started/overview),
-[claude-mem](https://github.com/thedotmack/claude-mem),
-[Claude Code auto memory](https://code.claude.com/docs/en/memory),
-[Codex memories](https://developers.openai.com/codex/memories),
-[Cursor rules](https://cursor.com/docs/context/rules),
-[Windsurf memories](https://docs.devin.ai/desktop/cascade/memories) — corrections welcome.
-
-## Benchmarks
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/benchmark-dark.svg">
-  <img alt="OwnMem benchmark: 100% Recall@1 versus 3.1% for naive grep, and 1.17 ms P50 / 2.46 ms P95 recall latency against a 5 ms release gate" src="./docs/assets/benchmark-light.svg" width="100%">
-</picture>
-
-Every release must pass a locked public benchmark: a 40-topic CC0 corpus
-spanning 40 BCP 47 language tags and 25 script groups, with 128 positive
-queries and 40 unrelated negatives. Numbers below are from a release-grade
-run (25 timed iterations per query):
-
-| Metric | Result | Release gate |
-| --- | --- | --- |
-| Recall@1 / Recall@5 (128 positive queries) | **100% / 100%** | = 100% |
-| MRR | **1.000** | = 1.000 |
-| Abstention on 40 unrelated queries | **40 / 40** | = 100% |
-| Recall latency P50 / P95 (4,200 timed samples) | **1.17 ms / 2.46 ms** | P95 ≤ 5 ms |
-| Languages / scripts under the same gates | 40 tags / 25 scripts | per-language & per-script P95 ≤ 5 ms |
-| Model calls / network calls during recall | **0 / 0** | = 0 |
-| Runtime dependencies | 2 (`ajv`, `yaml` — pure JS) | locked |
-| Extra memory during the run (RSS delta) | < 2 MB | — |
-
-On the same corpus, a case-insensitive fixed-string grep scores 3.1%
-Recall@1. Staying lexical and deterministic is not the trick by itself — the
-Unicode-script-aware BM25F ranking is.
-
-Reproduce it yourself:
-
-```bash
-git clone https://github.com/grpcer/ownmem
-cd ownmem && npm ci && npm run benchmark
-```
-
-> **Note:** Measured on an Apple M5 Pro with Node 25. The corpus hash,
-> rankings, and thresholds are locked, and the run repeats with a reversed
-> topic order to prove determinism. These synthetic metrics are regression
-> evidence, not a claim of real-user accuracy.
-
-## References
-
-None of the ranking math is homemade — every technique in the engine is a
-published, battle-tested method. OwnMem's contribution is composing them into
-a deterministic engine with two small pure-JavaScript runtime dependencies:
-
-| In OwnMem | Technique | Literature |
-| --- | --- | --- |
-| `bm25f` lane | Field-weighted BM25 ranking | Robertson & Zaragoza (2009), *[The Probabilistic Relevance Framework: BM25 and Beyond](https://doi.org/10.1561/1500000019)*; Robertson, Zaragoza & Taylor (2004), *[Simple BM25 extension to multiple weighted fields](https://doi.org/10.1145/1031171.1031181)* |
-| Lane & multi-query fusion | Reciprocal Rank Fusion | Cormack, Clarke & Büttcher (2009), *[Reciprocal rank fusion outperforms Condorcet and individual rank learning methods](https://doi.org/10.1145/1571941.1572114)* |
-| Result diversity | Maximal Marginal Relevance | Carbonell & Goldstein (1998), *[The use of MMR, diversity-based reranking for reordering documents and producing summaries](https://doi.org/10.1145/290941.291025)* |
-| `ngram` lane | Character n-gram similarity (Dice) | Dice (1945), *[Measures of the amount of ecologic association between species](https://doi.org/10.2307/1932409)* |
-| `fuzzy` lane | Bounded edit distance | Levenshtein (1966), *Binary codes capable of correcting deletions, insertions, and reversals*, Soviet Physics Doklady 10(8) |
-| Near-duplicate gate | SimHash | Charikar (2002), *[Similarity estimation techniques from rounding algorithms](https://doi.org/10.1145/509907.509965)*; Manku, Jain & Das Sarma (2007), *[Detecting near-duplicates for web crawling](https://doi.org/10.1145/1242572.1242592)* |
-| Near-duplicate gate | MinHash | Broder (1997), *[On the resemblance and containment of documents](https://doi.org/10.1109/SEQUEN.1997.666900)* |
-| Tokenizer | Script-aware segmentation | *[UAX #24: Unicode Script Property](https://unicode.org/reports/tr24/)*; *[UAX #29: Unicode Text Segmentation](https://unicode.org/reports/tr29/)* |
-
-## Install the agent plugin (optional, once per machine)
-
-**Do you have to install it? No — skip it and everything still works.**
-`ownmem init` already wrote the discipline into the repository's agent
-instructions, so any agent that opens the repository follows it. The plugin is
-machine-wide convenience: it adds the same three skills to every repository
-on the machine — including ones with no `.ownmem/` yet, where the init skill
-walks the agent through the engine setup. This repository doubles as the
-plugin marketplace, and the plugin's commands just route to `npx ownmem`, so
-a plugin update never rewrites your memory.
-
-One plugin, three skills, one set of names:
-
-| Skill | Claude Code | Codex CLI | What it does |
-| --- | --- | --- | --- |
-| `recall` | `/ownmem:recall` | `ownmem:recall` | Recall memory before changing code |
-| `init` | `/ownmem:init` | `ownmem:init` | Set up or update OwnMem in a repository |
-| `dashboard` | `/ownmem:dashboard` | `ownmem:dashboard` | Open the local console |
-
-**Claude Code** — run both commands, in order: the first registers this
-repository as a plugin marketplace (needed once), the second installs the
-plugin from it:
-
-```
-/plugin marketplace add grpcer/ownmem
-/plugin install ownmem@ownmem
-```
-
-Then restart Claude Code: plugin commands load at session start, so they
-appear in the next session, not the one that installed them. Enable
-auto-update for the marketplace under `/plugin` → Marketplaces to receive new
-versions automatically.
-
-**Codex CLI** — the same two steps in order: register the marketplace, then
-add the plugin:
-
-```
-codex plugin marketplace add grpcer/ownmem
-codex plugin add ownmem@ownmem
-```
-
-Skills load at session start here too; find them in the `$` skill picker.
-Refresh later with `codex plugin marketplace upgrade ownmem` followed by
-`codex plugin add ownmem@ownmem`.
-
-**Grok CLI** — again both commands in order: register the marketplace, then
-install (Grok requires the explicit `--trust`). Skip the first command if
-Grok already imported your Claude Code marketplaces:
-
-```
-grok plugin marketplace add grpcer/ownmem
-grok plugin install ownmem@ownmem --trust
-```
-
-This installs the same three skills. When a bare skill name is already
-taken, Grok namespaces it — its built-in dashboard makes ours
-`/ownmem:dashboard`. Update with `grok plugin update ownmem`.
-
-**Antigravity** — a single command, no marketplace step:
-
-```
-agy plugin install https://github.com/grpcer/ownmem
-```
-
-This imports the `ownmem`, `ownmem-init`, and `ownmem-dashboard` skills;
-update by re-running the same command. (Classic Gemini CLI setups — API key,
-Vertex AI, or an enterprise license — can still install the same repository
-with `gemini extensions install https://github.com/grpcer/ownmem`.)
-
-## Safe automatic updates
-
-OwnMem is designed for reviewable dependency updates, not silent background
-rewrites. Enable Dependabot or Renovate for npm dependencies. When it opens an
-OwnMem upgrade pull request, CI should run these three commands in order:
-
-```bash
-npx ownmem init --update
-npx ownmem init --check
-npx ownmem audit
-```
-
-`init --update` refreshes only OwnMem-managed boundaries and preserves project
-memory. `init --check` fails when generated adapters drift. Committing
-`package-lock.json` keeps every agent and CI job on the reviewed version.
-
-For a manual update, run all four in order:
-
-```bash
-npm install --save-dev ownmem@latest
-npx ownmem init --update
-npx ownmem init --check
-npx ownmem audit
-```
-
-Avoid floating `npx ownmem@latest` in production repositories: it is convenient
-for a first look, but it makes executions non-reproducible.
-
-## Layers
-
-Pick how much machinery you want — each layer contains the previous one:
-
-| Layer | Adds |
+| Good fit | Choose another system when |
 | --- | --- |
-| `core` | Initialization, strict schema, Unicode-script BM25F recall, deterministic multi-query fusion, growth quota |
-| `gates` | Pure-Node audit and near-duplicate gate |
-| `compiler` | Immutable snapshots, stdio resident runtime, optional Claude Code hook |
-| `dashboard` | OwnMem Console and the optional embedding evaluation lane |
+| A team wants project knowledge reviewed and migrated with code. | You need a cross-repository personal profile or global user memory. |
+| Several coding agents rotate through one repository. | You need to capture every conversation automatically with no evidence or risk boundary. |
+| Local, reproducible, zero-query-cost recall matters. | You need large-scale cloud vector search or a real-time global knowledge graph. |
+| Bad memory must be attributable, rejectable, and reversible. | Maximum recall volume matters more than governance. |
 
-All layers use only the pure-JavaScript `ajv` and `yaml` runtime dependencies.
-OwnMem Console ships complete catalogs for English, Simplified and Traditional
-Chinese, Japanese, Korean, Spanish, French, German, Brazilian Portuguese,
-Arabic, Hindi, Indonesian, Russian, Thai, Turkish, and Vietnamese.
+## Local-first by default
 
-## AI agent memory FAQ
+- Default recall reads repository files and local snapshots only: no LLM call, network request, or per-query token cost.
+- Runtime events stay in a Git-ignored local directory. Missing outcome samples are shown as unavailable, never fabricated as 0%.
+- Secrets and personal or production data that do not belong in Git do not belong in memory.
+- The embedding lane is optional and isolated. It joins weighted ranking only after repository-local A/B evidence passes the safety gate.
 
-### What is an AI agent memory system?
+## Research lineage
 
-An AI agent memory system stores knowledge that an agent can reuse across
-tasks or sessions. OwnMem specializes that idea for software repositories: it
-keeps reviewed engineering lessons rather than chat history or user profiles.
+OwnMem does not claim these foundations as inventions. Its contribution is their composition into an executable protocol for repository memory:
 
-### How do I give Claude Code or Codex persistent project memory?
+- **Agent memory and reflection:** [Reflexion (NeurIPS 2023)](https://papers.neurips.cc/paper_files/paper/2023/hash/1b44b878bb782e6954cd888628510e90-Abstract-Conference.html), [MemGPT (2023)](https://arxiv.org/abs/2310.08560)
+- **Memory and knowledge-base poisoning:** [AgentPoison (NeurIPS 2024)](https://proceedings.neurips.cc/paper_files/paper/2024/hash/eb113910e9c3f6242541c1652e30dfd6-Abstract-Conference.html), [PoisonedRAG (USENIX Security 2025)](https://www.usenix.org/conference/usenixsecurity25/presentation/zou-poisonedrag)
+- **Untrusted data separated from authority:** [CaMeL: Defeating Prompt Injections by Design (2025)](https://arxiv.org/abs/2503.18813)
+- **Independent provenance:** [in-toto (USENIX Security 2019)](https://www.usenix.org/conference/usenixsecurity19/presentation/torres-arias)
+- **Selective prediction and abstention:** [Selective Classification (JMLR 2010)](https://jmlr.org/papers/v11/el-yaniv10a.html)
+- **Differential validation and compensation:** [Metamorphic Testing (1998)](https://www.cse.ust.hk/~scc/publ/CS98-01-metamorphictesting.pdf), [Sagas (SIGMOD 1987)](https://doi.org/10.1145/38713.38742)
+- **Decomposed retrieval evaluation:** [ARES (NAACL 2024)](https://aclanthology.org/2024.naacl-long.20/), [RAGChecker (2024)](https://arxiv.org/abs/2408.08067)
 
-Follow the [quick start](#quick-start) once in each repository, then reopen the
-agent. Claude Code, Codex, Antigravity, Cursor, Gemini CLI, and Grok CLI can
-read the same `.ownmem/` files instead of maintaining separate memory silos.
+These citations describe the research lineage; they do not imply that the papers implement OwnMem or that OwnMem reproduces their experiments.
 
-### Where is the memory stored, and how do teammates share it?
+## Documentation
 
-Memory is plain Markdown under `.ownmem/`. Commit appropriate memories to Git
-and they travel through the repository's normal clone, pull request, access
-control, and rollback workflow; do not record secrets that do not belong in
-the repository.
+| Document | Purpose |
+| --- | --- |
+| [Architecture](./docs/ARCHITECTURE.md) | Package boundaries, snapshots, trust, and evolution |
+| [Technical design](./docs/TECHNICAL.md) | Mechanisms, threat model, and research mapping |
+| [Plugins](./docs/PLUGINS.md) | Optional host plugin installation |
+| [Updating](./docs/UPDATING.md) | Safe repository updates and 0.2 → 0.3 migration |
+| [Privacy](./docs/PRIVACY.md) | Local data and optional channel boundaries |
+| [Changelog](./CHANGELOG.md) | Version history |
+| [License](./LICENSE) | Apache-2.0 |
 
-### Does OwnMem require an LLM, embedding API, vector database, or network?
-
-Default recall requires none of them: it is local lexical retrieval with two
-small pure-JavaScript runtime dependencies. Installing packages can require
-network access, and the optional embedding lane stays disabled until local A/B
-evidence passes its safety gate.
-
-### How is OwnMem different from Mem0, Graphiti, claude-mem, or built-in memory?
-
-OwnMem is repository-scoped, curated, deterministic, and reviewable in Git.
-Those alternatives are a better fit when you need automatic capture, semantic
-search over large stores, user-level memory, knowledge graphs, or cloud sync;
-see the [comparison and its sourced limitations](#how-ownmem-compares).
-
-## Contributing
-
-Issues and pull requests are welcome — see [CONTRIBUTING.md](./.github/CONTRIBUTING.md)
-for the ground rules: keep default recall deterministic, local, and model-free,
-add a regression case for every retrieval change, and run `npm test` plus
-`npm run benchmark:release` before requesting review. Security reports go
-through [SECURITY.md](./.github/SECURITY.md).
-
-## Safety and evidence
-
-- Memory files remain inspectable Markdown inside the repository.
-- Schema, quota, generated-boundary, and near-duplicate checks run locally.
-- `recall.consumed` is the adoption north star; Recall@K is a process metric.
-- The default installation never downloads or invokes a model.
-- The optional embedding lane stays out of ranking until local A/B evidence passes its safety gate.
-
-OwnMem is licensed under Apache-2.0. See `docs/PRIVACY.md`, `.github/SECURITY.md`, and
-`docs/RELEASE.md` before sharing artifacts or publishing a release.
-
-## Acknowledgements
-
-- [LINUX DO](https://linux.do/)
+OwnMem is open source. Reproducible issues and pull requests are welcome.

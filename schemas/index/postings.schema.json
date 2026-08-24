@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ownmem-index.postings/v2",
   "title": "OwnMem BM25F postings",
-  "description": "v2 interns two heavily repeated values into lookup tables: document ids (232,867 postings referenced only 357 distinct names) and idf (128,344 terms held only 134 distinct values). Measured on a 357-topic corpus this took the file from 18.95 MB to 8.95 MB and read+parse from 81 ms to 45 ms. v1 snapshots stay readable through postings-v1.schema.json and are upgraded in memory on read.",
+  "description": "v2 interns two heavily repeated values into lookup tables: document ids (232,867 postings referenced only 357 distinct names) and idf (128,344 terms held only 134 distinct values). Measured on a 357-topic corpus this took the file from 18.95 MB to 8.95 MB and read+parse from 81 ms to 45 ms. This is the only readable encoding: a snapshot written before it is refused by the reader and rebuilt from the Markdown sources.",
   "type": "object",
   "required": ["schema", "document_count", "field_names", "average_field_lengths", "document_ids", "idf_table", "terms"],
   "properties": {

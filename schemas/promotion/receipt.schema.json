@@ -1,0 +1,1039 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ownmem.dev/schemas/promotion/receipt.schema.json",
+  "title": "OwnMem promotion receipt",
+  "description": "What was promoted, on whose authority, against which original evidence, and how to undo it. The receipt is content-bound: receipt_id is the sha256 of the receipt with receipt_id zeroed, so editing any byte of it invalidates the id. Two structural rules carry the rest of the file. First, an anchor has no free-text field and must carry a binding that can be recomputed from the repository, so a model's summary of the evidence cannot be entered as the evidence -- summarise-then-store is a laundering channel, not a shortcut. Second, the readable summary lives at candidate.summary, outside the anchor set, so it cannot enter anchor_root_sha256 no matter what a producer intends.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "receipt_id",
+    "promotion_id",
+    "operation",
+    "issued_at",
+    "candidate",
+    "policy",
+    "decision",
+    "change",
+    "anchors",
+    "anchor_root_sha256",
+    "evidence_checks",
+    "verification",
+    "verifier",
+    "source_commit",
+    "target_commit",
+    "scope",
+    "guards",
+    "quota",
+    "rollback"
+  ],
+  "properties": {
+    "schema": {
+      "const": "ownmem-promotion-receipt/v1"
+    },
+    "receipt_id": {
+      "$ref": "#/$defs/sha256",
+      "description": "The sha256 of this receipt with receipt_id set to 64 zeroes, over a key-sorted serialisation. Self-certifying: nothing outside the receipt has to be trusted to detect that it was edited."
+    },
+    "promotion_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "pattern": "^[a-z0-9]+(?:[-_.][a-z0-9]+)*$",
+      "description": "The accumulation key. Every change that belongs to one promotion carries the same id, and the quota is settled over all of them together -- which is the only reason splitting one over-quota change into two small ones cannot get past the gate."
+    },
+    "operation": {
+      "enum": [
+        "promote",
+        "rollback"
+      ],
+      "description": "A rollback is a receipt too. Undoing a promotion is an explainable event with a predecessor, not the erasure of one."
+    },
+    "issued_at": {
+      "$ref": "#/$defs/isoTimestamp"
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "memory_id",
+        "content_sha256",
+        "summary"
+      ],
+      "properties": {
+        "memory_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+        },
+        "content_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The hash of the content this receipt promotes. Null only on a rollback that removes a topic outright, where there is no content left to bind."
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "The one readable sentence, for a person scanning the ledger. It is deliberately the only prose field in the receipt and it is deliberately outside `anchors`, so it never reaches anchor_root_sha256. A summary may describe evidence; it may never be evidence."
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "version": {
+          "$ref": "#/$defs/semver"
+        }
+      },
+      "description": "Which promotion policy graded this, and at which version. A receipt issued under an older matrix stays readable as such instead of being silently reinterpreted under the current one."
+    },
+    "decision": {
+      "$ref": "https://ownmem.dev/schemas/promotion/decision.schema.json",
+      "description": "The graded decision in full, carried rather than summarised: risk, automation, ceiling, the sentences explaining where it stopped, and the observation record it was graded against."
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "current_lifecycle",
+        "target_lifecycle",
+        "metadata_fields"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "retrieval_metadata",
+            "memory_body",
+            "memory_created",
+            "active_set",
+            "repository_artifact",
+            "governance_policy"
+          ],
+          "description": "What surface this promotion edits. Risk is derived from this and from what the memory asserts, never from the prose of the memory itself."
+        },
+        "current_lifecycle": {
+          "enum": [
+            "observed",
+            "candidate",
+            "shadow",
+            "advisory",
+            "active",
+            "stale",
+            "deprecated",
+            "rejected",
+            "superseded",
+            null
+          ]
+        },
+        "target_lifecycle": {
+          "enum": [
+            "observed",
+            "candidate",
+            "shadow",
+            "advisory",
+            "active",
+            "stale",
+            "deprecated",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "metadata_fields": {
+          "$ref": "#/$defs/stringArray",
+          "description": "The frontmatter fields a retrieval_metadata change touches. Empty means no frontmatter was touched at all, which is what a pure queue entry looks like."
+        }
+      }
+    },
+    "anchors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/anchor"
+      },
+      "description": "The original evidence, by locator and binding. Never a transcription of it."
+    },
+    "anchor_root_sha256": {
+      "$ref": "#/$defs/sha256",
+      "description": "The digest of the normalised anchor set. Computed over `anchors` alone: no readable field of this receipt can move it."
+    },
+    "evidence_checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "regression_gate_passed",
+        "machine_receipt_complete",
+        "sandbox_replay_passed",
+        "rollback_defined",
+        "scope_declared"
+      ],
+      "properties": {
+        "regression_gate_passed": {
+          "type": "boolean"
+        },
+        "machine_receipt_complete": {
+          "type": "boolean"
+        },
+        "sandbox_replay_passed": {
+          "type": "boolean"
+        },
+        "rollback_defined": {
+          "type": "boolean"
+        },
+        "scope_declared": {
+          "type": "boolean"
+        }
+      },
+      "description": "All five are required, so a check that was never run is recorded as false rather than being absent and read as whatever the reader assumes. These are the same names the risk matrix consumes."
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/verificationResult"
+      },
+      "description": "The replay, test, CI or user-confirmation results the checks above were derived from. An empty list is legal and means nothing was verified, which is why no check that requires a result may be true alongside it."
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "machine",
+            "reviewer"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "source_commit": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/gitHash"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The tree the anchors were measured against. Null is legal for a draft and is exactly what stops machine_receipt_complete from holding: without it, nothing says which tree a rollback would restore from."
+    },
+    "target_commit": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/gitHash"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The commit the change lands in. Null until it exists, which is the honest state for every receipt issued before its change is applied -- a promotion is graded first and committed afterwards, so nothing can fill this at issue time. A post-apply step is what sets it, and until one exists this field is null in practice rather than merely nullable."
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hosts",
+        "scenarios"
+      ],
+      "properties": {
+        "hosts": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "scenarios": {
+          "$ref": "#/$defs/stringArray"
+        }
+      },
+      "description": "Where the promoted content may be injected. Empty lists mean the scope was never declared, so \"it worked\" cannot be read as \"it works anywhere\"."
+    },
+    "guards": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quarantine_on",
+        "rollback_on",
+        "on_rollback"
+      ],
+      "properties": {
+        "quarantine_on": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/degradeSignal"
+          }
+        },
+        "rollback_on": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/degradeSignal"
+          }
+        },
+        "on_rollback": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "stop-injection",
+              "record-event",
+              "open-review-change"
+            ]
+          },
+          "description": "What the runtime must do when a rollback fires. A closed set so a host cannot invent a quieter action: stopping injection and leaving a trace are not optional, and the persistent half is always a change someone reviews."
+        }
+      }
+    },
+    "quota": {
+      "$ref": "#/$defs/quotaPlan"
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "previous_receipt_id",
+        "previous_content_sha256",
+        "previous_lifecycle",
+        "restore"
+      ],
+      "properties": {
+        "previous_receipt_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previous_content_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previous_lifecycle": {
+          "enum": [
+            "observed",
+            "candidate",
+            "shadow",
+            "advisory",
+            "active",
+            "stale",
+            "deprecated",
+            "rejected",
+            "superseded",
+            null
+          ]
+        },
+        "restore": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/restorePlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The minimum needed to put the previous trusted state back. Null means this promotion declared no way to undo itself, which is what rollback_defined reports."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "description": "A promotion always promotes some content, so its hash is not optional. Only a rollback that removes a topic outright may leave it null.",
+      "if": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "promote"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "candidate": {
+            "type": "object",
+            "properties": {
+              "content_sha256": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "A rollback has something to roll back to, so it names the receipt it undoes.",
+      "if": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "rollback"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "rollback": {
+            "type": "object",
+            "properties": {
+              "previous_receipt_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Only a retrieval_metadata change may name frontmatter fields. Any other kind naming them would be claiming metadata-only blast radius for an edit that is not metadata-only.",
+      "if": {
+        "type": "object",
+        "properties": {
+          "change": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "not": {
+                  "const": "retrieval_metadata"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "change": {
+            "type": "object",
+            "properties": {
+              "metadata_fields": {
+                "type": "array",
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "gitHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40,64}$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "isoTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "uniqueItems": true
+    },
+    "repositoryPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "degradeSignal": {
+      "enum": [
+        "harmful-feedback",
+        "wrong-feedback",
+        "evidence-drift",
+        "evidence-unverifiable",
+        "wall-clock-stale",
+        "gate-conflict",
+        "agent-abandoned",
+        "risk-out-of-scope"
+      ],
+      "description": "The tripwire signals of the observation period. A closed set, because a guard list a producer can extend at will is a guard list that stops meaning anything."
+    },
+    "anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "locator",
+        "path",
+        "sha256",
+        "fingerprint",
+        "symbol"
+      ],
+      "description": "One piece of original evidence. There is no field here that accepts prose, and the constraints below make sure none can be smuggled into the ones that exist: the locator is a single whitespace-free token, and every anchor must carry something the repository can recompute.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "topic",
+            "path",
+            "symbol",
+            "test",
+            "commit",
+            "document",
+            "user-confirmation",
+            "replay",
+            "episode",
+            "feedback"
+          ],
+          "description": "Closed. The first eight are the trust store's evidence kinds and are verified by the same verifier; `episode` and `feedback` bind a selected set of lines in a local JSONL ledger, by digest, never by quoting them."
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "pattern": "^\\S+$",
+          "description": "A single token: a path, a path#symbol, a doc_id, a commit, a receipt id, a file#selector. Measured on this repository's 870 live anchors, not one contains whitespace, so requiring a single token costs nothing real and removes the one field wide enough to hold a sentence."
+        },
+        "path": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/repositoryPath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fingerprint": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{16}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "symbol": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500,
+              "pattern": "^[^\\n\\r]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "sha256": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "sha256"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "fingerprint": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "fingerprint"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "commit"
+            },
+            "locator": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{7,64}$"
+            }
+          },
+          "required": [
+            "kind",
+            "locator"
+          ]
+        }
+      ],
+      "if": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "not": {
+              "const": "commit"
+            }
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verificationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "locator",
+        "outcome",
+        "observed_at"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "replay",
+            "test",
+            "ci",
+            "user-confirmation"
+          ]
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "pattern": "^\\S+$"
+        },
+        "outcome": {
+          "enum": [
+            "passed",
+            "failed"
+          ],
+          "description": "The repository's existing execution vocabulary. A third spelling of the same two states is how a rename breaks one producer and not the others."
+        },
+        "observed_at": {
+          "$ref": "#/$defs/isoTimestamp"
+        }
+      }
+    },
+    "quotaEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "memory_id",
+        "effect",
+        "path",
+        "bytes_before",
+        "bytes_after",
+        "existed_before",
+        "exists_after"
+      ],
+      "properties": {
+        "memory_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+        },
+        "effect": {
+          "enum": [
+            "create",
+            "edit",
+            "archive"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "bytes_before": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Measured, never estimated: the file's size on disk when the plan was computed."
+        },
+        "bytes_after": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Measured from the proposed bytes themselves, so the delta is the delta that will actually land."
+        },
+        "existed_before": {
+          "type": "boolean"
+        },
+        "exists_after": {
+          "type": "boolean"
+        }
+      }
+    },
+    "quotaProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "memory_id",
+        "frees_bytes",
+        "authority",
+        "references",
+        "recommendation",
+        "requires_review"
+      ],
+      "properties": {
+        "memory_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+        },
+        "frees_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "references": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many other active topics link to it. Two or more makes it a hub, and hubs are never proposed."
+        },
+        "recommendation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "requires_review": {
+          "const": true,
+          "description": "Pinned. Retiring a memory is a person's decision; this system proposes and never deletes."
+        }
+      }
+    },
+    "restorePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "memory_id",
+        "path",
+        "content_sha256",
+        "lifecycle",
+        "bytes",
+        "source_commit"
+      ],
+      "properties": {
+        "operation": {
+          "enum": [
+            "restore-content",
+            "reverse-byte-insert",
+            "remove-topic"
+          ]
+        },
+        "memory_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+        },
+        "path": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "content_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "What the restored file must hash to. The bytes themselves are recovered from source_commit and checked against this, which is why a promotion without a source commit cannot claim to be undoable."
+        },
+        "lifecycle": {
+          "enum": [
+            "observed",
+            "candidate",
+            "shadow",
+            "advisory",
+            "active",
+            "stale",
+            "deprecated",
+            "rejected",
+            "superseded",
+            null
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_commit": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/gitHash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "byte_offset": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "inserted_bytes": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "inserted_sha256": {
+          "oneOf": [
+            { "$ref": "#/$defs/sha256" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "description": "Restoring content needs a hash to restore to and a tree to take it from.",
+          "if": {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "const": "restore-content"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "content_sha256": {
+                "type": "string"
+              },
+              "source_commit": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "description": "A bounded metadata insertion can be reversed without copying source bytes into the receipt or requiring an uncommitted state to exist in Git.",
+          "if": {
+            "type": "object",
+            "properties": {
+              "operation": { "const": "reverse-byte-insert" }
+            },
+            "required": ["operation"]
+          },
+          "then": {
+            "type": "object",
+            "required": ["byte_offset", "inserted_bytes", "inserted_sha256"],
+            "properties": {
+              "content_sha256": { "type": "string" },
+              "source_commit": { "type": "null" },
+              "byte_offset": { "type": "integer" },
+              "inserted_bytes": { "type": "integer" },
+              "inserted_sha256": { "type": "string" }
+            }
+          }
+        }
+      ]
+    },
+    "quotaPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "verdict",
+        "metric",
+        "measured_count",
+        "measured_bytes",
+        "limit_count",
+        "limit_bytes",
+        "promotion_count_delta",
+        "promotion_bytes_delta",
+        "change_count_delta",
+        "change_bytes_delta",
+        "growth_policy",
+        "automatic_growth_limit",
+        "automatic_growth_remaining",
+        "prior_entries",
+        "entries",
+        "proposals",
+        "reasons"
+      ],
+      "properties": {
+        "schema": {
+          "const": "ownmem-promotion-quota/v1"
+        },
+        "verdict": {
+          "enum": [
+            "no_growth",
+            "growth_mode",
+            "bounded_metadata_growth",
+            "swap_planned",
+            "over_quota"
+          ],
+          "description": "no_growth: the promotion does not grow the active set, so nothing is owed. growth_mode: the repository's quota is still filling and the ratchet has not engaged. bounded_metadata_growth: a replay-proven R0 retrieval edit fits both its per-promotion allowance and the repository's existing hard byte cap. swap_planned: growth is covered by naming what leaves, which a person still has to approve. over_quota: refused, with proposals attached."
+        },
+        "metric": {
+          "const": "active-l3-utf8-bytes",
+          "description": "The same measurement the audit's ratchet uses: raw UTF-8 file bytes of the active L3 set, excluding the indexes and the archive."
+        },
+        "measured_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "measured_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "promotion_count_delta": {
+          "type": "integer"
+        },
+        "promotion_bytes_delta": {
+          "type": "integer"
+        },
+        "change_count_delta": {
+          "type": "integer"
+        },
+        "change_bytes_delta": {
+          "type": "integer"
+        },
+        "growth_policy": {
+          "enum": [
+            "net-zero",
+            "bounded-metadata"
+          ]
+        },
+        "automatic_growth_limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "automatic_growth_remaining": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "prior_entries": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many file effects earlier changes under this promotion already booked. This is what makes the accounting cumulative instead of per call."
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/quotaEntry"
+          }
+        },
+        "proposals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/quotaProposal"
+          }
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          }
+        }
+      }
+    },
+    "ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "updated_at",
+        "promotions"
+      ],
+      "description": "Every receipt this repository has issued, grouped by promotion. It is the durable half of cumulative quota accounting: a process that cannot see what an earlier process already booked would let the same over-quota change through one small piece at a time.",
+      "properties": {
+        "schema": {
+          "const": "ownmem.promotions/v1"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/isoTimestamp"
+        },
+        "promotions": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[-_.][a-z0-9]+)*$"
+          },
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#"
+            }
+          }
+        }
+      }
+    }
+  }
+}

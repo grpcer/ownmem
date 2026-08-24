@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ownmem.dev/schemas/promotion/review-material.schema.json",
+  "title": "OwnMem review-ready material",
+  "description": "What this system hands a person when it may not put a change into effect itself. It is a value, never a file: nothing on this path writes to the memory directory, and the constructor refuses the one input that would let a control-plane change arrive as a ready-made patch. Like the decision schema next door, the invariants live here as well as in the module, because the shape has to bind producers that do not exist yet.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "material_id",
+    "generated_at",
+    "origin",
+    "memory_id",
+    "automation",
+    "disposition",
+    "risk",
+    "change",
+    "decision",
+    "patch",
+    "anchors",
+    "anchor_root_sha256",
+    "quota",
+    "reviewer_actions",
+    "merge_requirement"
+  ],
+  "properties": {
+    "schema": { "const": "ownmem-review-material/v1" },
+    "material_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Digest of every other field, so the id is the integrity check and two runs over an unchanged repository produce the same material."
+    },
+    "generated_at": { "type": "string", "minLength": 20, "maxLength": 30 },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "attribution"],
+      "properties": {
+        "kind": {
+          "enum": ["correction-candidate", "proposed-change"],
+          "description": "correction-candidate: the user pushed back while these memories were on screen. proposed-change: a caller proposed a specific edit."
+        },
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "attribution": {
+          "oneOf": [{ "enum": ["temporal_association", "structural", "reproducible_contribution"] }, { "type": "null" }],
+          "description": "How strong the link between the origin and the memory is, copied from the candidate rather than restated. Null when the origin is an explicit proposal, where there is nothing to attribute."
+        }
+      }
+    },
+    "memory_id": {
+      "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 128 }, { "type": "null" }],
+      "description": "The memory the material is about, or null for a change that is not about one -- a control-plane edit being the case that matters."
+    },
+    "automation": {
+      "enum": ["review", "pr-only", "forbidden"],
+      "description": "Copied from the decision. `auto` is absent by construction: a change the promotion engine may apply does not need review material, and the constructor refuses one."
+    },
+    "disposition": {
+      "enum": ["needs-approval", "needs-a-person-to-merge", "ordinary-release-process"],
+      "description": "What the reader is being asked to do, bound to `automation` by the rules below so the two can never disagree."
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "reason", "logical_type", "logical_type_source"],
+      "properties": {
+        "level": { "enum": ["R0", "R1", "R2", "R3", "R4", "R5"] },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 400 },
+        "logical_type": { "enum": ["normative", "procedural", "factual", "diagnostic", "preference", "feedback", null] },
+        "logical_type_source": {
+          "enum": ["declared-type", "declared-authority", "caller-supplied", "not-applicable"],
+          "description": "Which declared field decided what the memory asserts. Never a regex over the body: grading a lesson as procedural because its prose contains the word `run` is the drift this field exists to make visible."
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "current_lifecycle", "target_lifecycle", "metadata_fields"],
+      "properties": {
+        "kind": { "enum": ["retrieval_metadata", "memory_body", "memory_created", "active_set", "repository_artifact", "governance_policy"] },
+        "current_lifecycle": { "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded", null] },
+        "target_lifecycle": { "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded"] },
+        "metadata_fields": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "description": "The graded decision, verbatim. It is carried rather than summarised so that `why was this not automatic` is answered by the policy's own sentences; the module validates it with the policy's own validator on the way out."
+    },
+    "patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "absent_reason"],
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/patchFile" },
+          "description": "The proposed change as a diff. Computed from the bytes on disk and the bytes proposed, so what is shown is what would land; nothing here is written anywhere."
+        },
+        "absent_reason": {
+          "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 400 }, { "type": "null" }],
+          "description": "Why there is no diff. Required exactly when there is none, so an empty patch can never read as a change with no effect."
+        }
+      }
+    },
+    "anchors": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/anchor" },
+      "description": "Where the supporting evidence is, in locators a reader can recompute. The shape is closed and has no prose field, for the same reason the receipt's is: a paragraph that becomes evidence is evidence that only ever agrees with itself."
+    },
+    "anchor_root_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Computed over the anchors alone, by the receipt module's own function. Every readable field of this material sits outside it."
+    },
+    "quota": { "$ref": "#/$defs/quota" },
+    "reviewer_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/reviewerAction" },
+      "description": "What a person can do with this. Enumerated rather than picked, because choosing between revising, narrowing and retiring a memory is the judgement being handed over."
+    },
+    "merge_requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["automatic", "actor", "statement"],
+      "properties": {
+        "automatic": { "const": false, "description": "Pinned. There is no value of any other field that makes this material something the system may apply." },
+        "actor": { "const": "person" },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 300 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "description": "The control plane may not have a change drafted for it from inside. `pr-only` says here is the change, a person merges it; `forbidden` says here is the observation, a person decides whether to write a change at all. Making that difference structural is what stops the second from quietly becoming the first.",
+      "if": { "properties": { "automation": { "const": "forbidden" } }, "required": ["automation"] },
+      "then": {
+        "properties": {
+          "disposition": { "const": "ordinary-release-process" },
+          "patch": { "type": "object", "properties": { "files": { "type": "array", "maxItems": 0 } } },
+          "quota": { "type": "object", "properties": { "settled": { "const": false } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "automation": { "const": "pr-only" } }, "required": ["automation"] },
+      "then": { "properties": { "disposition": { "const": "needs-a-person-to-merge" } } }
+    },
+    {
+      "if": { "properties": { "automation": { "const": "review" } }, "required": ["automation"] },
+      "then": { "properties": { "disposition": { "const": "needs-approval" } } }
+    },
+    {
+      "description": "A patch with no files and no stated reason reads as a change that does nothing, which is the one thing it never is.",
+      "if": {
+        "properties": { "patch": { "type": "object", "properties": { "files": { "type": "array", "maxItems": 0 } } } },
+        "required": ["patch"]
+      },
+      "then": {
+        "properties": { "patch": { "type": "object", "properties": { "absent_reason": { "type": "string", "minLength": 1 } } } }
+      },
+      "else": {
+        "properties": { "patch": { "type": "object", "properties": { "absent_reason": { "type": "null" } } } }
+      }
+    }
+  ],
+  "$defs": {
+    "patchFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "effect", "bytes_before", "bytes_after", "diff"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "effect": { "enum": ["create", "edit", "archive"] },
+        "bytes_before": { "type": "integer", "minimum": 0 },
+        "bytes_after": { "type": "integer", "minimum": 0 },
+        "diff": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unified diff against the file as it is on disk right now. A reviewer reads this instead of trusting a sentence about what would change."
+        }
+      }
+    },
+    "anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "locator", "path", "sha256", "fingerprint", "symbol"],
+      "properties": {
+        "kind": { "enum": ["topic", "path", "symbol", "test", "document", "commit", "user-confirmation", "replay", "feedback", "episode"] },
+        "locator": { "type": "string", "pattern": "^\\S+$", "description": "One token, which is what keeps a sentence from being stored where a locator belongs." },
+        "path": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+        "sha256": { "oneOf": [{ "type": "string", "pattern": "^[0-9a-f]{64}$" }, { "type": "null" }] },
+        "fingerprint": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+        "symbol": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] }
+      },
+      "anyOf": [
+        { "properties": { "sha256": { "type": "string" } }, "required": ["sha256"] },
+        { "properties": { "fingerprint": { "type": "string" } }, "required": ["fingerprint"] },
+        { "properties": { "kind": { "const": "commit" }, "locator": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" } }, "required": ["kind", "locator"] }
+      ]
+    },
+    "quota": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["settled", "reason", "plan"],
+      "properties": {
+        "settled": { "type": "boolean" },
+        "reason": { "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 300 }, { "type": "null" }] },
+        "plan": {
+          "description": "The measured plan from the receipt module, or null when there is no change to settle. Only its identity and verdict are re-checked here; the plan's own shape is the receipt schema's business and duplicating it would create a second definition to keep in step.",
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["schema", "verdict"],
+              "properties": {
+                "schema": { "const": "ownmem-promotion-quota/v1" },
+                "verdict": { "enum": ["no_growth", "growth_mode", "swap_planned", "over_quota"] }
+              }
+            },
+            { "type": "null" }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "settled": { "const": true } }, "required": ["settled"] },
+          "then": { "properties": { "plan": { "type": "object" }, "reason": { "type": "null" } } },
+          "else": { "properties": { "plan": { "type": "null" }, "reason": { "type": "string", "minLength": 1 } } }
+        }
+      ]
+    },
+    "reviewerAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "requires_human_text", "note", "frees_bytes"],
+      "properties": {
+        "action": { "enum": ["revise", "narrow_scope", "retire", "write_the_change_yourself"] },
+        "requires_human_text": {
+          "type": "boolean",
+          "description": "True when the replacement prose has to be written by a person. Nothing in this system drafts the body of a memory: a machine-written paragraph that later becomes the evidence for itself is the laundering path the whole receipt design is built against."
+        },
+        "note": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "frees_bytes": {
+          "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }],
+          "description": "Measured, never estimated, and null for the actions where nothing is freed. Retiring a memory is the only action here whose quota effect can be known without a person writing anything."
+        }
+      }
+    }
+  }
+}

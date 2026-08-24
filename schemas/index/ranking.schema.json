@@ -7,6 +7,7 @@
     "schema",
     "profile",
     "compiler_version",
+    "tokenizer_profile",
     "bm25",
     "field_weights",
     "rrf",
@@ -14,12 +15,14 @@
     "thresholds",
     "mmr",
     "conflicts",
+    "trust",
     "quality_source"
   ],
   "properties": {
     "schema": { "const": "ownmem-index.ranking/v3" },
     "profile": { "const": "deterministic-ranker-v1" },
     "compiler_version": { "$ref": "#/$defs/semver" },
+    "tokenizer_profile": { "type": "string", "minLength": 1, "maxLength": 128 },
     "bm25": {
       "type": "object",
       "required": ["k1"],
@@ -250,6 +253,14 @@
       "properties": {
         "explicit_superseded_penalty": { "$ref": "#/$defs/unitNumber" },
         "authority_role_penalty": { "$ref": "#/$defs/unitNumber" }
+      },
+      "additionalProperties": false
+    },
+    "trust": {
+      "type": "object",
+      "required": ["max_staleness_days"],
+      "properties": {
+        "max_staleness_days": { "type": "integer", "minimum": 1, "maximum": 3650 }
       },
       "additionalProperties": false
     },

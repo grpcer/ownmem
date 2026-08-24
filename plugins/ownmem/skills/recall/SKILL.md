@@ -30,15 +30,45 @@ npx ownmem recall --multi -- "symptom in plain words" "root-cause term" "english
 Open a hit's full topic file before relying on it, then verify against live
 code: memories record what was true when they were written.
 
-## Record recall quality
+## The three feedback streams
 
-When a recall clearly helped or clearly missed, say so. Feedback stays in a
-project-local review inbox and is never uploaded:
+Three different questions, three separate local files, three separate
+denominators. Nothing here is uploaded, and no stream may stand in for another.
+
+**1. Retrieval verdict** — did recall return the right thing?
 
 ```bash
 npx ownmem recall --feedback correct -- "query that matched"
-npx ownmem recall --feedback miss --expected memory_name -- "query that should have matched"
+npx ownmem recall --feedback retrieval_miss --expected memory_name -- "query that should have matched"
 ```
+
+`retrieval_miss` means the right memory is active but fell outside the top-k,
+so it must name it. `coverage_gap` means no right memory exists yet, so it
+never takes `--expected`. `wrong`, `stale` and `conflict` may name one.
+
+**2. Outcome receipt** — what happened after a memory was used? Record it only
+when the user or the host actually confirmed it; an agent's own opinion is
+refused here on purpose. Only the digest of the confirming statement is stored,
+never its text.
+
+```bash
+npx ownmem outcome --memory memory_name --outcome applied \
+  --confirmed-by user --confirmation "yes, that fixed it"
+```
+
+This is the only honest measure of actual application. Until receipts
+accumulate, a full-text open still means only that a body was read.
+
+**3. Weak self-attribution** — at the end of a turn in which memory was
+injected, and only when a memory clearly helped or clearly misled you:
+
+```bash
+npx ownmem attribute --memory memory_name --label useful
+```
+
+Record nothing when the turn was neutral. Because the sample selects itself,
+these labels are counts and never a rate: an unlabelled turn is unknown, not
+neutral.
 
 ## Keep the memory healthy
 

@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ownmem.dev/schemas/procedure/procedure.schema.json",
+  "title": "OwnMem procedure (advisory playbook)",
+  "description": "A written-down way of doing something, shown to a reader and never run by this system. Everything the plan requires of a procedural skill is a required field here rather than a convention: preconditions and scope, ordered steps with the tools they need, postconditions, idempotency, rollback, a timeout and resource budget, risk with the environments it may not touch, a replay fixture with failure samples, and a version with its receipt and what it supersedes. Three of those are not merely required but constrained: `execution` admits one mode and it is the advisory one, `forbidden_environments` has to name production and release, and `allowed_environments` cannot. Like the candidate schema, the gate sits at the writer, so a producer that does not exist yet -- a host adapter, a model-generated playbook -- is bound by it without having to remember it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "procedure_id",
+    "version",
+    "title",
+    "risk",
+    "execution",
+    "scope",
+    "preconditions",
+    "allowed_tools",
+    "steps",
+    "postconditions",
+    "idempotency",
+    "rollback",
+    "budget",
+    "allowed_environments",
+    "forbidden_environments",
+    "replay",
+    "receipt",
+    "supersedes"
+  ],
+  "properties": {
+    "schema": { "const": "ownmem-procedure/v1" },
+    "procedure_id": {
+      "$ref": "#/$defs/identifier",
+      "description": "Stable across versions. The pattern also does the path safety for the on-disk location, which is derived from this id rather than taken from a caller: no separator and no dot segment can appear in it."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per procedure_id. An integer rather than a semver because nothing here has a compatibility contract to express -- a replay record binds to one exact version and a changed procedure is simply a later one."
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "risk": {
+      "enum": ["R0", "R1", "R2", "R3", "R4", "R5"],
+      "description": "Blast radius of running this, which is not the same question as what the memory describing it is about. The promotion risk matrix reads this."
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "auto_execute"],
+      "description": "How this may be carried out, pinned to the only answer this schema version has. Adding an executing form means editing this file and raising the schema version, which is the point: a caller cannot opt into automatic execution, and no reviewer has to trust that every producer chose to stay advisory. The plan is explicit that procedural skills ship first as advisory playbooks that show their steps and preconditions without running them.",
+      "properties": {
+        "mode": { "const": "advisory-playbook" },
+        "auto_execute": {
+          "const": false,
+          "description": "Restated as its own field because the object is what a reviewer reads, and 'advisory-playbook' only says this to someone who already knows the vocabulary."
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applies_to", "platforms"],
+      "description": "Where this is claimed to work. Both lists admit the value `any`, so a procedure that genuinely applies everywhere can say so honestly -- and the promotion check reads a universal scope as no scope at all, because 'it worked' must not be readable as 'it works anywhere'.",
+      "properties": {
+        "applies_to": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64 } },
+        "platforms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["any", "darwin", "linux", "win32"] },
+          "description": "Node's own platform vocabulary, which is what the recall path already fills into a query context. One vocabulary, not a second spelling of the same three values."
+        }
+      }
+    },
+    "preconditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/condition" },
+      "description": "What has to hold before step one. Non-empty: a procedure that starts from anywhere has not been thought about, and it is the first thing a reader needs in order to decide whether the playbook is for them."
+    },
+    "allowed_tools": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/tool" },
+      "description": "The capabilities the whole procedure may use. Every step's tool has to appear here, which is checked outside the schema because JSON Schema cannot compare two sibling arrays. A reader sees the full blast radius without summing the steps."
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/step" },
+      "description": "In order. The order is enforced rather than assumed: indexes must run 1..n with no gap, so a step that was deleted from a later version cannot leave a playbook that silently skips one."
+    },
+    "postconditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/condition" },
+      "description": "What is true afterwards if this worked. Non-empty, and the plan says why: without a postcondition there is nothing a replay can have checked, and a promotion is refused outright."
+    },
+    "idempotency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "guard", "note"],
+      "description": "What running it twice does. `guarded` is the honest middle case and names the precondition that stops the second run; the other two carry a null guard, so the field cannot be left ambiguous by omission.",
+      "properties": {
+        "kind": { "enum": ["idempotent", "guarded", "not_idempotent"] },
+        "guard": {
+          "oneOf": [{ "$ref": "#/$defs/identifier" }, { "type": "null" }],
+          "description": "The id of a declared precondition that refuses the second run. Required-and-nullable: 'there is no guard' and 'nobody filled this in' must not look the same."
+        },
+        "note": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "steps", "verification", "reason"],
+      "description": "How to undo it. `irreversible` is deliberately expressible: a schema that required undo steps from everything would only teach producers to write fictional ones, and the promotion check would then be satisfied by every procedure and mean nothing. Declaring irreversibility is honest and costs the procedure its promotion, which is the correct price.",
+      "properties": {
+        "strategy": { "enum": ["steps", "irreversible"] },
+        "steps": { "type": "array", "items": { "$ref": "#/$defs/step" } },
+        "verification": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/condition" },
+          "description": "What proves the undo worked. Rollback steps that nobody checks are the same as no rollback."
+        },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timeout_seconds", "max_steps", "max_files_touched"],
+      "description": "The ceiling a runner would enforce. Nothing runs procedures today, so these numbers are read by a person -- which is exactly why max_steps is checked against the declared steps: a budget that cannot afford its own playbook is a mistake visible today, not when a runner finally arrives.",
+      "properties": {
+        "timeout_seconds": { "type": "integer", "minimum": 1, "maximum": 3600 },
+        "max_steps": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "max_files_touched": { "type": "integer", "minimum": 0, "maximum": 1000 }
+      }
+    },
+    "allowed_environments": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["local", "sandbox", "ci", "staging"],
+        "description": "production and release are absent from this vocabulary by construction, not by omission. The plan's rule is that a high-risk procedure may not be tried out in a real production or release environment, and a rule enforced only at the runner is a rule that arrives after the mistake."
+      }
+    },
+    "forbidden_environments": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/environment" },
+      "allOf": [
+        {
+          "description": "Naming production is mandatory rather than conventional, so that a procedure cannot be written that simply forgot to exclude it.",
+          "contains": { "const": "production" }
+        },
+        {
+          "description": "Release is the second one, and it is not the same environment as production: a release pipeline can publish artefacts from a machine that is not production at all.",
+          "contains": { "const": "release" }
+        }
+      ]
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixture", "failure_samples"],
+      "description": "What this can be replayed against, and what it must fail on. A fixture alone would only ever demonstrate the happy path; the failure samples are what make a replay capable of catching a procedure that has stopped refusing.",
+      "properties": {
+        "fixture": { "$ref": "#/$defs/fixture" },
+        "failure_samples": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "fixture", "expected_outcome"],
+            "properties": {
+              "id": { "$ref": "#/$defs/identifier" },
+              "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+              "fixture": { "$ref": "#/$defs/fixture" },
+              "expected_outcome": {
+                "enum": ["refused", "no_op", "rolled_back"],
+                "description": "What the procedure is supposed to do with this input. Three words, because 'it failed' hides the difference between refusing up front, doing nothing, and undoing what it started."
+              }
+            }
+          }
+        }
+      }
+    },
+    "receipt": {
+      "description": "The promotion receipt that admitted this version, or null while it has none. Required-and-nullable: a procedure that has never been promoted genuinely has no receipt, and that must not look like a producer forgetting the field.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["receipt_id", "issued_at"],
+          "properties": {
+            "receipt_id": { "$ref": "#/$defs/sha256" },
+            "issued_at": { "$ref": "#/$defs/timestamp" }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "supersedes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["procedure_id", "version"],
+        "properties": {
+          "procedure_id": { "$ref": "#/$defs/identifier" },
+          "version": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "description": "Earlier procedures this one retires. Empty for a first version -- required and empty, so that 'this is the first' and 'nobody said' stay distinguishable."
+    }
+  },
+  "$defs": {
+    "identifier": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "description": "Written as a pattern rather than format: date-time so this file validates under a bare ajv, matching the candidate schema."
+    },
+    "repoPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$",
+      "description": "Repository-relative, no absolute paths and no dot segments. Same pattern as the trust lock's nullablePath, and it is load-bearing: these paths are read by the evidence verifier, so the escape check belongs where the value is written down rather than at each reader."
+    },
+    "environment": { "enum": ["local", "sandbox", "ci", "staging", "production", "release"] },
+    "tool": {
+      "enum": ["read", "write", "shell", "network"],
+      "description": "Coarse on purpose. A reader of an advisory playbook needs to know whether a step only looks, writes files, runs commands, or talks to the network; a finer taxonomy would be a second tool registry to keep in sync with the host's."
+    },
+    "command": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": { "type": "string", "minLength": 1, "maxLength": 500 },
+      "description": "argv, never a shell line. A shell string is a second language the reader has to parse and any future checker has to quote correctly, and quoting is where that kind of code goes wrong."
+    },
+    "fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "description": "A committed input this can be replayed against, bound to its content. Committed rather than generated, because evidence has to survive moving to another machine and a fixture that only exists in someone's scratch directory is evidence nobody else can re-check.",
+      "properties": {
+        "path": { "$ref": "#/$defs/repoPath" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "tool", "intent", "command"],
+      "properties": {
+        "index": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "tool": { "$ref": "#/$defs/tool" },
+        "intent": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "command": {
+          "description": "The argv a reader would run, or null for a step that is not a command. Required-and-nullable so a missing command reads as a decision rather than an omission.",
+          "oneOf": [{ "$ref": "#/$defs/command" }, { "type": "null" }]
+        }
+      }
+    },
+    "condition": {
+      "description": "One decidable claim. Every form names the procedure that decides it and carries every operand that procedure needs, so a checker never has to read prose to find out what to do -- which is what 'postconditions are declared and decidable' has to mean if it is to mean anything. The label is for the reader; the kind and its operands are the claim.",
+      "oneOf": [
+        { "$ref": "#/$defs/fileCondition" },
+        { "$ref": "#/$defs/fileHashCondition" },
+        { "$ref": "#/$defs/commandCondition" },
+        { "$ref": "#/$defs/commandOutputCondition" }
+      ]
+    },
+    "fileCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "kind", "path"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "kind": { "enum": ["file_exists", "file_absent"] },
+        "path": { "$ref": "#/$defs/repoPath" }
+      }
+    },
+    "fileHashCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "kind", "path", "sha256"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "kind": { "const": "file_sha256" },
+        "path": { "$ref": "#/$defs/repoPath" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "commandCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "kind", "command"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "kind": { "const": "command_exit_zero" },
+        "command": { "$ref": "#/$defs/command" }
+      }
+    },
+    "commandOutputCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "kind", "command", "needle"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "kind": { "const": "command_output_contains" },
+        "command": { "$ref": "#/$defs/command" },
+        "needle": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    }
+  }
+}

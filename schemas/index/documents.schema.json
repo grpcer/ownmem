@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ownmem-index.documents/v1",
+  "$id": "ownmem-index.documents/v2",
   "title": "OwnMem compiled memory documents",
   "type": "object",
   "required": ["schema", "compiler_version", "field_names", "documents"],
   "properties": {
-    "schema": { "const": "ownmem-index.documents/v1" },
+    "schema": { "const": "ownmem-index.documents/v2" },
     "compiler_version": { "$ref": "#/$defs/semver" },
     "field_names": {
       "type": "array",
@@ -115,18 +115,20 @@
     },
     "document": {
       "type": "object",
-      "required": ["id", "path", "source_sha256", "compile_sha256", "metadata", "provenance", "relations", "fields", "field_lengths", "chunks"],
+      "required": ["id", "path", "source_sha256", "source_content", "compile_sha256", "metadata", "provenance", "relations", "trust", "fields", "field_lengths", "chunks"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
         "path": { "$ref": "#/$defs/safePath" },
         "source_sha256": { "$ref": "#/$defs/sha256" },
+        "source_content": { "type": "string", "minLength": 1 },
         "compile_sha256": { "$ref": "#/$defs/sha256" },
         "metadata": {
           "type": "object",
-          "required": ["type", "authority", "last_verified", "scopes", "applies_to", "triggers"],
+          "required": ["type", "authority", "declared_authority", "last_verified", "scopes", "applies_to", "triggers"],
           "properties": {
             "type": { "enum": ["lesson", "debug", "preference", "feedback", "decision-pointer"] },
             "authority": { "enum": ["observed", "normative", "user-confirmed"] },
+            "declared_authority": { "enum": ["observed", "normative", "user-confirmed"] },
             "last_verified": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
             "scopes": { "$ref": "#/$defs/stringArray" },
             "applies_to": { "$ref": "#/$defs/stringArray" },
@@ -136,18 +138,75 @@
         },
         "provenance": {
           "type": "object",
-          "required": ["topic_path", "topic_sha256", "l2_hooks"],
+          "required": ["topic_path", "topic_sha256", "l2_hooks", "receipt_id", "evidence_root_sha256", "source_commit"],
           "properties": {
             "topic_path": { "$ref": "#/$defs/safePath" },
             "topic_sha256": { "$ref": "#/$defs/sha256" },
-            "l2_hooks": { "type": "array", "items": { "$ref": "#/$defs/hook" } }
+            "l2_hooks": { "type": "array", "items": { "$ref": "#/$defs/hook" } },
+            "receipt_id": { "$ref": "#/$defs/nullableSha256" },
+            "evidence_root_sha256": { "$ref": "#/$defs/nullableSha256" },
+            "source_commit": { "oneOf": [{ "type": "string", "pattern": "^[a-f0-9]{40,64}$" }, { "type": "null" }] }
           },
           "additionalProperties": false
         },
         "relations": { "$ref": "#/$defs/relations" },
+        "trust": { "$ref": "#/$defs/trust" },
         "fields": { "$ref": "#/$defs/fields" },
         "field_lengths": { "$ref": "#/$defs/lengths" },
         "chunks": { "type": "array", "items": { "$ref": "#/$defs/chunk" } }
+      },
+      "additionalProperties": false
+    }
+  ,
+    "nullableSha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+    "trust": {
+      "type": "object",
+      "required": ["receipt_id", "lifecycle", "logical_type", "action_risk", "authority", "issued_at", "evidence_root_sha256", "evidence_kinds", "source_commit", "change", "valid_for", "preconditions", "postconditions", "counterexamples", "integrity", "integrity_reasons", "instruction"],
+      "properties": {
+        "receipt_id": { "$ref": "#/$defs/nullableSha256" },
+        "lifecycle": { "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded"] },
+        "logical_type": { "enum": ["normative", "procedural", "factual", "diagnostic", "preference", "feedback"] },
+        "action_risk": { "enum": ["R0", "R1", "R2", "R3", "R4", "R5"] },
+        "authority": { "enum": ["observed", "advisory", "normative", "user-confirmed"] },
+        "issued_at": { "oneOf": [{ "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$" }, { "type": "null" }] },
+        "evidence_root_sha256": { "$ref": "#/$defs/nullableSha256" },
+        "evidence_kinds": { "type": "array", "uniqueItems": true, "items": { "enum": ["topic", "path", "symbol", "test", "commit", "document", "user-confirmation", "replay"] } },
+        "source_commit": { "oneOf": [{ "type": "string", "pattern": "^[a-f0-9]{40,64}$" }, { "type": "null" }] },
+        "change": {
+          "type": "object",
+          "required": ["mode", "base_memory_sha256"],
+          "properties": {
+            "mode": { "enum": ["import", "delta", "structured-merge"] },
+            "base_memory_sha256": { "$ref": "#/$defs/nullableSha256" }
+          },
+          "additionalProperties": false
+        },
+        "valid_for": {
+          "type": "object",
+          "required": ["commit_range", "semver", "platforms", "environments"],
+          "properties": {
+            "commit_range": { "type": ["object", "null"] },
+            "semver": { "type": ["object", "null"] },
+            "platforms": { "$ref": "#/$defs/stringArray" },
+            "environments": { "$ref": "#/$defs/stringArray" }
+          },
+          "additionalProperties": false
+        },
+        "preconditions": { "$ref": "#/$defs/stringArray" },
+        "postconditions": { "$ref": "#/$defs/stringArray" },
+        "counterexamples": { "$ref": "#/$defs/stringArray" },
+        "integrity": { "enum": ["passed", "advisory", "blocked"] },
+        "integrity_reasons": { "$ref": "#/$defs/stringArray" },
+        "instruction": {
+          "type": "object",
+          "required": ["context_role", "cannot_authorize_actions", "instruction_override_detected"],
+          "properties": {
+            "context_role": { "const": "untrusted-advisory" },
+            "cannot_authorize_actions": { "const": true },
+            "instruction_override_detected": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     }

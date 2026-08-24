@@ -9,7 +9,7 @@
 
   <g font-size="20" font-weight="650">
     <rect x="96" y="432" width="238" height="52" rx="26" fill="#f0fdf4" stroke="#15803d" stroke-width="1.6"/>
-    <text x="215" y="465" text-anchor="middle" fill="#15803d">2.46 ms P95 recall</text>
+    <text x="215" y="465" text-anchor="middle" fill="#15803d">0.57 ms P95 recall</text>
     <rect x="350" y="432" width="196" height="52" rx="26" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
     <text x="448" y="465" text-anchor="middle" fill="#2563eb">0 model calls</text>
     <rect x="562" y="432" width="192" height="52" rx="26" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.6"/>

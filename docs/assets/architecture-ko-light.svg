@@ -1,105 +1,109 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 872" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
-  <title id="title">OwnMem이 질문을 신뢰할 수 있는 컨텍스트로 바꾸는 과정</title>
-  <desc id="description">세 가지 신뢰 도메인: 저장소는 선별된 Markdown을 보유하고 거버넌스 게이트를 거쳐 불변 snapshot으로 컴파일됩니다. 결정적 엔진은 6개 후보 channel, 랭킹, 확신도 게이트, 400 token envelope로 답합니다. coding agent는 질문하고 현재 code와 대조해 검증하며 새 교훈을 audit과 compile을 통해 되돌려 씁니다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Arial, sans-serif">
+  <title id="title">OwnMem 아키텍처</title>
+  <desc id="description">저장소 소유 Markdown과 독립 trust receipt를 불변 snapshot으로 compile한다. 5개 결정적 로컬 후보 lane과 선택적 embedding lane이 4개 전달 gate를 통과한다. turn 종료 coordinator는 저위험 R0를 replay, 승격, 관찰, 격리하고 정확히 rollback하며 고위험 변경은 검토로 남긴다.</desc>
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/></marker>
-    <marker id="accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/></marker>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#526176"/></marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/></marker>
   </defs>
-  <rect x="0" y="0" width="1600" height="872" rx="18" fill="#ffffff"/>
-  <text x="40" y="54" text-anchor="start" font-size="24" font-weight="700" fill="#0f172a">OwnMem이 질문을 신뢰할 수 있는 컨텍스트로 바꾸는 과정</text>
-  <text x="40" y="80" text-anchor="start" font-size="13.5" font-weight="400" fill="#57606a">저장소 소유 · 기본은 결정적 · 답변 전에 증거 확인</text>
-  <rect x="1140" y="36" width="420" height="32" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
-  <text x="1350" y="57" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">기본값: 모델 호출 0 · 네트워크 호출 0</text>
-  <rect x="40" y="120" width="370" height="560" rx="16" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <rect x="470" y="120" width="660" height="560" rx="16" fill="#f6f8fa" stroke="#2563eb" stroke-width="1.5"/>
-  <rect x="1190" y="120" width="370" height="560" rx="16" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <rect x="60" y="106" width="69" height="28" rx="14" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="94.5" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#0f172a">저장소</text>
-  <rect x="490" y="106" width="148" height="28" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
-  <text x="564" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#2563eb">OWNMEM ENGINE</text>
-  <rect x="1210" y="106" width="138" height="28" rx="14" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1279" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#0f172a">CODING AGENT</text>
-  <text x="60" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">플레인 Markdown · git과 함께 이동</text>
-  <text x="490" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">결정적 · 같은 질문, 같은 답</text>
-  <text x="1210" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">판단은 여기서만 일어남</text>
-  <rect x="60" y="170" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="78" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">선별된 메모리 topic</text>
-  <text x="78" y="224" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">교훈 · trigger · evidence</text>
-  <text x="78" y="242" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">L1 색인 · L2 영역 · L3 topic</text>
-  <path d="M 225 262 L 225 286" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <text x="235" y="281" text-anchor="start" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem audit</text>
-  <rect x="60" y="292" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="78" y="322" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">거버넌스 게이트</text>
-  <text x="78" y="346" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">schema · 크기 상한 · 증가 quota</text>
-  <text x="78" y="364" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">SimHash + MinHash 중복 제거</text>
-  <path d="M 225 384 L 225 408" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <text x="235" y="403" text-anchor="start" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem compile</text>
-  <rect x="60" y="414" width="330" height="92" rx="12" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
-  <text x="78" y="444" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">불변 snapshot</text>
-  <text x="78" y="468" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">postings · exact map · graph · ranking</text>
-  <text x="78" y="486" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">이전 snapshot으로 안전하게 대체</text>
-  <rect x="60" y="545" width="330" height="70" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4" stroke-dasharray="5 4"/>
-  <text x="78" y="573" text-anchor="start" font-size="12.5" font-weight="600" fill="#0f172a">코드처럼 리뷰</text>
-  <text x="78" y="595" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">diff · pull request · 롤백</text>
-  <text x="440" y="448" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">로드</text>
-  <path d="M 394 460 L 466 460" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="490" y="170" width="620" height="74" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="510" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">쿼리 이해</text>
-  <text x="510" y="226" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">의도 분류 · 문자 체계 인식 토크나이저 · 40개 언어</text>
-  <path d="M 800 244 L 800 262" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="490" y="268" width="620" height="118" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="510" y="296" text-anchor="start" font-size="13.5" font-weight="650" fill="#0f172a">6개 후보 channel</text>
-  <rect x="510" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="554" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Exact</text>
-  <rect x="606" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="650" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">BM25F</text>
-  <rect x="702" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="746" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">n-gram</text>
-  <rect x="798" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="842" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Fuzzy</text>
-  <rect x="894" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="938" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Graph</text>
-  <rect x="990" y="312" width="88" height="30" rx="7" fill="#fffbeb" stroke="#a16207" stroke-width="1.4" stroke-dasharray="4 3"/>
-  <text x="1034" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">Embedding*</text>
-  <text x="800" y="370" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a">각 channel이 독립적으로 후보를 순위화</text>
-  <path d="M 800 386 L 800 404" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="490" y="410" width="620" height="74" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="510" y="440" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">통합 및 판정</text>
-  <text x="510" y="466" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">RRF · authority · 최신성 · evidence · conflict · MMR</text>
-  <path d="M 800 484 L 800 500" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <polygon points="800,506 872,558 800,610 728,558" fill="#fffbeb" stroke="#a16207" stroke-width="1.5"/>
-  <text x="800" y="563" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">확실한가?</text>
-  <rect x="500" y="518" width="200" height="80" rx="11" fill="#fff1f0" stroke="#b42318" stroke-width="1.4"/>
-  <text x="600" y="548" text-anchor="middle" font-size="13" font-weight="650" fill="#b42318">아니요 → abstain</text>
-  <text x="600" y="572" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">아무것도 주입하지 않음</text>
-  <path d="M 724 558 L 706 558" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="900" y="518" width="210" height="80" rx="11" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
-  <text x="1005" y="548" text-anchor="middle" font-size="13" font-weight="650" fill="#15803d">예 → context envelope</text>
-  <text x="1005" y="574" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">≤400 tokens · topic 1개</text>
-  <path d="M 876 558 L 894 558" fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
-  <path d="M 1110 558 L 1160 558 L 1160 338 L 1204 338" fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
-  <rect x="1210" y="170" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1228" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">일상 언어로 질문</text>
-  <text x="1228" y="224" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">증상을 그대로 설명</text>
-  <text x="1228" y="242" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">2–3개 표현을 엔진이 융합</text>
-  <rect x="1210" y="292" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1228" y="322" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">신뢰 전에 검증</text>
-  <text x="1228" y="346" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">topic 전문을 열어</text>
-  <text x="1228" y="364" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">현재 code와 대조</text>
-  <rect x="1210" y="414" width="330" height="64" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1228" y="440" text-anchor="start" font-size="12.5" font-weight="650" fill="#0f172a">correct · wrong · miss</text>
-  <text x="1228" y="462" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">로컬 feedback이 trigger를 개선</text>
-  <rect x="1210" y="508" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1228" y="538" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">새 교훈 기록</text>
-  <text x="1228" y="562" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">doc · 게이트 · 테스트로 안 될 때만</text>
-  <text x="1228" y="580" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">플레인 Markdown, PR에서 리뷰</text>
-  <text x="1160" y="192" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem</text>
-  <text x="1160" y="205" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">recall</text>
-  <path d="M 1204 216 L 1136 216 " fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
-  <path d="M 1375 600 L 1375 716 L 225 716 L 225 688" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
-  <text x="800" y="706" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">새 교훈 / feedback → audit → compile → 다음 recall 준비</text>
-  <rect x="40" y="744" width="1520" height="64" rx="12" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="800" y="770" text-anchor="middle" font-size="14" font-weight="650" fill="#0f172a">하나의 메모리, 모든 coding agent</text>
-  <text x="800" y="792" text-anchor="middle" font-size="12" font-weight="400" fill="#57606a">Claude Code · Codex · Gemini CLI · Cursor · Grok CLI</text>
-  <text x="40" y="840" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">* 선택적 embedding은 격리되며 실패해도 어휘 결과 유지.</text>
+  <rect x="0" y="0" width="1600" height="980" rx="28" fill="#f4f7ff"/>
+  <text x="52" y="58" text-anchor="start" font-size="27" font-weight="750" fill="#0f172a">OwnMem 아키텍처</text>
+  <text x="52" y="88" text-anchor="start" font-size="14" font-weight="500" fill="#526176">저장소 소유 · 로컬 회상 · 증거 거버넌스 · 제한된 자율성</text>
+  <rect x="1130" y="34" width="418" height="44" rx="22" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1339" y="62" text-anchor="middle" font-size="13" font-weight="650" fill="#2563eb">기본 recall: 모델 0 · 네트워크 0</text>
+  <rect x="52" y="120" width="1496" height="108" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="78" y="150" text-anchor="start" font-size="12" font-weight="750" fill="#526176">HOST LAYER</text>
+  <rect x="78" y="168" width="160" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="158" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Claude Code</text>
+  <rect x="250" y="168" width="136" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="318" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Codex</text>
+  <rect x="402" y="168" width="136" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="470" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Cursor</text>
+  <rect x="554" y="168" width="160" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="634" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Gemini CLI</text>
+  <rect x="730" y="168" width="170" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="815" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Other Agents</text>
+  <path d="M 916 187 L 962 187" fill="none" stroke="#526176" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="982" y="150" width="536" height="64" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1250" y="177" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">통합 프로젝트 입구</text>
+  <text x="1250" y="199" text-anchor="middle" font-size="11.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">instructions · skills · commands · hook</text>
+  <path d="M 800 228 L 800 258" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="52" y="274" width="420" height="420" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="78" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">01 · REPOSITORY SOURCE</text>
+  <text x="78" y="342" text-anchor="start" font-size="22" font-weight="750" fill="#0f172a">.ownmem/</text>
+  <text x="78" y="367" text-anchor="start" font-size="12.5" font-weight="400" fill="#526176">읽기 가능 · Git review · rollback</text>
+  <rect x="78" y="394" width="368" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="94" y="419" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">L1 · MEMORY.md</text>
+  <text x="94" y="441" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">routing index · always-small contract</text>
+  <rect x="78" y="468" width="368" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="94" y="493" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">L2 · MEMORY-&lt;area&gt;.md</text>
+  <text x="94" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">area index · scoped loading</text>
+  <rect x="78" y="542" width="368" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="94" y="567" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">L3 · topic.md</text>
+  <text x="94" y="589" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">one lesson · triggers · evidence</text>
+  <rect x="78" y="620" width="178" height="62" rx="11" fill="#fff7ed" stroke="#9a3412" stroke-width="1.4"/>
+  <text x="94" y="645" text-anchor="start" font-size="13.5" font-weight="700" fill="#9a3412">Trust receipt</text>
+  <text x="94" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">content hash · evidence · lifecycle</text>
+  <rect x="268" y="620" width="178" height="62" rx="11" fill="#f0fdf4" stroke="#166534" stroke-width="1.4"/>
+  <text x="284" y="645" text-anchor="start" font-size="13.5" font-weight="700" fill="#166534">Audit gates</text>
+  <text x="284" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">quota · dedupe · Schema</text>
+  <rect x="500" y="274" width="666" height="420" rx="18" fill="#ffffff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="526" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#2563eb">02 · CANONICAL RUNTIME</text>
+  <rect x="526" y="330" width="614" height="62" rx="11" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="542" y="355" text-anchor="start" font-size="13.5" font-weight="700" fill="#2563eb">Compile</text>
+  <text x="542" y="377" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">Schema · graph · receipts · live evidence</text>
+  <path d="M 833 392 L 833 416" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="724" y="420" width="218" height="42" rx="11" fill="#2563eb"/>
+  <text x="833" y="446" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">Immutable snapshot</text>
+  <text x="526" y="490" text-anchor="start" font-size="14" font-weight="700" fill="#0f172a">Candidate recall</text>
+  <rect x="526" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="578" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">exact</text>
+  <rect x="642" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="694" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">BM25F</text>
+  <rect x="758" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="810" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">n-gram</text>
+  <rect x="874" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="926" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">fuzzy</text>
+  <rect x="990" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1042" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">graph</text>
+  <rect x="526" y="552" width="568" height="36" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="810" y="575" text-anchor="middle" font-size="11.5" font-weight="600" fill="#2563eb">선택적 embedding: observe / weight 0, local A/B 통과 후 참여</text>
+  <rect x="526" y="606" width="274" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="542" y="631" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">Fuse + rank</text>
+  <text x="542" y="653" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">deterministic · dedupe · bounded</text>
+  <path d="M 800 637 L 830 637" fill="none" stroke="#526176" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="846" y="606" width="294" height="62" rx="11" fill="#fff7ed" stroke="#9a3412" stroke-width="1.4"/>
+  <text x="862" y="631" text-anchor="start" font-size="13.5" font-weight="700" fill="#9a3412">Four delivery gates</text>
+  <text x="862" y="653" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">relevance · validity · applicability · risk</text>
+  <rect x="1194" y="274" width="354" height="420" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1220" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">03 · TRUSTED DELIVERY</text>
+  <rect x="1220" y="336" width="302" height="62" rx="11" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1236" y="361" text-anchor="start" font-size="13.5" font-weight="700" fill="#2563eb">Context envelope</text>
+  <text x="1236" y="383" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">최대 1 topic · 400 token · provenance</text>
+  <path d="M 1166 486 L 1194 486" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="1220" y="430" width="302" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1236" y="455" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">Coding agent</text>
+  <text x="1236" y="477" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">현재 code와 docs로 다시 검증</text>
+  <rect x="1220" y="524" width="302" height="62" rx="11" fill="#f0fdf4" stroke="#166534" stroke-width="1.4"/>
+  <text x="1236" y="549" text-anchor="start" font-size="13.5" font-weight="700" fill="#166534">Honest observability</text>
+  <text x="1236" y="571" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">confirmed adoption은 별도 outcome</text>
+  <text x="1371" y="626" text-anchor="middle" font-size="11.5" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">completed → delivered → consumed</text>
+  <rect x="52" y="736" width="1496" height="188" rx="18" fill="#0f172a"/>
+  <text x="78" y="770" text-anchor="start" font-size="12" font-weight="750" fill="#2563eb">04 · LOCAL FEEDBACK / BOUNDED EVOLUTION</text>
+  <rect x="78" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
+  <text x="215" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Three ledgers</text>
+  <text x="215" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">retrieval · confirmed outcome · self-attribution</text>
+  <rect x="382" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
+  <text x="519" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Candidate queue</text>
+  <text x="519" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">candidate ≠ memory · 기본 quarantine</text>
+  <rect x="686" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
+  <text x="823" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Risk + observation</text>
+  <text x="823" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">replay · regression · quota · tripwire</text>
+  <path d="M 352 840 L 372 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <path d="M 656 840 L 676 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <path d="M 960 840 L 980 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="990" y="792" width="532" height="96" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1256" y="824" text-anchor="middle" font-size="14" font-weight="750" fill="#2563eb">R0 자동 쓰기 · R1–R5 검토</text>
+  <text x="1256" y="851" text-anchor="middle" font-size="11.5" font-weight="500" fill="#526176">실패는 격리 후 이전 byte를 정확히 복구</text>
+  <text x="1256" y="874" text-anchor="middle" font-size="10.8" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">trust → audit → compile → tripwire → rollback receipt</text>
+  <path d="M 1256 792 C 1256 718, 262 734, 262 694" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#arrowBlue)"/>
 </svg>

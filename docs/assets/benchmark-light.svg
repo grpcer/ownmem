@@ -15,10 +15,10 @@
   <line x1="860" y1="80" x2="860" y2="182" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 3"/>
   <text x="480" y="80" font-size="13" fill="#52514e">P50</text>
   <rect x="480" y="90" width="89" height="26" rx="4" fill="#2a78d6"/>
-  <text x="577" y="107" font-size="12.5" font-weight="600" fill="#52514e">1.17 ms</text>
+  <text x="577" y="107" font-size="12.5" font-weight="600" fill="#52514e">0.30 ms</text>
   <text x="480" y="146" font-size="13" fill="#52514e">P95</text>
   <rect x="480" y="156" width="187" height="26" rx="4" fill="#2a78d6"/>
-  <text x="675" y="173" font-size="12.5" font-weight="600" fill="#52514e">2.46 ms</text>
+  <text x="675" y="173" font-size="12.5" font-weight="600" fill="#52514e">0.57 ms</text>
 
   <!-- stats row -->
   <line x1="20" y1="216" x2="900" y2="216" stroke="#d0d7de" stroke-width="1"/>

@@ -59,7 +59,7 @@
               "type": "object",
               "properties": {
                 "file": { "const": "documents.json" },
-                "schema": { "const": "ownmem-index.documents/v1" }
+                "schema": { "const": "ownmem-index.documents/v2" }
               }
             }
           ]
@@ -71,7 +71,10 @@
               "type": "object",
               "properties": {
                 "file": { "const": "postings.json" },
-                "schema": { "enum": ["ownmem-index.postings/v2", "ownmem-index.postings/v1"] }
+                "schema": {
+                  "description": "Only v2 is readable. v1 remains an accepted declaration solely so that a snapshot left on disk by an older build is recognised and refused by the reader as a schema incompatibility -- which rebuilds from the Markdown sources -- instead of being reported as a malformed manifest. No reader, upgrader, or producer for v1 exists.",
+                  "enum": ["ownmem-index.postings/v2", "ownmem-index.postings/v1"]
+                }
               }
             }
           ]
@@ -120,7 +123,7 @@
       "required": ["minimum_reader_version", "query_result_schema", "fallback_policy"],
       "properties": {
         "minimum_reader_version": { "type": "integer", "minimum": 1 },
-        "query_result_schema": { "const": "ownmem-query-result/v1" },
+        "query_result_schema": { "const": "ownmem-query-result/v5" },
         "fallback_policy": { "const": "rebuild-then-markdown-v1" }
       },
       "additionalProperties": false
@@ -144,7 +147,7 @@
           "minLength": 1,
           "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
         },
-        "kind": { "enum": ["topic", "l2", "catalog", "ranking-config"] },
+        "kind": { "enum": ["topic", "l2", "catalog", "ranking-config", "trust-config"] },
         "sha256": { "$ref": "#/$defs/sha256" },
         "bytes": { "type": "integer", "minimum": 0 }
       },

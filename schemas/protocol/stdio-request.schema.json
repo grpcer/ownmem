@@ -10,6 +10,7 @@
     "query": { "type": "string", "minLength": 1, "maxLength": 512 },
     "tier": { "enum": ["default", "expanded"] },
     "limit": { "type": "integer", "minimum": 1, "maximum": 3 },
+    "episode_id": { "anyOf": [{ "type": "string", "pattern": "^[a-f0-9]{64}$" }, { "type": "null" }] },
     "exclude_memory_ids": {
       "type": "array",
       "maxItems": 64,

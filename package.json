@@ -1,7 +1,7 @@
 {
   "name": "ownmem",
-  "version": "0.2.0",
-  "description": "Open-source AI agent memory system: Git-native, repo-owned Markdown project memory with deterministic local recall for Claude Code, Codex, Cursor, and more.",
+  "version": "0.3.0",
+  "description": "Git-native project memory for AI coding agents: deterministic local recall, evidence-governed trust, and bounded unattended evolution.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "grpcer",
@@ -14,7 +14,7 @@
     "url": "https://github.com/grpcer/ownmem/issues"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.6.0"
   },
   "bin": {
     "ownmem": "bin/ownmem.mjs"
@@ -24,16 +24,18 @@
     "./schemas/*": "./schemas/*"
   },
   "files": [
+    "benchmarks/",
     "bin/",
     "lib/",
     "schemas/",
+    "test/",
     "README.md",
     "LICENSE",
     "NOTICE",
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node ./test/structure-self-test.mjs && node ./test/public-self-test.mjs",
+    "test": "node ./test/structure-self-test.mjs && node ./test/public-self-test.mjs && node ./test/evolution-self-test.mjs",
     "test:structure": "node ./test/structure-self-test.mjs",
     "benchmark": "node ./benchmarks/public-benchmark.mjs --iterations 20",
     "benchmark:release": "node ./benchmarks/public-benchmark.mjs --iterations 100",

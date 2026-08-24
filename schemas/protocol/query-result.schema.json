@@ -1,110 +1,272 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ownmem-query-result/v1",
+  "$id": "ownmem-query-result/v5",
   "title": "OwnMem memory query result envelope",
   "type": "object",
-  "required": ["schema", "trace_id", "query", "source", "results", "abstain", "budget", "warnings"],
+  "required": [
+    "schema",
+    "trace_id",
+    "runtime",
+    "policy",
+    "query",
+    "source",
+    "results",
+    "abstain",
+    "budget",
+    "warnings"
+  ],
   "properties": {
-    "schema": { "const": "ownmem-query-result/v1" },
-    "trace_id": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "schema": {
+      "const": "ownmem-query-result/v5"
+    },
+    "trace_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$"
+    },
+    "runtime": {
+      "type": "object",
+      "description": "Which recall stack produced this envelope. ranking_profile_hash was removed in v4: a 64-hex digest of the ranking manifest cost 22.5 tokens in every envelope and had one reader, which runs beside the manifest and derives the digest from it. additionalProperties false makes a re-added copy a hard error rather than a silent second source of truth.",
+      "required": [
+        "version",
+        "profile_id"
+      ],
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/semver"
+        },
+        "profile_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "policy": {
+      "const": "untrusted-memory-v1"
+    },
     "query": {
       "type": "object",
-      "required": ["classifications", "cache_key_sha256"],
+      "required": [
+        "classifications"
+      ],
       "properties": {
         "classifications": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "enum": ["identifier", "path", "error", "natural", "decision", "mixed"] }
-        },
-        "cache_key_sha256": { "$ref": "#/$defs/sha256" }
+          "items": {
+            "enum": [
+              "identifier",
+              "path",
+              "error",
+              "natural",
+              "decision",
+              "mixed"
+            ]
+          }
+        }
       },
       "additionalProperties": false
     },
     "source": {
       "type": "object",
+      "description": "Where this envelope was served from. snapshot_schema is a constant and is not published; degraded, rebuild_trigger and fallback_reason are published only when they are not nominal, so a healthy recall carries three keys and a degraded one still explains itself in full. snapshot_id is the full digest on purpose: observability events, the recall ledger and the hook session key all pair on it against digests recorded elsewhere.",
       "required": [
         "mode",
         "status",
-        "snapshot_id",
-        "snapshot_schema",
-        "degraded",
-        "rebuild_trigger",
-        "fallback_reason"
+        "snapshot_id"
       ],
       "properties": {
-        "mode": { "enum": ["snapshot", "markdown-fallback"] },
-        "status": { "enum": ["ready", "rebuilt", "previous", "fallback"] },
+        "mode": {
+          "enum": [
+            "snapshot",
+            "markdown-fallback"
+          ]
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "rebuilt",
+            "previous",
+            "fallback"
+          ]
+        },
         "snapshot_id": {
           "anyOf": [
-            { "$ref": "#/$defs/sha256" },
-            { "type": "null" }
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
-        "snapshot_schema": {
-          "anyOf": [
-            { "const": "ownmem-index/v1" },
-            { "type": "null" }
-          ]
+        "degraded": {
+          "const": true
         },
-        "degraded": { "type": "boolean" },
         "rebuild_trigger": {
-          "enum": [null, "missing", "schema-incompatible", "manifest-invalid", "checksum-mismatch"]
+          "enum": [
+            "missing",
+            "schema-incompatible",
+            "manifest-invalid",
+            "checksum-mismatch",
+            "source-changed"
+          ]
         },
-        "fallback_reason": { "enum": [null, "rebuild-failed"] }
+        "fallback_reason": {
+          "const": "rebuild-failed"
+        }
       },
       "allOf": [
         {
-          "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "ready" } } },
+          "if": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "ready"
+              }
+            }
+          },
           "then": {
             "type": "object",
+            "required": [
+              "snapshot_id"
+            ],
+            "maxProperties": 3,
             "properties": {
-              "mode": { "const": "snapshot" },
-              "snapshot_id": { "$ref": "#/$defs/sha256" },
-              "snapshot_schema": { "const": "ownmem-index/v1" },
-              "degraded": { "const": false },
-              "rebuild_trigger": { "type": "null" },
-              "fallback_reason": { "type": "null" }
+              "mode": {
+                "const": "snapshot"
+              },
+              "snapshot_id": {
+                "$ref": "#/$defs/sha256"
+              }
             }
           }
         },
         {
-          "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "rebuilt" } } },
+          "if": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "rebuilt"
+              }
+            }
+          },
           "then": {
             "type": "object",
+            "required": [
+              "snapshot_id",
+              "rebuild_trigger"
+            ],
+            "maxProperties": 4,
             "properties": {
-              "mode": { "const": "snapshot" },
-              "snapshot_id": { "$ref": "#/$defs/sha256" },
-              "snapshot_schema": { "const": "ownmem-index/v1" },
-              "degraded": { "const": false },
-              "rebuild_trigger": { "enum": ["missing", "schema-incompatible", "manifest-invalid", "checksum-mismatch"] },
-              "fallback_reason": { "type": "null" }
+              "mode": {
+                "const": "snapshot"
+              },
+              "snapshot_id": {
+                "$ref": "#/$defs/sha256"
+              },
+              "rebuild_trigger": {
+                "enum": [
+                  "missing",
+                  "schema-incompatible",
+                  "manifest-invalid",
+                  "checksum-mismatch",
+                  "source-changed"
+                ]
+              }
             }
           }
         },
         {
-          "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "previous" } } },
+          "if": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "previous"
+              }
+            }
+          },
           "then": {
             "type": "object",
+            "required": [
+              "snapshot_id",
+              "degraded",
+              "rebuild_trigger",
+              "fallback_reason"
+            ],
             "properties": {
-              "mode": { "const": "snapshot" },
-              "snapshot_id": { "$ref": "#/$defs/sha256" },
-              "snapshot_schema": { "const": "ownmem-index/v1" },
-              "degraded": { "const": true },
-              "rebuild_trigger": { "enum": ["missing", "schema-incompatible", "manifest-invalid", "checksum-mismatch"] },
-              "fallback_reason": { "const": "rebuild-failed" }
+              "mode": {
+                "const": "snapshot"
+              },
+              "snapshot_id": {
+                "$ref": "#/$defs/sha256"
+              },
+              "degraded": {
+                "const": true
+              },
+              "rebuild_trigger": {
+                "enum": [
+                  "missing",
+                  "schema-incompatible",
+                  "manifest-invalid",
+                  "checksum-mismatch",
+                  "source-changed"
+                ]
+              },
+              "fallback_reason": {
+                "const": "rebuild-failed"
+              }
             }
           }
         },
         {
-          "if": { "type": "object", "required": ["status"], "properties": { "status": { "const": "fallback" } } },
+          "if": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "fallback"
+              }
+            }
+          },
           "then": {
             "type": "object",
+            "required": [
+              "degraded",
+              "rebuild_trigger",
+              "fallback_reason"
+            ],
             "properties": {
-              "mode": { "const": "markdown-fallback" },
-              "degraded": { "const": true },
-              "rebuild_trigger": { "enum": ["missing", "schema-incompatible", "manifest-invalid", "checksum-mismatch"] },
-              "fallback_reason": { "const": "rebuild-failed" }
+              "mode": {
+                "const": "markdown-fallback"
+              },
+              "degraded": {
+                "const": true
+              },
+              "rebuild_trigger": {
+                "enum": [
+                  "missing",
+                  "schema-incompatible",
+                  "manifest-invalid",
+                  "checksum-mismatch",
+                  "source-changed"
+                ]
+              },
+              "fallback_reason": {
+                "const": "rebuild-failed"
+              }
             }
           }
         }
@@ -114,41 +276,117 @@
     "results": {
       "type": "array",
       "maxItems": 3,
-      "items": { "$ref": "#/$defs/result" }
+      "items": {
+        "$ref": "#/$defs/result"
+      }
     },
     "abstain": {
       "type": "object",
-      "required": ["abstained", "reason"],
+      "required": [
+        "abstained",
+        "reason",
+        "gate",
+        "verdict_reason"
+      ],
       "properties": {
-        "abstained": { "type": "boolean" },
-        "reason": { "enum": [null, "no-trusted-candidate", "below-threshold", "budget-empty", "all-candidates-excluded"] }
+        "abstained": {
+          "type": "boolean"
+        },
+        "reason": {
+          "enum": [
+            null,
+            "no-trusted-candidate",
+            "below-threshold",
+            "blocked-validity",
+            "blocked-applicability",
+            "blocked-risk",
+            "budget-empty",
+            "all-candidates-excluded"
+          ]
+        },
+        "gate": {
+          "enum": [
+            null,
+            "relevance",
+            "validity",
+            "applicability",
+            "risk",
+            "budget"
+          ]
+        },
+        "verdict_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       },
       "additionalProperties": false
     },
     "budget": {
       "type": "object",
-      "required": ["tier", "max_topics", "max_tokens", "estimated_tokens", "estimator", "truncated"],
+      "required": [
+        "tier",
+        "estimated_tokens",
+        "truncated"
+      ],
       "properties": {
-        "tier": { "enum": ["default", "expanded"] },
-        "max_topics": { "type": "integer", "minimum": 1, "maximum": 3 },
-        "max_tokens": { "type": "integer", "minimum": 1, "maximum": 1200 },
-        "estimated_tokens": { "type": "integer", "minimum": 0, "maximum": 1200 },
-        "estimator": { "const": "cjk1-ascii4-v1" },
-        "truncated": { "type": "boolean" },
-        "dropped_topics": { "type": "integer", "minimum": 0, "maximum": 3 }
+        "tier": {
+          "enum": [
+            "default",
+            "expanded"
+          ]
+        },
+        "estimated_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1200
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "dropped_topics": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        }
       },
       "allOf": [
         {
-          "if": { "type": "object", "properties": { "tier": { "const": "default" } } },
-          "then": { "type": "object", "properties": { "max_tokens": { "type": "integer", "maximum": 400 } } }
+          "if": {
+            "type": "object",
+            "properties": {
+              "tier": {
+                "const": "default"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "estimated_tokens": {
+                "type": "integer",
+                "maximum": 400
+              },
+              "dropped_topics": {
+                "type": "integer",
+                "maximum": 1
+              }
+            }
+          }
         }
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "tier is the whole budget contract: MEMORY_CONTEXT_BUDGETS in lib/memory-runtime-contract.mjs maps it to max topics, max tokens and the token estimator, so the envelope names the tier instead of restating all three."
     },
     "warnings": {
       "type": "array",
       "maxItems": 5,
-      "items": { "type": "string", "minLength": 1, "maxLength": 160 }
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      }
     }
   },
   "allOf": [
@@ -158,25 +396,66 @@
         "properties": {
           "abstain": {
             "type": "object",
-            "properties": { "abstained": { "const": true } }
+            "properties": {
+              "abstained": {
+                "const": true
+              }
+            }
           }
         }
       },
       "then": {
         "type": "object",
         "properties": {
-          "results": { "type": "array", "maxItems": 0 },
+          "results": {
+            "type": "array",
+            "maxItems": 0
+          },
           "abstain": {
             "type": "object",
-            "properties": { "reason": { "enum": ["no-trusted-candidate", "below-threshold", "budget-empty", "all-candidates-excluded"] } }
+            "properties": {
+              "reason": {
+                "enum": [
+                  "no-trusted-candidate",
+                  "below-threshold",
+                  "blocked-validity",
+                  "blocked-applicability",
+                  "blocked-risk",
+                  "budget-empty",
+                  "all-candidates-excluded"
+                ]
+              },
+              "gate": {
+                "enum": [
+                  "relevance",
+                  "validity",
+                  "applicability",
+                  "risk",
+                  "budget"
+                ]
+              }
+            }
           }
         }
       },
       "else": {
         "type": "object",
         "properties": {
-          "results": { "type": "array", "minItems": 1 },
-          "abstain": { "type": "object", "properties": { "reason": { "type": "null" } } }
+          "results": {
+            "type": "array",
+            "minItems": 1
+          },
+          "abstain": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "null"
+              },
+              "gate": {
+                "type": "null"
+              }
+            }
+          }
         }
       }
     }
@@ -186,6 +465,10 @@
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
     },
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+    },
     "result": {
       "type": "object",
       "required": [
@@ -193,7 +476,8 @@
         "memory_id",
         "path",
         "score",
-        "channels",
+        "gate_score",
+        "lanes",
         "matched_fields",
         "matched_terms",
         "excerpt",
@@ -201,53 +485,231 @@
         "explanation"
       ],
       "properties": {
-        "rank": { "type": "integer", "minimum": 1, "maximum": 3 },
-        "memory_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
-        "path": { "type": "string", "minLength": 1 },
-        "score": { "type": "number", "minimum": 0 },
-        "channels": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": { "enum": ["exact", "bm25f", "ngram", "fuzzy", "graph", "embedding"] }
+        "rank": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "memory_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gate_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lanes": {
+          "type": "object",
+          "description": "Only the lanes that actually ranked this topic, keyed by lane name in fixed channel order. An absent lane did not match; this replaces the six-key object and the separate channels array, which spelled out the same key set a second time.",
+          "minProperties": 1,
+          "properties": {
+            "exact": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "bm25f": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "ngram": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "fuzzy": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "graph": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "embedding": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "trust": {
+          "type": "object",
+          "required": [
+            "lifecycle",
+            "authority",
+            "action_risk",
+            "integrity"
+          ],
+          "properties": {
+            "lifecycle": {
+              "enum": [
+                "observed",
+                "candidate",
+                "shadow",
+                "advisory",
+                "active",
+                "stale",
+                "deprecated",
+                "rejected",
+                "superseded"
+              ]
+            },
+            "authority": {
+              "enum": [
+                "observed",
+                "advisory",
+                "normative",
+                "user-confirmed"
+              ]
+            },
+            "action_risk": {
+              "enum": [
+                "R0",
+                "R1",
+                "R2",
+                "R3",
+                "R4",
+                "R5"
+              ]
+            },
+            "logical_type": {
+              "description": "What kind of claim this memory makes, which is what decides the advice a delivery surface gives about a non-nominal result: a drifted code lesson is re-checked against the code, a recorded user preference has no code to check. Optional because it is the last thing compaction drops; when it is absent the advice falls back to a generic one instead of guessing.",
+              "enum": [
+                "normative",
+                "procedural",
+                "factual",
+                "diagnostic",
+                "preference",
+                "feedback"
+              ]
+            },
+            "integrity": {
+              "enum": [
+                "passed",
+                "advisory"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "receipt_id",
+            "evidence_root_sha256",
+            "source_commit"
+          ],
+          "properties": {
+            "receipt_id": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/sha256"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_root_sha256": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/sha256"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "source_commit": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{40,64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
         },
         "matched_fields": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "matched_terms": {
           "type": "array",
           "maxItems": 12,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
         },
         "excerpt": {
           "anyOf": [
             {
               "type": "object",
-              "required": ["field", "text"],
+              "required": [
+                "field",
+                "text"
+              ],
               "properties": {
-                "field": { "type": "string", "minLength": 1 },
-                "text": { "type": "string", "minLength": 1, "maxLength": 600 }
+                "field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600
+                }
               },
               "additionalProperties": false
             },
-            { "type": "null" }
+            {
+              "type": "null"
+            }
           ]
         },
         "authority_docs": {
           "type": "array",
           "maxItems": 5,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 3 }
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
         },
         "explanation": {
           "type": "array",
           "minItems": 1,
           "maxItems": 4,
-          "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
         }
       },
       "additionalProperties": false

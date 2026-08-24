@@ -6,16 +6,23 @@
   "additionalProperties": false,
   "required": ["schema", "event", "recorded_at", "trace_id", "snapshot_id", "process", "payload"],
   "properties": {
-    "schema": { "const": "ownmem-observability.event/v1" },
+    "schema": { "const": "ownmem-observability.event/v2" },
     "event": {
       "enum": [
         "recall.completed",
         "recall.delivered",
         "recall.consumed",
         "feedback.recorded",
+        "outcome.recorded",
+        "attribution.recorded",
         "index.build",
         "maintenance.completed",
-        "gate.completed"
+        "command.completed",
+        "correction.observed",
+        "external.context.observed",
+        "gate.completed",
+        "trust.quarantined",
+        "evolution.completed"
       ]
     },
     "recorded_at": { "type": "string", "format": "date-time" },
@@ -45,6 +52,14 @@
       "then": { "properties": { "payload": { "$ref": "#/$defs/feedbackRecorded" } } }
     },
     {
+      "if": { "properties": { "event": { "const": "outcome.recorded" } }, "required": ["event"] },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/outcomeRecorded" } } }
+    },
+    {
+      "if": { "properties": { "event": { "const": "attribution.recorded" } }, "required": ["event"] },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/attributionRecorded" } } }
+    },
+    {
       "if": { "properties": { "event": { "const": "index.build" } }, "required": ["event"] },
       "then": { "properties": { "payload": { "$ref": "#/$defs/indexBuild" } } }
     },
@@ -53,8 +68,28 @@
       "then": { "properties": { "payload": { "$ref": "#/$defs/maintenanceCompleted" } } }
     },
     {
+      "if": { "properties": { "event": { "const": "command.completed" } }, "required": ["event"] },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/commandCompleted" } } }
+    },
+    {
+      "if": { "properties": { "event": { "const": "correction.observed" } }, "required": ["event"] },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/correctionObserved" } } }
+    },
+    {
+      "if": { "properties": { "event": { "const": "external.context.observed" } }, "required": ["event"] },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/externalContextObserved" } } }
+    },
+    {
       "if": { "properties": { "event": { "const": "gate.completed" } }, "required": ["event"] },
       "then": { "properties": { "payload": { "$ref": "#/$defs/gateCompleted" } } }
+    },
+    {
+      "if": { "properties": { "event": { "const": "trust.quarantined" } }, "required": ["event"] },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/trustQuarantined" } } }
+    },
+    {
+      "if": { "properties": { "event": { "const": "evolution.completed" } }, "required": ["event"] },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/evolutionCompleted" } } }
     }
   ],
   "$defs": {
@@ -69,24 +104,61 @@
         "component_version": { "type": "string", "minLength": 1, "maxLength": 64 }
       }
     },
+    "correctionObserved": {
+      "description": "The user pushed back at the start of a turn. Classification only: a fixed set of marker names, a coarse length bucket and two keyed ids -- no prompt text, no excerpt, no length in characters. The markers and the length cut this detector uses were measured over 601 real human-typed turns; above ~200 characters the same vocabulary only ever appeared inside task instructions, so nothing longer is classified at all. corrected_episode_id is the turn immediately before, taken from the transcript's own order rather than from a time window; it is still only 'the previous turn', which is why anything built from it is a temporal association.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["markers", "prompt_length", "episode_id", "corrected_episode_id", "session_id"],
+      "properties": {
+        "markers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": { "enum": ["negation", "still_broken", "undo", "negation_en", "still_broken_en", "undo_en"] }
+        },
+        "prompt_length": { "enum": ["xs", "s", "m", "l"] },
+        "episode_id": { "$ref": "#/$defs/sha256" },
+        "corrected_episode_id": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "session_id": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] }
+      }
+    },
+    "externalContextObserved": {
+      "description": "Text from outside the repository entered this session. Recorded so that candidate extraction can refuse to run for the session rather than depending on whoever runs the scan remembering to declare it. The source is a class, never an instance: every MCP server records as `mcp`, because which one is the user's infrastructure and knowing it would not change the answer.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "episode_id", "session_id"],
+      "properties": {
+        "source": { "enum": ["web_fetch", "web_search", "mcp"] },
+        "episode_id": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "session_id": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] }
+      }
+    },
     "nonNegativeNumber": { "type": "number", "minimum": 0 },
     "nonNegativeInteger": { "type": "integer", "minimum": 0 },
+    "topicName": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$", "maxLength": 160 },
     "topicNames": {
       "type": "array",
       "maxItems": 20,
       "uniqueItems": true,
-      "items": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$", "maxLength": 160 }
+      "items": { "$ref": "#/$defs/topicName" }
     },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "pairingStrength": { "enum": ["session", "recent"] },
     "recallCompleted": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "query_id", "query_class", "execution", "total_ms", "stage_ms", "channels",
-        "rrf_candidates", "abstained", "returned_topics", "estimated_tokens", "cache_hit", "truncated"
+        "rrf_candidates", "abstained", "returned_topics", "estimated_tokens", "cache_hit", "truncated",
+        "episode_id"
       ],
       "properties": {
         "surface": { "enum": ["claude-hook", "cli"] },
         "consumption_eligible": { "type": "boolean" },
+        "episode_id": {
+          "description": "The user turn this recall happened in, keyed locally. Null for surfaces with no notion of a turn -- a command-line recall has none, and inventing one from a timestamp would make episode membership a guess rather than a fact.",
+          "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+        },
         "query_id": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
         "query_class": {
           "type": "array",
@@ -172,12 +244,40 @@
       }
     },
     "feedbackRecorded": {
+      "description": "Stream 1, retrieval verdict: did recall return the right thing. Never mixed with the outcome receipt or the weak self-attribution label; each stream owns its own event, file, and denominator.",
       "type": "object",
       "additionalProperties": false,
       "required": ["verdict", "expected_in_top_k"],
       "properties": {
-        "verdict": { "enum": ["correct", "wrong", "miss"] },
+        "verdict": { "enum": ["correct", "wrong", "retrieval_miss", "coverage_gap", "stale", "conflict"] },
         "expected_in_top_k": { "type": ["boolean", "null"] }
+      }
+    },
+    "outcomeRecorded": {
+      "description": "Stream 2, outcome receipt: what happened after a memory was used. Only a user or the host may confirm it; `self` is an agent opinion and belongs to attribution.recorded. The payload is an allowlist of enums, booleans and digests -- no prompt, no confirmation text, no file body ever enters telemetry.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["memory_id", "outcome", "confirmed_by", "confirmation_sha256", "pairing", "note_present"],
+      "properties": {
+        "memory_id": { "$ref": "#/$defs/topicName" },
+        "outcome": { "enum": ["applied", "helpful_but_not_used", "harmful"] },
+        "confirmed_by": { "enum": ["user", "host"] },
+        "confirmation_sha256": { "$ref": "#/$defs/sha256" },
+        "pairing": { "$ref": "#/$defs/pairingStrength" },
+        "note_present": { "type": "boolean" }
+      }
+    },
+    "attributionRecorded": {
+      "description": "Stream 3, weak turn-scoped self-attribution. Self-reported and self-selected (only clearly useful or clearly misleading is recorded), so it can never be turned into a rate and must never enter the numerator or denominator of a gate. `basis` is a constant so the stream cannot be silently promoted to explicit feedback.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["memory_id", "label", "basis", "scope", "pairing"],
+      "properties": {
+        "memory_id": { "$ref": "#/$defs/topicName" },
+        "label": { "enum": ["useful", "misleading"] },
+        "basis": { "const": "self-attribution" },
+        "scope": { "const": "turn" },
+        "pairing": { "$ref": "#/$defs/pairingStrength" }
       }
     },
     "indexBuild": {
@@ -215,6 +315,24 @@
         "success": { "type": "boolean" }
       }
     },
+    "commandCompleted": {
+      "description": "A shell command the host ran, reduced to what a debug lesson needs and nothing more. No command line, stdout or stderr is stored: command_id is a locally keyed HMAC that answers only \"the same command as before\", which is what makes a failed -> passed transition detectable without keeping the text that would make it readable. program comes from a fixed allowlist and is \"other\" otherwise, so an unusual binary name cannot leak through it. interrupted is kept apart from failed because a cancelled run is the user changing their mind, and counting it as red would manufacture recoveries out of every interrupted build.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["program", "command_id", "status", "exit_code", "duration_ms", "episode_id", "session_id"],
+      "properties": {
+        "program": { "type": "string", "pattern": "^[a-z0-9._-]+$", "maxLength": 40 },
+        "command_id": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },
+        "status": { "enum": ["passed", "failed", "interrupted"] },
+        "exit_code": { "anyOf": [{ "type": "integer", "minimum": 0, "maximum": 255 }, { "type": "null" }] },
+        "duration_ms": { "$ref": "#/$defs/nonNegativeNumber" },
+        "episode_id": {
+          "description": "One user turn, as the host identifies it. The episode boundary did not have to be invented: the host stamps every tool event with the id of the prompt that caused it.",
+          "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+        },
+        "session_id": { "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] }
+      }
+    },
     "gateCompleted": {
       "type": "object",
       "additionalProperties": false,
@@ -224,6 +342,42 @@
         "status": { "enum": ["passed", "failed"] },
         "errors": { "$ref": "#/$defs/nonNegativeInteger" },
         "warnings": { "$ref": "#/$defs/nonNegativeInteger" },
+        "duration_ms": { "$ref": "#/$defs/nonNegativeNumber" }
+      }
+    },
+    "trustQuarantined": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["topics", "gates", "reasons", "use_time_revalidation"],
+      "properties": {
+        "topics": { "$ref": "#/$defs/topicNames" },
+        "gates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["validity", "applicability", "risk"] }
+        },
+        "reasons": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9-]+$", "maxLength": 80 }
+        },
+        "use_time_revalidation": { "const": true }
+      }
+    },
+    "evolutionCompleted": {
+      "description": "One unattended safe-maintenance pass. Counts only; candidate text, queries, memory bodies and file contents never enter telemetry.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "source", "dry_run", "candidates", "promotions", "rollbacks", "blocked", "audit_errors", "duration_ms"],
+      "properties": {
+        "status": { "enum": ["completed", "blocked", "failed", "skipped"] },
+        "source": { "type": "string", "pattern": "^[a-z0-9._-]+$", "maxLength": 40 },
+        "dry_run": { "type": "boolean" },
+        "candidates": { "$ref": "#/$defs/nonNegativeInteger" },
+        "promotions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "rollbacks": { "$ref": "#/$defs/nonNegativeInteger" },
+        "blocked": { "$ref": "#/$defs/nonNegativeInteger" },
+        "audit_errors": { "$ref": "#/$defs/nonNegativeInteger" },
         "duration_ms": { "$ref": "#/$defs/nonNegativeNumber" }
       }
     }

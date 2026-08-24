@@ -65,7 +65,7 @@
             "additionalProperties": false,
             "required": ["path", "symbols", "tests"],
             "properties": {
-              "path": { "type": "string", "minLength": 1 },
+              "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
               "symbols": { "$ref": "#/$defs/stringArray" },
               "tests": { "$ref": "#/$defs/stringArray" },
               "commit": { "type": "string" }

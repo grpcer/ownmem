@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ownmem.dev/schemas/promotion/decision.schema.json",
+  "title": "OwnMem promotion decision",
+  "description": "How far one proposed change may travel without a person, and why it stopped there. Like the candidate schema, this is a gate at the exit rather than a promise each producer keeps: the shape has to hold for producers that do not exist yet -- a host adapter, a model-backed proposer -- and the invariants below therefore do not depend on the policy module being correct. Two of them are the whole point: a high-risk decision cannot be encoded as automatic at all, and an automatic decision cannot carry a blocker.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "risk", "logical_type", "current_lifecycle", "target_lifecycle", "ceiling", "automation", "reasons", "blocked_by", "statistics"],
+  "properties": {
+    "schema": { "const": "ownmem-promotion-decision/v1" },
+    "risk": {
+      "enum": ["R0", "R1", "R2", "R3", "R4", "R5"],
+      "description": "Blast radius if this turns out to be wrong. It grades the change, never how often the change has worked."
+    },
+    "logical_type": {
+      "enum": ["normative", "procedural", "factual", "diagnostic", "preference", "feedback", null],
+      "description": "What kind of memory this is about, or null when the request is not about writing one."
+    },
+    "current_lifecycle": {
+      "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded", null],
+      "description": "Where it is now. Null is a first import, which the lifecycle graph admits from nowhere."
+    },
+    "target_lifecycle": {
+      "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded"],
+      "description": "Where the request wanted to go. Echoed rather than clamped to the ceiling: a decision that quietly rewrote what was asked for would be unreadable as a receipt."
+    },
+    "ceiling": {
+      "enum": ["observed", "candidate", "shadow", "advisory", "active", null],
+      "description": "The furthest lifecycle this request could have reached with nobody watching, or null when nothing could. Only promotion states appear here; a demotion is never something a ceiling permits."
+    },
+    "automation": {
+      "enum": ["auto", "review", "pr-only", "forbidden"],
+      "description": "auto: the system may apply it. review: a person may approve it, and nothing happens until they do. pr-only: the system may produce reviewable material and nothing else. forbidden: the system may not act at all."
+    },
+    "reasons": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1, "maxLength": 300 },
+      "description": "Why it landed here, in sentences. Required and non-empty because the readable half is the deliverable: someone should be able to see why a promotion was not automatic without opening the policy module."
+    },
+    "blocked_by": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9-]+(?::[A-Za-z0-9_:-]+)?$" },
+      "description": "Machine-readable codes for everything that stopped automation, one per cause. Empty exactly when the decision is automatic."
+    },
+    "statistics": {
+      "description": "The observation record this decision was graded against, or null when none applied. Carried on the decision so the numbers travel with the verdict.",
+      "oneOf": [{ "$ref": "#/$defs/statistics" }, { "type": "null" }]
+    }
+  },
+  "allOf": [
+    {
+      "description": "R4 and R5 can never be encoded as automatic, whatever the evidence or the repository configuration says. Written here as well as in the policy so that a producer building a decision by hand is bound by it too.",
+      "if": { "properties": { "risk": { "enum": ["R4", "R5"] } }, "required": ["risk"] },
+      "then": {
+        "properties": {
+          "automation": { "enum": ["pr-only", "forbidden"] },
+          "ceiling": { "type": "null" }
+        }
+      }
+    },
+    {
+      "description": "The control plane -- policy, gates, permissions, this system's own code -- may not take effect from inside at all, so R5 is not merely non-automatic.",
+      "if": { "properties": { "risk": { "const": "R5" } }, "required": ["risk"] },
+      "then": { "properties": { "automation": { "const": "forbidden" } } }
+    },
+    {
+      "description": "An automatic decision that also names a blocker is self-contradictory, and it is the exact shape a bug in the resolver would produce.",
+      "if": { "properties": { "automation": { "const": "auto" } }, "required": ["automation"] },
+      "then": {
+        "properties": {
+          "blocked_by": { "type": "array", "maxItems": 0 },
+          "ceiling": { "type": "string" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "statistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "independent_episodes",
+        "failed_episodes",
+        "independent_sessions",
+        "observations_collapsed",
+        "observations_unattributable",
+        "lower_bound",
+        "interpretation",
+        "reason"
+      ],
+      "description": "What the observation record supports. There is deliberately no field here naming how likely the thing is to hold: the bound is a floor under an unbroken run, and the vocabulary of this object is not allowed to suggest otherwise.",
+      "properties": {
+        "verdict": {
+          "enum": ["weak_pass", "insufficient_evidence", "circuit_broken"],
+          "description": "circuit_broken: at least one independent episode failed, whatever the bound says. insufficient_evidence: too few episodes, or a bound that does not clear the weak gate. weak_pass: no failure seen and the bound clears -- which means 'not seen to fail and not obviously bad', and nothing more."
+        },
+        "independent_episodes": { "type": "integer", "minimum": 0, "description": "Distinct turns. Repeats inside one turn are one data point, because eight triggers of the same procedure in one turn are one situation." },
+        "failed_episodes": { "type": "integer", "minimum": 0 },
+        "independent_sessions": { "type": "integer", "minimum": 0, "description": "Reported, never gated on. Twelve episodes in one session are weaker than twelve across twelve days, and a reader should see that; no measurement here says how much weaker." },
+        "observations_collapsed": { "type": "integer", "minimum": 0, "description": "Observations that shared a turn with an earlier one and so added no data point. Reported so the collapsing is visible rather than quiet." },
+        "observations_unattributable": { "type": "integer", "minimum": 0, "description": "Observations with no turn identity at all. They cannot be shown to be independent, so they are excluded and counted here rather than folded in." },
+        "lower_bound": {
+          "oneOf": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "null" }],
+          "description": "One-sided 95% Wilson lower bound over independent episodes, or null when there are none. Named for what it is: a bound, not a rate and not a claim."
+        },
+        "interpretation": {
+          "const": "weak-gate-only",
+          "description": "Pinned. The bound exists to run a weak gate and a circuit breaker, and this field is what stops a later reader from quoting it as anything stronger."
+        },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 300 }
+      }
+    }
+  }
+}

@@ -8,7 +8,11 @@
     "schema": { "const": "ownmem-hook-request/v1" },
     "id": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$" },
     "session_id": { "type": "string", "minLength": 1, "maxLength": 256 },
-    "query": { "type": "string", "minLength": 1, "maxLength": 512 }
+    "query": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "episode_id": {
+      "description": "The user turn this recall belongs to, already keyed by the caller. Absent when the caller has no notion of a turn, which is the honest answer for a command-line recall; it is never synthesized from a clock.",
+      "anyOf": [{ "type": "string", "pattern": "^[a-f0-9]{64}$" }, { "type": "null" }]
+    }
   },
   "additionalProperties": false
 }

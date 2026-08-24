@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ownmem-embedding-ab/v1",
+  "$id": "ownmem-embedding-ab/v2",
   "title": "OwnMem local memory embedding A/B report",
   "type": "object",
   "required": [
@@ -8,7 +8,7 @@
     "weights", "corpus", "metrics", "guard", "diffs"
   ],
   "properties": {
-    "schema": { "const": "ownmem-embedding-ab/v1" },
+    "schema": { "const": "ownmem-embedding-ab/v2" },
     "report_id": { "$ref": "#/$defs/sha256" },
     "snapshot_id": { "$ref": "#/$defs/sha256" },
     "provider": { "type": "string", "minLength": 1, "maxLength": 64 },
@@ -19,6 +19,16 @@
       "minLength": 1,
       "maxLength": 64
     },
+    "runtime": {
+      "type": "object",
+      "required": ["a", "b"],
+      "properties": {
+        "a": { "$ref": "#/$defs/runtimeProfile" },
+        "b": { "$ref": "#/$defs/runtimeProfile" }
+      },
+      "additionalProperties": false
+    },
+    "cases_sha256": { "$ref": "#/$defs/sha256" },
     "dimensions": { "type": "integer", "minimum": 1, "maximum": 65536 },
     "weights": {
       "type": "object",
@@ -61,11 +71,43 @@
     },
     "guard": {
       "type": "object",
-      "required": ["negative_not_worse", "recommended_weight_safe"],
+      "description": "A tie is not a pass. `recommended_weight_safe` only says nothing regressed, which is all a saturated corpus can ever say; `verdict` states whether this corpus was able to show a gain at all, so an enable path can tell 'proved better' apart from 'could not tell'.",
+      "required": [
+        "negative_not_worse", "recommended_weight_safe",
+        "benefit_measurable", "benefit_observed", "headroom", "gained", "verdict"
+      ],
       "properties": {
         "negative_not_worse": { "type": "boolean" },
-        "recommended_weight_safe": { "type": "boolean" }
+        "recommended_weight_safe": { "type": "boolean" },
+        "benefit_measurable": { "type": "boolean" },
+        "benefit_observed": { "type": "boolean" },
+        "headroom": {
+          "description": "Metrics whose baseline arm is below its ceiling, i.e. the only ones on which arm B could have shown an improvement.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+        },
+        "gained": {
+          "description": "Metrics with headroom that arm B actually improved. Always a subset of headroom.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+        },
+        "verdict": {
+          "description": "improves = a metric with room got better. no_change = there was room and nothing moved. uninformative = the baseline is at the ceiling everywhere, so this corpus cannot answer the question. regresses = something got worse. insufficient_evidence = no scored cases.",
+          "enum": ["improves", "no_change", "uninformative", "regresses", "insufficient_evidence"]
+        }
       },
+      "allOf": [
+        {
+          "description": "A verdict of improves is unreachable without an observed gain, whatever the producer believes.",
+          "if": { "properties": { "verdict": { "const": "improves" } }, "required": ["verdict"] },
+          "then": { "properties": { "benefit_observed": { "const": true }, "benefit_measurable": { "const": true } } }
+        },
+        {
+          "description": "uninformative means there was no room anywhere; if a metric had room the honest word is no_change.",
+          "if": { "properties": { "verdict": { "const": "uninformative" } }, "required": ["verdict"] },
+          "then": { "properties": { "benefit_measurable": { "const": false }, "headroom": { "type": "array", "maxItems": 0 } } }
+        }
+      ],
       "additionalProperties": false
     },
     "diffs": {
@@ -76,6 +118,17 @@
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "nonNegativeInteger": { "type": "integer", "minimum": 0 },
+    "runtimeProfile": {
+      "type": "object",
+      "required": ["version", "engine_lane", "profile_id", "ranking_profile_hash"],
+      "properties": {
+        "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "engine_lane": { "const": "canonical" },
+        "profile_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "ranking_profile_hash": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
     "unit": { "type": "number", "minimum": 0, "maximum": 1 },
     "rankingMetrics": {
       "type": "object",

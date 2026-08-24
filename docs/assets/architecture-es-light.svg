@@ -1,105 +1,109 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 872" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif">
-  <title id="title">Cómo OwnMem convierte una pregunta en contexto fiable</title>
-  <desc id="description">Tres dominios de confianza: el repositorio guarda Markdown curado que pasa puertas de gobierno y se compila en un snapshot inmutable; el motor determinista responde con seis canales candidatos, ranking, una puerta de confianza y un sobre de 400 tokens; el coding agent pregunta, verifica contra el código actual y escribe nuevas lecciones que vuelven por audit y compile.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Arial, sans-serif">
+  <title id="title">Arquitectura de OwnMem</title>
+  <desc id="description">Markdown propiedad del repositorio y trust receipts independientes se compilan en snapshots inmutables. Cinco canales deterministas locales y embedding opcional pasan cuatro puertas de entrega. Un coordinador al final del turno reproduce, promueve, observa, aísla y revierte con precisión cambios R0 de bajo riesgo; los cambios de mayor riesgo quedan para revisión.</desc>
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/></marker>
-    <marker id="accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/></marker>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#526176"/></marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/></marker>
   </defs>
-  <rect x="0" y="0" width="1600" height="872" rx="18" fill="#ffffff"/>
-  <text x="40" y="54" text-anchor="start" font-size="24" font-weight="700" fill="#0f172a">Cómo OwnMem convierte una pregunta en contexto fiable</text>
-  <text x="40" y="80" text-anchor="start" font-size="13.5" font-weight="400" fill="#57606a">Memoria del repositorio · determinista por defecto · evidencia antes de responder</text>
-  <rect x="1140" y="36" width="420" height="32" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
-  <text x="1350" y="57" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb">Por defecto: 0 llamadas a modelos · 0 llamadas de red</text>
-  <rect x="40" y="120" width="370" height="560" rx="16" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <rect x="470" y="120" width="660" height="560" rx="16" fill="#f6f8fa" stroke="#2563eb" stroke-width="1.5"/>
-  <rect x="1190" y="120" width="370" height="560" rx="16" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <rect x="60" y="106" width="157" height="28" rx="14" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="138.5" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#0f172a">TU REPOSITORIO</text>
-  <rect x="490" y="106" width="138" height="28" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
-  <text x="559" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#2563eb">MOTOR OWNMEM</text>
-  <rect x="1210" y="106" width="162" height="28" rx="14" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1291" y="125" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#0f172a">TU CODING AGENT</text>
-  <text x="60" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">Markdown plano · viaja con git</text>
-  <text x="490" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">determinista · misma consulta, misma respuesta</text>
-  <text x="1210" y="154" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">el único lugar donde se juzga</text>
-  <rect x="60" y="170" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="78" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Temas de memoria curados</text>
-  <text x="78" y="224" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">lección · triggers · evidencia</text>
-  <text x="78" y="242" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">índice L1 · áreas L2 · temas L3</text>
-  <path d="M 225 262 L 225 286" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <text x="235" y="281" text-anchor="start" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem audit</text>
-  <rect x="60" y="292" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="78" y="322" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Puertas de gobierno</text>
-  <text x="78" y="346" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">schema · límites de tamaño · cuota</text>
-  <text x="78" y="364" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">deduplicación SimHash + MinHash</text>
-  <path d="M 225 384 L 225 408" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <text x="235" y="403" text-anchor="start" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem compile</text>
-  <rect x="60" y="414" width="330" height="92" rx="12" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
-  <text x="78" y="444" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Snapshot inmutable</text>
-  <text x="78" y="468" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">postings · exact map · graph · ranking</text>
-  <text x="78" y="486" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">respaldo seguro al anterior</text>
-  <rect x="60" y="545" width="330" height="70" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4" stroke-dasharray="5 4"/>
-  <text x="78" y="573" text-anchor="start" font-size="12.5" font-weight="600" fill="#0f172a">Revisado como código</text>
-  <text x="78" y="595" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">diff · pull request · rollback</text>
-  <text x="440" y="448" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">carga</text>
-  <path d="M 394 460 L 466 460" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="490" y="170" width="620" height="74" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="510" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Comprensión de la consulta</text>
-  <text x="510" y="226" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">clasifica la intención · tokenizador por escritura · 40 idiomas</text>
-  <path d="M 800 244 L 800 262" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="490" y="268" width="620" height="118" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="510" y="296" text-anchor="start" font-size="13.5" font-weight="650" fill="#0f172a">Seis canales candidatos</text>
-  <rect x="510" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="554" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Exact</text>
-  <rect x="606" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="650" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">BM25F</text>
-  <rect x="702" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="746" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">n-gram</text>
-  <rect x="798" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="842" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Fuzzy</text>
-  <rect x="894" y="312" width="88" height="30" rx="7" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="938" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0f172a">Graph</text>
-  <rect x="990" y="312" width="88" height="30" rx="7" fill="#fffbeb" stroke="#a16207" stroke-width="1.4" stroke-dasharray="4 3"/>
-  <text x="1034" y="331" text-anchor="middle" font-size="11.5" font-weight="600" fill="#a16207">Embedding*</text>
-  <text x="800" y="370" text-anchor="middle" font-size="10.5" font-weight="400" fill="#57606a">cada canal ordena candidatos por su cuenta</text>
-  <path d="M 800 386 L 800 404" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="490" y="410" width="620" height="74" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="510" y="440" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Fusionar y decidir</text>
-  <text x="510" y="466" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">RRF · autoridad · frescura · evidencia · conflictos · MMR</text>
-  <path d="M 800 484 L 800 500" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <polygon points="800,506 872,558 800,610 728,558" fill="#fffbeb" stroke="#a16207" stroke-width="1.5"/>
-  <text x="800" y="563" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">¿Es fiable?</text>
-  <rect x="500" y="518" width="200" height="80" rx="11" fill="#fff1f0" stroke="#b42318" stroke-width="1.4"/>
-  <text x="600" y="548" text-anchor="middle" font-size="13" font-weight="650" fill="#b42318">No → abstenerse</text>
-  <text x="600" y="572" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">no inyectar nada</text>
-  <path d="M 724 558 L 706 558" fill="none" stroke="#64748b" stroke-width="1.7" marker-end="url(#arrow)"/>
-  <rect x="900" y="518" width="210" height="80" rx="11" fill="#f0fdf4" stroke="#15803d" stroke-width="1.4"/>
-  <text x="1005" y="548" text-anchor="middle" font-size="13" font-weight="650" fill="#15803d">Sí → sobre de contexto</text>
-  <text x="1005" y="574" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">≤400 tokens · 1 tema</text>
-  <path d="M 876 558 L 894 558" fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
-  <path d="M 1110 558 L 1160 558 L 1160 338 L 1204 338" fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
-  <rect x="1210" y="170" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1228" y="200" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Pregunta en lenguaje llano</text>
-  <text x="1228" y="224" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">un síntoma en palabras corrientes</text>
-  <text x="1228" y="242" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">2–3 variantes, fusionadas por el motor</text>
-  <rect x="1210" y="292" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1228" y="322" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Verifica antes de confiar</text>
-  <text x="1228" y="346" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">abre el tema completo</text>
-  <text x="1228" y="364" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">contrasta con el código actual</text>
-  <rect x="1210" y="414" width="330" height="64" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1228" y="440" text-anchor="start" font-size="12.5" font-weight="650" fill="#0f172a">correcto · erróneo · omitido</text>
-  <text x="1228" y="462" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">el feedback local mejora los triggers</text>
-  <rect x="1210" y="508" width="330" height="92" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="1228" y="538" text-anchor="start" font-size="14" font-weight="650" fill="#0f172a">Escribe nuevas lecciones</text>
-  <text x="1228" y="562" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">solo si no cabe en doc, puerta o test</text>
-  <text x="1228" y="580" text-anchor="start" font-size="11.5" font-weight="400" fill="#57606a">Markdown plano, revisado en PRs</text>
-  <text x="1160" y="192" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">ownmem</text>
-  <text x="1160" y="205" text-anchor="middle" font-size="10.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" fill="#57606a">recall</text>
-  <path d="M 1204 216 L 1136 216 " fill="none" stroke="#2563eb" stroke-width="1.7" marker-end="url(#accent)"/>
-  <path d="M 1375 600 L 1375 716 L 225 716 L 225 688" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
-  <text x="800" y="706" text-anchor="middle" font-size="11" font-weight="400" fill="#57606a">nueva lección o feedback → audit → compile → listo para el próximo recall</text>
-  <rect x="40" y="744" width="1520" height="64" rx="12" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.4"/>
-  <text x="800" y="770" text-anchor="middle" font-size="14" font-weight="650" fill="#0f172a">Una memoria para todos los coding agents</text>
-  <text x="800" y="792" text-anchor="middle" font-size="12" font-weight="400" fill="#57606a">Claude Code · Codex · Gemini CLI · Cursor · Grok CLI</text>
-  <text x="40" y="840" text-anchor="start" font-size="11" font-weight="400" fill="#57606a">* El embedding opcional está aislado; un fallo conserva lo léxico.</text>
+  <rect x="0" y="0" width="1600" height="980" rx="28" fill="#f4f7ff"/>
+  <text x="52" y="58" text-anchor="start" font-size="27" font-weight="750" fill="#0f172a">Arquitectura de OwnMem</text>
+  <text x="52" y="88" text-anchor="start" font-size="14" font-weight="500" fill="#526176">Propiedad del repositorio · recall local · evidencia · autonomía acotada</text>
+  <rect x="1130" y="34" width="418" height="44" rx="22" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1339" y="62" text-anchor="middle" font-size="13" font-weight="650" fill="#2563eb">Recall por defecto: 0 modelos · 0 red</text>
+  <rect x="52" y="120" width="1496" height="108" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="78" y="150" text-anchor="start" font-size="12" font-weight="750" fill="#526176">CAPA DE HOSTS</text>
+  <rect x="78" y="168" width="160" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="158" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Claude Code</text>
+  <rect x="250" y="168" width="136" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="318" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Codex</text>
+  <rect x="402" y="168" width="136" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="470" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Cursor</text>
+  <rect x="554" y="168" width="160" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="634" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Gemini CLI</text>
+  <rect x="730" y="168" width="170" height="38" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="815" y="192" text-anchor="middle" font-size="12.5" font-weight="650" fill="#0f172a">Other Agents</text>
+  <path d="M 916 187 L 962 187" fill="none" stroke="#526176" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="982" y="150" width="536" height="64" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1250" y="177" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Entrada unificada del proyecto</text>
+  <text x="1250" y="199" text-anchor="middle" font-size="11.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">instrucciones · skills · commands · hook</text>
+  <path d="M 800 228 L 800 258" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="52" y="274" width="420" height="420" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="78" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">01 · FUENTE DEL REPOSITORIO</text>
+  <text x="78" y="342" text-anchor="start" font-size="22" font-weight="750" fill="#0f172a">.ownmem/</text>
+  <text x="78" y="367" text-anchor="start" font-size="12.5" font-weight="400" fill="#526176">Legible · revisable en Git · reversible</text>
+  <rect x="78" y="394" width="368" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="94" y="419" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">L1 · MEMORY.md</text>
+  <text x="94" y="441" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">routing index · always-small contract</text>
+  <rect x="78" y="468" width="368" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="94" y="493" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">L2 · MEMORY-&lt;area&gt;.md</text>
+  <text x="94" y="515" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">area index · scoped loading</text>
+  <rect x="78" y="542" width="368" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="94" y="567" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">L3 · topic.md</text>
+  <text x="94" y="589" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">one lesson · triggers · evidence</text>
+  <rect x="78" y="620" width="178" height="62" rx="11" fill="#fff7ed" stroke="#9a3412" stroke-width="1.4"/>
+  <text x="94" y="645" text-anchor="start" font-size="13.5" font-weight="700" fill="#9a3412">Trust receipt</text>
+  <text x="94" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">hash · evidencia · ciclo de vida</text>
+  <rect x="268" y="620" width="178" height="62" rx="11" fill="#f0fdf4" stroke="#166534" stroke-width="1.4"/>
+  <text x="284" y="645" text-anchor="start" font-size="13.5" font-weight="700" fill="#166534">Audit gates</text>
+  <text x="284" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">cuota · duplicados · Schema</text>
+  <rect x="500" y="274" width="666" height="420" rx="18" fill="#ffffff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="526" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#2563eb">02 · RUNTIME CANÓNICO</text>
+  <rect x="526" y="330" width="614" height="62" rx="11" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="542" y="355" text-anchor="start" font-size="13.5" font-weight="700" fill="#2563eb">Compile</text>
+  <text x="542" y="377" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">Schema · grafo · receipts · evidencia viva</text>
+  <path d="M 833 392 L 833 416" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="724" y="420" width="218" height="42" rx="11" fill="#2563eb"/>
+  <text x="833" y="446" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">Immutable snapshot</text>
+  <text x="526" y="490" text-anchor="start" font-size="14" font-weight="700" fill="#0f172a">Candidate recall</text>
+  <rect x="526" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="578" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">exact</text>
+  <rect x="642" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="694" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">BM25F</text>
+  <rect x="758" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="810" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">n-gram</text>
+  <rect x="874" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="926" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">fuzzy</text>
+  <rect x="990" y="506" width="104" height="36" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1042" y="529" text-anchor="middle" font-size="11.5" font-weight="650" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0f172a">graph</text>
+  <rect x="526" y="552" width="568" height="36" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="810" y="575" text-anchor="middle" font-size="11.5" font-weight="600" fill="#2563eb">embedding opcional: observe / peso 0 hasta superar A/B local</text>
+  <rect x="526" y="606" width="274" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="542" y="631" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">Fuse + rank</text>
+  <text x="542" y="653" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">deterministic · dedupe · bounded</text>
+  <path d="M 800 637 L 830 637" fill="none" stroke="#526176" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="846" y="606" width="294" height="62" rx="11" fill="#fff7ed" stroke="#9a3412" stroke-width="1.4"/>
+  <text x="862" y="631" text-anchor="start" font-size="13.5" font-weight="700" fill="#9a3412">Four delivery gates</text>
+  <text x="862" y="653" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">relevancia · validez · aplicabilidad · riesgo</text>
+  <rect x="1194" y="274" width="354" height="420" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1220" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">03 · ENTREGA CONFIABLE</text>
+  <rect x="1220" y="336" width="302" height="62" rx="11" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1236" y="361" text-anchor="start" font-size="13.5" font-weight="700" fill="#2563eb">Context envelope</text>
+  <text x="1236" y="383" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">≤1 tema · 400 tokens · procedencia</text>
+  <path d="M 1166 486 L 1194 486" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="1220" y="430" width="302" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1236" y="455" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">Coding agent</text>
+  <text x="1236" y="477" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">verificar contra código y docs actuales</text>
+  <rect x="1220" y="524" width="302" height="62" rx="11" fill="#f0fdf4" stroke="#166534" stroke-width="1.4"/>
+  <text x="1236" y="549" text-anchor="start" font-size="13.5" font-weight="700" fill="#166534">Honest observability</text>
+  <text x="1236" y="571" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">la adopción confirmada es otro outcome</text>
+  <text x="1371" y="626" text-anchor="middle" font-size="11.5" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">completed → delivered → consumed</text>
+  <rect x="52" y="736" width="1496" height="188" rx="18" fill="#0f172a"/>
+  <text x="78" y="770" text-anchor="start" font-size="12" font-weight="750" fill="#2563eb">04 · FEEDBACK LOCAL Y EVOLUCIÓN ACOTADA</text>
+  <rect x="78" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
+  <text x="215" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Three ledgers</text>
+  <text x="215" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">retrieval · outcome confirmado · autoatribución</text>
+  <rect x="382" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
+  <text x="519" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Candidate queue</text>
+  <text x="519" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">candidate ≠ memory · cuarentena por defecto</text>
+  <rect x="686" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
+  <text x="823" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Risk + observation</text>
+  <text x="823" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">replay · regresión · cuota · tripwire</text>
+  <path d="M 352 840 L 372 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <path d="M 656 840 L 676 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <path d="M 960 840 L 980 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <rect x="990" y="792" width="532" height="96" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1256" y="824" text-anchor="middle" font-size="14" font-weight="750" fill="#2563eb">R0 automático · R1–R5 a revisión</text>
+  <text x="1256" y="851" text-anchor="middle" font-size="11.5" font-weight="500" fill="#526176">los fallos aíslan y restauran los bytes exactos</text>
+  <text x="1256" y="874" text-anchor="middle" font-size="10.8" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">trust → audit → compile → tripwire → rollback receipt</text>
+  <path d="M 1256 792 C 1256 718, 262 734, 262 694" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#arrowBlue)"/>
 </svg>

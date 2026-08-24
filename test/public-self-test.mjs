@@ -115,6 +115,7 @@ function packedOfflineInstall(fixture) {
   const apiProbe = runCommand(process.execPath, ['--input-type=module', '--eval', `
     import { readFileSync } from 'node:fs';
     import { classifyIntent } from 'ownmem';
+    if (typeof import.meta.resolve !== 'function') throw new Error('ownmem requires Node 20.6.0 or newer for import.meta.resolve');
     if (classifyIntent('do you remember this?') !== 'recall') throw new Error('package API export failed');
     const schema = JSON.parse(readFileSync(new URL(import.meta.resolve('ownmem/schemas/memory.schema.json')), 'utf8'));
     if (!schema.$id.endsWith('/schemas/memory.schema.json')) throw new Error('schema subpath export failed');
@@ -130,6 +131,41 @@ function packedOfflineInstall(fixture) {
     'exec', '--offline', '--', 'ownmem', 'recall', '--root', project, '--json', '--', 'repository constraint',
   ], consumer, 0, { env: { ...process.env, npm_config_offline: 'true', npm_config_cache: cache } }).stdout);
   assert(recalled.results[0]?.memory_id === 'example_repository_memory', 'offline installed npm bin did not recall from the initialized consumer');
+}
+
+function legacyLayoutLifecycle(fixture) {
+  const project = path.join(fixture, 'legacy memory project');
+  mkdirSync(path.join(project, '.claude'), { recursive: true });
+  run([
+    'init', '--root', project, '--memory-dir', '.memory', '--layers', 'dashboard',
+    '--hosts', 'claude,codex', '--command', 'ownmem', '--hook',
+  ], project);
+  assert(existsSync(path.join(project, '.memory', 'config.json')), 'legacy init did not write its selected config');
+  assert(!existsSync(path.join(project, '.ownmem')), 'legacy init created a competing .ownmem directory');
+
+  run(['audit', '--root', project, '--skip-benchmark', '--no-observability'], project);
+  run(['compile', '--root', project, '--json'], project);
+  const recalled = JSON.parse(run(['recall', '--root', project, '--json', '--', 'repository constraint'], project).stdout);
+  assert(recalled.results[0]?.memory_id === 'example_repository_memory', 'legacy layout was not recalled through config discovery');
+  assert(existsSync(path.join(project, '.memory', 'index', 'v1')), 'legacy compile did not publish beside the selected memory');
+  assert(!existsSync(path.join(project, '.ownmem')), 'a delegated command created a competing .ownmem directory');
+
+  const status = JSON.parse(run(['hook', 'status', '--root', project], project).stdout);
+  assert(status.enabled && status.observation_enabled, 'hook status was not routed to its subcommand');
+  run(['hook', 'disable', '--root', project], project);
+  const disabled = JSON.parse(run(['hook', 'status', '--root', project], project).stdout);
+  assert(!disabled.enabled, 'hook disable was not routed to its subcommand');
+  run(['hook', 'enable', '--root', project], project);
+
+  const embedUsage = run(['embed'], project).stdout;
+  assert(embedUsage.includes('Usage: ownmem embed'), 'bare embed did not print command usage');
+  assert(run(['embed', '--json'], project).stdout.includes('Usage: ownmem embed'),
+    'flag-only embed did not print command usage');
+  run(['recall', '--unknown-option'], project, 1);
+
+  const missing = '.missing-memory';
+  run(['compile', '--root', project, '--memory-dir', missing, '--json'], project, 1);
+  assert(!existsSync(path.join(project, missing)), 'failed compile created the missing memory directory before validation');
 }
 
 async function waitFor(predicate, timeoutMs = 5_000) {
@@ -191,6 +227,9 @@ async function main() {
     assert(readFileSync(path.join(project, 'AGENTS.md'), 'utf8').startsWith('# Project instructions'), 'Codex adapter overwrote project-owned instructions');
     assert(existsSync(path.join(project, '.claude', 'commands', 'ownmem.md')), 'Claude Code command adapter is missing');
     assert(run(['init', '--root', project, '--check', '--json'], project).status === 0, 'init check reported drift immediately after installation');
+    const trust = JSON.parse(run(['trust', 'check', '--root', project, '--json'], project).stdout);
+    assert(trust.summary.topics === 1 && trust.summary.quarantined === 0, 'initialized trust baseline did not validate');
+    assert(trust.quota_utility.automatic_deletions === 0, 'quota utility must remain proposal-only');
 
     const recalled = JSON.parse(run(['recall', '--root', project, '--json', '--', 'repository constraint'], project).stdout);
     assert(recalled.results[0]?.memory_id === 'example_repository_memory', 'initialized memory was not recalled');
@@ -201,6 +240,11 @@ async function main() {
       && feedback[0].expected === 'example_repository_memory', 'explicit recall feedback was not stored in the local review inbox');
     run(['audit', '--root', project, '--skip-benchmark', '--no-observability'], project);
     run(['compile', '--root', project, '--json'], project);
+    const l2 = path.join(project, '.ownmem', 'MEMORY-general.md');
+    writeFileSync(l2, `${readFileSync(l2, 'utf8').trimEnd()}\n\n<!-- snapshot rollback fixture -->\n`, 'utf8');
+    run(['compile', '--root', project, '--json'], project);
+    const rolledBack = JSON.parse(run(['compile', '--root', project, '--rollback-previous', '--json'], project).stdout);
+    assert(rolledBack.schema === 'ownmem-snapshot-rollback/v1', 'public CLI did not expose one-step snapshot rollback');
     const recalledByTopicPath = JSON.parse(run([
       'recall', '--root', project, '--json', '--', '.ownmem/example_repository_memory.md',
     ], project).stdout);
@@ -215,7 +259,7 @@ async function main() {
       .filter(name => name.startsWith('events-'))
       .flatMap(name => readFileSync(path.join(observabilityDirectory, name), 'utf8').trim().split('\n'))
       .map(line => JSON.parse(line));
-    assert(events.every(event => event.schema === 'ownmem-observability.event/v1'), 'a local observability event failed its schema identity');
+    assert(events.every(event => event.schema === 'ownmem-observability.event/v2'), 'a local observability event failed its schema identity');
     for (const expected of ['recall.completed', 'recall.delivered', 'feedback.recorded', 'gate.completed']) {
       assert(events.some(event => event.event === expected), `consumer usage did not produce a local ${expected} event`);
     }
@@ -231,6 +275,7 @@ async function main() {
       assert(result.status === 0 && result.stdout.includes('ownmem dashboard'), 'real-path/symlink CLI entry contract failed');
     }
 
+    legacyLayoutLifecycle(fixture);
     await dashboardLifecycle(project);
     packedOfflineInstall(fixture);
     const benchmark = await runPublicBenchmark({ iterations: 2 });

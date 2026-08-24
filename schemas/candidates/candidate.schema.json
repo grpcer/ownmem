@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ownmem.dev/schemas/candidates/candidate.schema.json",
+  "title": "OwnMem review candidate",
+  "description": "A lead offered to a person, never a memory. The schema is the gate every extractor has to pass -- deterministic today, host-assisted or model-backed later -- so that 'only schema-valid candidates exist' is enforced by the writer rather than promised by each producer. Everything a candidate may say is enumerated here: there is no free-text field, because a sentence in a review queue is one copy-paste away from being a memory.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "candidate_id", "lifecycle", "logical_type", "observation", "recalled_topics", "attribution", "provenance", "policy"],
+  "properties": {
+    "schema": { "const": "ownmem-candidate/v1" },
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Content hash of what the lead is about, not of the whole object. It has to stay the same as the observation grows, or a rejection could not stick across a re-scan."
+    },
+    "lifecycle": {
+      "const": "candidate",
+      "description": "Pinned. `candidate` is the one lifecycle with no path into a delivered context, and pinning it here means a producer cannot mint a lead that is already injectable."
+    },
+    "logical_type": {
+      "enum": ["diagnostic", "factual", "procedural", "preference", "feedback", "normative", null],
+      "description": "What kind of memory this lead might become, when it is a lead about writing one. A maintenance proposal does not propose writing a memory, so it carries null rather than a type that would be wrong."
+    },
+    "observation": {
+      "description": "What the ledger or the corpus was seen to contain. One shape per kind, all closed: a producer cannot attach an extra field, and no field holds prose.",
+      "oneOf": [
+        { "$ref": "#/$defs/recoveryObservation" },
+        { "$ref": "#/$defs/correctionObservation" },
+        { "$ref": "#/$defs/duplicateObservation" },
+        { "$ref": "#/$defs/conflictObservation" },
+        { "$ref": "#/$defs/supersedeObservation" }
+      ]
+    },
+    "recalled_topics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/memoryName" },
+      "description": "Memories that were on screen while the observed thing was happening. Association only; the attribution field says how weak."
+    },
+    "attribution": {
+      "enum": ["temporal_association", "structural"],
+      "description": "How the lead is connected to what it names. temporal_association: two things happened in the same window, and nothing here replayed the fix with the memory withheld. structural: the relationship is a property of the corpus itself (two topics really do declare the same document as authority and history), so no causal claim is involved at all. Neither is ever a contribution."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["episode_id", "session_id", "producer", "producer_version"],
+      "properties": {
+        "episode_id": {
+          "oneOf": [{ "type": "string", "pattern": "^[a-f0-9]{64}$" }, { "type": "null" }],
+          "description": "The turn this came out of, or null when the producer works on something that belongs to no turn. Required-and-nullable rather than optional: 'nobody wrote it' and 'there genuinely is none' must not look the same."
+        },
+        "session_id": {
+          "oneOf": [{ "type": "string", "pattern": "^[a-f0-9]{64}$" }, { "type": "null" }],
+          "description": "The session this came out of, keyed, or null when the producer works outside any session. Null is not a pass: it is what makes the untrusted-context filter fall back to the coarser time window instead of letting the lead through unchecked."
+        },
+        "producer": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9-]+$" },
+        "producer_version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["injectable", "can_authorize_actions", "requires_human_review"],
+      "description": "Restated on the object because the object is what a reviewer reads, and because a future caller must not have to infer it. All three are constants: there is no candidate for which any of them differs.",
+      "properties": {
+        "injectable": { "const": false },
+        "can_authorize_actions": { "const": false },
+        "requires_human_review": { "const": true }
+      }
+    },
+    "first_seen_at": { "$ref": "#/$defs/timestamp" },
+    "last_seen_at": { "$ref": "#/$defs/timestamp" }
+  },
+  "$defs": {
+    "timestamp": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$", "description": "Written as a pattern rather than format: date-time so this file validates under a bare ajv, with no format vocabulary the caller has to remember to register." },
+    "memoryName": { "type": "string", "pattern": "^[a-z0-9_]+$", "maxLength": 96 },
+    "recoveryObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "label", "identity", "failures", "episodes", "first_failure_at", "recovered_at"],
+      "properties": {
+        "kind": { "enum": ["gate-recovery", "command-recovery"] },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120, "description": "The gate name, or the allowlisted program name for a command. Never the command line." },
+        "identity": { "type": "string", "minLength": 1, "maxLength": 200, "description": "kind:fingerprint. For a command the fingerprint is keyed to this machine and reverses to nothing." },
+        "failures": { "type": "integer", "minimum": 1 },
+        "episodes": {
+          "oneOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }],
+          "description": "How many turns the red streak spanned, or null for a kind that belongs to no turn. Null is not zero: one means 'fixed inside the turn that broke it', null means unknowable."
+        },
+        "first_failure_at": { "$ref": "#/$defs/timestamp" },
+        "recovered_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "correctionObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "label", "markers", "prompt_length", "observed_at"],
+      "properties": {
+        "kind": { "const": "user-correction" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120, "description": "The marker names, joined. Never the prompt: the classification is the whole record." },
+        "markers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": { "enum": ["negation", "still_broken", "undo", "negation_en", "still_broken_en", "undo_en"] }
+        },
+        "prompt_length": { "enum": ["xs", "s", "m", "l"] },
+        "observed_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "duplicateObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "label", "members", "simhash_similarity", "minhash_similarity"],
+      "properties": {
+        "kind": { "const": "duplicate-pair" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "members": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/memoryName" } },
+        "simhash_similarity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "minhash_similarity": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "conflictObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "label", "members", "document"],
+      "properties": {
+        "kind": { "const": "authority-conflict" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "members": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/memoryName" } },
+        "document": { "type": "string", "minLength": 1, "maxLength": 200, "description": "The doc_id one topic calls current authority and the other calls history. That disagreement is the whole finding." }
+      }
+    },
+    "supersedeObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "label", "members"],
+      "properties": {
+        "kind": { "const": "supersede-unarchived" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "members": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/memoryName" },
+          "description": "[the topic that declares the supersede, the topic it retired and which is still active]."
+        }
+      }
+    }
+  }
+}

@@ -225,7 +225,7 @@
     {"group":"remedy","locale":"he","query":"לשלוח את תעודת השרת ואת תעודות הביניים","expected":"he_tls_missing_intermediate"},
     {"group":"symptom","locale":"mr","query":"SQLite migration चालवताना database busy राहतो","expected":"mr_sqlite_migration_lock"},
     {"group":"cause","locale":"mr","query":"दीर्घ transaction मुळे migration lock मिळत नाही","expected":"mr_sqlite_migration_lock"},
-    {"group":"remedy","locale":"mr","query":"transaction rollback करून migration पुन्हा चालवा","expected":"mr_sqlite_migration_lock"},
+    {"group":"remedy","locale":"mr","query":"transaction बंद करून migration पुन्हा चालवा","expected":"mr_sqlite_migration_lock"},
     {"group":"symptom","locale":"bn","query":"cache মেয়াদ শেষ হলে origin সেবা হঠাৎ overload হয়","expected":"bn_cache_stampede"},
     {"group":"cause","locale":"bn","query":"একই key অনেক অনুরোধ একসঙ্গে refresh করে","expected":"bn_cache_stampede"},
     {"group":"remedy","locale":"bn","query":"একটি single flight refresh চালিয়ে বাকিদের অপেক্ষা করান","expected":"bn_cache_stampede"},

@@ -5,6 +5,109 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-24
+
+### Added
+
+- `ownmem evolve` is the default end-of-turn safe-maintenance coordinator. It
+  serializes and debounces runs, evaluates tripwires first, scans the local
+  candidate queue, applies only replay-proven R0 retrieval metadata, issues the
+  matching trust delta, audits the result, and compiles a validated snapshot.
+  Repository-local `status`, `enable`, and `disable` controls keep the
+  unattended path visible and reversible.
+- Automatic R0 promotions carry a content-addressed inverse operation. A
+  harmful host- or user-confirmed outcome quarantines the memory and restores
+  the exact previous bytes while appending a rollback receipt; manual and
+  higher-risk promotions remain review-only.
+- `evolution.completed` local events and dashboard overview data report runs,
+  promotions, rollbacks, blocked work, and failures without recording queries
+  or memory content.
+- Content-bound trust receipts separate topic text from authority, lifecycle,
+  evidence, applicability, and rollback history.
+- Evidence verifiers cover repository paths, symbol slices, tests, commits,
+  canonical documents, user confirmations, and procedure replays. A replay
+  anchor is bound to a committed replay record and checked against the
+  procedure it names: the fixture it ran against, the environment it ran in,
+  and whether every postcondition it reports was one that procedure declared.
+  A fixture or environment that moved is drift; a missing fixture, an edited
+  procedure, an undeclared postcondition or a run in a forbidden environment
+  is blocking.
+- `ownmem trust check` audits receipt integrity and produces a proposal-only
+  quota utility report. `ownmem trust issue <memory>` (or `--all`, with
+  `--dry-run`) signs the receipt for a new or edited memory: a first receipt
+  imports it, and every later edit is recorded as a delta that names the
+  content it replaces. Signing a person- or host-authored topic change is
+  always an explicit command: the audit reports what is unsigned and how to
+  sign it, but never signs for you. The unattended R0 coordinator is the narrow
+  exception because its promotion receipt, replay, inverse operation, and
+  machine verifier bind the exact metadata edit it signs in the same transaction.
+  Drifted evidence is a warning, not an error: the memory is still recalled,
+  with its authority capped at advisory. `--refresh-evidence` is the way back.
+  It re-signs a memory whose body is unchanged but whose evidence moved,
+  recording that it still holds against the files as they are now, and it
+  reports which anchors drifted so the assertion is reviewable. It re-signs
+  only topics that actually drifted, and only when you type it: without an
+  explicit exit, a downgrade caused by editing a file elsewhere would be
+  permanent, and a refresh that ran by itself would vouch for nothing.
+- `ownmem compile --rollback-previous` restores the prior validated snapshot in
+  one operation.
+
+### Changed
+
+- Every command now shares one project memory-directory resolver; legacy
+  `.memory` installations and Oriveo's `.claude/memory` dogfood layout remain
+  discoverable without creating a competing empty directory.
+- The supported Node floor is `>=20.6.0`, and the npm artifact now ships its
+  `test/` and `benchmarks/` evidence so consumers can reproduce release gates.
+- CI runs the full benchmark on one lane and checks `npm pack` on every other
+  supported platform lane.
+- General knowledge remains net-zero. Differentially replayed R0 retrieval
+  metadata may spend at most 256 bytes per promotion, only inside the
+  repository's existing hard byte cap and without adding a topic.
+- The README is now a concise architecture, advantages, usage, automation
+  boundary, and research overview in nine languages. Detailed technical,
+  plugin, migration, privacy, and release material lives in dedicated docs.
+- Every recall surface now uses the compiled canonical runtime; Markdown search
+  remains only as an explicit, degraded rebuild fallback.
+- Query envelopes separate retrieval relevance, epistemic validity, task
+  applicability, and action risk under one bounded context contract.
+- The compiler layer now owns recall. Core-only installs fail with an explicit
+  layer requirement instead of silently running a second retrieval engine.
+- Hook-enabled Claude installs register both write-time recall and Read-time
+  consumption receipts.
+- Recall revalidates external evidence at use time. Missing evidence, tampered
+  receipts, unreviewed topic edits, stale entries, and instruction-injecting
+  text are quarantined before context delivery. Evidence that still exists but
+  whose code moved is downgraded to advisory and reported, not hidden: a lesson
+  is most needed in the task that just refactored the code it points at.
+- Active memory history accepts only content-bound delta or structured-merge
+  receipts.
+- 0.3.0 is a clean break. Local run data written before it is not read: rows
+  under an older schema are rejected with the reason and the remedy, never
+  migrated and never dual-parsed. `.local-test/` is discardable local
+  telemetry, so deleting it is the whole fix — the current build collects
+  fresh rows. An install that predates the rename from `@oriveo/memory` is not
+  upgraded in place either; run `ownmem init` again. Upgrading from 0.2.x is
+  unaffected: `ownmem init --update` signs a trust baseline for the corpus
+  that install already has.
+
+### Security
+
+- Negated or unauthorized high-impact actions, stale guidance, cross-scope
+  matches, weak authority, and superseded instructions are blocked before
+  memory enters agent context.
+- Frontmatter can no longer grant itself normative authority. Host adapters
+  label recalled memory as untrusted advisory data that cannot override system
+  or developer instructions or authorize tools.
+
+### Fixed
+
+- Recall, compile, embed, audit, report, dashboard, review, and hook commands
+  agree on the corpus and snapshot paths selected by the project.
+- Hook subcommands, bare embed usage, runtime recall options, transitive optional
+  dependency errors, compile prevalidation, and installed-package structure
+  checks now fail or route as documented.
+
 ## [0.2.0] - 2026-08-18
 
 ### Added

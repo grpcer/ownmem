@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/grpcer/ownmem/main/schemas/observability/report.schema.json",
-  "title": "OwnMem local memory report v5",
+  "title": "OwnMem local memory report v7",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "generated_at", "environment", "window", "metric_roles", "samples", "delivery", "adoption", "performance", "quality", "context", "maintenance", "gates", "data_quality", "recommendations"],
+  "required": ["schema", "generated_at", "environment", "window", "metric_roles", "samples", "delivery", "adoption", "performance", "quality", "context", "maintenance", "governance", "gates", "data_quality", "recommendations"],
   "properties": {
-    "schema": { "const": "ownmem-report/v5" },
+    "schema": { "const": "ownmem-report/v7" },
     "generated_at": { "type": "string", "format": "date-time" },
     "environment": {
       "type": "object",
@@ -49,7 +49,7 @@
           "maxItems": 3
         },
         "accuracy_evidence": { "const": "explicit_feedback_only" },
-        "actual_application_evidence": { "const": "unavailable" }
+        "actual_application_evidence": { "const": "outcome_receipt", "description": "Names the stream allowed to answer it, as accuracy_evidence does for accuracy. Whether that stream currently has a printable sample is quality.outcome.actual_application.status, not this field." }
       }
     },
     "samples": {
@@ -80,7 +80,7 @@
         "fulltext_open_traces": { "$ref": "#/$defs/count" },
         "fulltext_open_rate": { "$ref": "#/$defs/ratio" },
         "top1_open_share": { "$ref": "#/$defs/ratio" },
-        "actual_application_rate": { "type": "null" },
+        "actual_application_rate": { "$ref": "#/$defs/ratio", "description": "Applied share of the outcome receipts, and null until they carry a printable sample. Full audit trail in quality.outcome.actual_application. Never derived from recall.consumed." },
         "orphan_delivery_events": { "$ref": "#/$defs/count" },
         "fulltext_open_without_delivery_events": { "$ref": "#/$defs/count" }
       }
@@ -220,21 +220,69 @@
     "quality": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["feedback"],
+      "description": "Three streams that answer three different questions, each with its own denominator. They are never summed, never blended, and never allowed to stand in for one another.",
+      "required": ["feedback", "outcome", "attribution"],
       "properties": {
         "feedback": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["total", "correct", "wrong", "miss", "wrong_miss_rate", "expected_in_top_k_rate", "accuracy_measurable", "accuracy_unmeasurable_reason"],
+          "description": "Stream 1: did recall return the right thing, judged by whoever deliberately recorded a verdict.",
+          "required": ["stream", "total", "verdicts", "denominator", "denominator_definition", "sample", "profile", "wrong_miss_rate", "expected_in_top_k_rate", "accuracy_measurable", "accuracy_unmeasurable_reason"],
           "properties": {
+            "stream": { "const": "retrieval_verdict" },
             "total": { "$ref": "#/$defs/count" },
-            "correct": { "$ref": "#/$defs/count" },
-            "wrong": { "$ref": "#/$defs/count" },
-            "miss": { "$ref": "#/$defs/count" },
-            "wrong_miss_rate": { "$ref": "#/$defs/ratio" },
+            "verdicts": {
+              "$ref": "#/$defs/countMap",
+              "description": "One bucket per verdict the retrieval-feedback module accepts, seeded to 0 and produced by its own summarizer. The vocabulary is deliberately NOT restated here: a second inventory of verdict names is what turned the `miss` -> `retrieval_miss` rename into a report that failed its own schema the first time the new verdict was recorded."
+            },
+            "denominator": { "$ref": "#/$defs/count" },
+            "denominator_definition": { "type": "string", "minLength": 1 },
+            "sample": { "$ref": "#/$defs/count" },
+            "profile": { "$ref": "#/$defs/streamProfile" },
+            "wrong_miss_rate": { "$ref": "#/$defs/ratio", "description": "Deliberately still wrong + retrieval_miss only: the added verdicts are collected, not folded into an existing rate." },
             "expected_in_top_k_rate": { "$ref": "#/$defs/ratio" },
             "accuracy_measurable": { "type": "boolean", "const": false, "description": "Always false, and not a sample-size gate: a wrong recall leaves no behavioural trace, so `wrong` has no source and the denominator cannot form." },
             "accuracy_unmeasurable_reason": { "type": "string", "minLength": 1, "description": "Rendered verbatim. Must not read as 'not collected yet'." }
+          }
+        },
+        "outcome": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Stream 2: what happened after a memory was used. The only surface allowed to speak about actual application, and only when a user or the host confirmed it.",
+          "required": ["stream", "total", "outcomes", "confirmed_by", "denominator", "denominator_definition", "sample", "profile", "actual_application"],
+          "properties": {
+            "stream": { "const": "outcome_receipt" },
+            "total": { "$ref": "#/$defs/count" },
+            "outcomes": { "$ref": "#/$defs/countMap", "description": "Produced by the outcome module's own summarizer; the outcome vocabulary is not restated here." },
+            "confirmed_by": { "$ref": "#/$defs/countMap", "description": "user / host only. `self` is refused at write time: an agent grading its own recall is a weak label, not a receipt." },
+            "denominator": { "$ref": "#/$defs/count" },
+            "denominator_definition": { "type": "string", "minLength": 1 },
+            "sample": { "$ref": "#/$defs/count" },
+            "profile": { "$ref": "#/$defs/streamProfile" },
+            "actual_application": { "$ref": "#/$defs/evaluationMetric", "description": "Applied over recorded receipts. insufficient_evidence below the shared minimum sample; never derived from recall.consumed, which proves only that a full text was opened." }
+          }
+        },
+        "attribution": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Stream 3: the agent's own weak, turn-scoped label. Counts only, forever -- the sample selects itself, so any percentage would describe the labelling habit rather than the memory.",
+          "required": ["stream", "total", "labels", "basis", "scope", "deliveries", "labelled_deliveries", "unlabelled_deliveries", "unlabelled_memories", "denominator", "denominator_definition", "sample", "profile", "rate_measurable", "rate_unmeasurable_reason"],
+          "properties": {
+            "stream": { "const": "self_attribution" },
+            "total": { "$ref": "#/$defs/count" },
+            "labels": { "$ref": "#/$defs/countMap", "description": "Produced by the attribution module's own summarizer; the label vocabulary is not restated here." },
+            "basis": { "const": "self-attribution" },
+            "scope": { "const": "turn" },
+            "deliveries": { "$ref": "#/$defs/count", "description": "Context for the counts, and explicitly not the denominator: an unlabelled delivery is unknown, not neutral." },
+            "labelled_deliveries": { "$ref": "#/$defs/count", "description": "Delivered traces carrying at least one label. Not equal to `total`: one turn may label several memories." },
+            "unlabelled_deliveries": { "$ref": "#/$defs/count", "description": "Deliveries nobody labelled. Reported so the unknown stays visible instead of being read as neutral." },
+            "unlabelled_memories": { "type": "array", "items": { "type": "string", "minLength": 1 }, "maxItems": 5, "description": "Names of delivered memories still carrying no label, so the reminder is actionable rather than a count the reader has to reconstruct. Capped; it is a prompt, not an inventory." },
+            "denominator": { "type": "null", "description": "Null on purpose. There is no denominator, and leaving the field out would invite a consumer to pick one." },
+            "denominator_definition": { "type": "string", "minLength": 1 },
+            "sample": { "$ref": "#/$defs/count" },
+            "profile": { "$ref": "#/$defs/streamProfile" },
+            "rate_measurable": { "type": "boolean", "const": false, "description": "Constant false, set by the producer. A consumer that computes a usefulness rate anyway is violating the contract, not filling a gap." },
+            "rate_unmeasurable_reason": { "type": "string", "minLength": 1, "description": "Rendered verbatim, including that an unlabelled delivery is unknown rather than neutral." }
           }
         }
       }
@@ -271,6 +319,20 @@
         "conflicts": { "$ref": "#/$defs/nullableCount" },
         "orphans": { "$ref": "#/$defs/nullableCount" },
         "drift": { "$ref": "#/$defs/nullableCount" }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "generated_at", "review_material", "observation_window", "quarantine", "quota_settlement"],
+      "description": "What the promotion governance surfaces can currently say. Two of the four have no collector in this build and report that rather than a count: an absent surface and an empty one are different facts, and rendering the first as zero is the failure this repository keeps a gate for.",
+      "properties": {
+        "schema": { "const": "ownmem-governance-surface/v1" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "review_material": { "$ref": "#/$defs/governanceBlock" },
+        "observation_window": { "$ref": "#/$defs/governanceBlock" },
+        "quarantine": { "$ref": "#/$defs/governanceBlock" },
+        "quota_settlement": { "$ref": "#/$defs/governanceBlock" }
       }
     },
     "gates": {
@@ -349,10 +411,13 @@
     "data_quality": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["files", "invalid_events", "event_errors", "gaps", "gap_codes"],
+      "required": ["files", "invalid_events", "readable_events", "readable_share", "invalid_outdated_schema", "event_errors", "gaps", "gap_codes"],
       "properties": {
         "files": { "$ref": "#/$defs/count" },
         "invalid_events": { "$ref": "#/$defs/count" },
+        "readable_events": { "$ref": "#/$defs/count", "description": "The denominator of every count in this report. Stated rather than left to be derived from the total minus the invalid ones, because a reader who does not derive it will read the counts as covering the whole ledger." },
+        "readable_share": { "$ref": "#/$defs/ratio", "description": "readable_events over every line on disk. A count of dropped rows reads the same at 20 and at 6638; only the share says whether the report describes the ledger or a fifth of it." },
+        "invalid_outdated_schema": { "$ref": "#/$defs/count", "description": "How many of the invalid lines were written under an earlier schema. Split out because the two halves have different remedies: an old file is deleted, while a current-schema row failing the payload contract is a producer to fix before it writes more." },
         "event_errors": {
           "type": "array",
           "maxItems": 10,
@@ -389,6 +454,98 @@
     }
   },
   "$defs": {
+    "governanceBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stream", "connected"],
+      "description": "One governance surface. A block that is not connected carries a reason and no numbers at all -- the count keys are absent rather than null, so a reader cannot mistake an unwired surface for a measured zero, and a collector wired in later cannot arrive without the denominator that explains its numbers.",
+      "properties": {
+        "stream": { "type": "string", "minLength": 1 },
+        "connected": { "type": "boolean" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 400 },
+        "reason_code": {
+          "enum": ["collector-not-wired", "source-unreadable", "collector-malformed"],
+          "description": "Which kind of absence this is. Three states rather than two because they have three different fixes: wire a collector in, repair the file it reads, or fix the producer that handed back a shape this console refused. None of them is a zero."
+        },
+        "entries": { "$ref": "#/$defs/count" },
+        "denominator": { "$ref": "#/$defs/count" },
+        "denominator_definition": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "sample": { "$ref": "#/$defs/count" },
+        "empty_reason": { "type": ["string", "null"], "maxLength": 500 },
+        "by_automation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["review", "pr-only", "forbidden"],
+          "properties": {
+            "review": { "$ref": "#/$defs/count" },
+            "pr-only": { "$ref": "#/$defs/count" },
+            "forbidden": { "$ref": "#/$defs/count" }
+          }
+        },
+        "candidates_queued": { "$ref": "#/$defs/count" },
+        "skipped_memories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["memory_id", "reason"],
+            "properties": {
+              "memory_id": { "type": "string", "minLength": 1 },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "verdicts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["no_growth", "growth_mode", "swap_planned", "over_quota"],
+          "properties": {
+            "no_growth": { "$ref": "#/$defs/count" },
+            "growth_mode": { "$ref": "#/$defs/count" },
+            "swap_planned": { "$ref": "#/$defs/count" },
+            "over_quota": { "$ref": "#/$defs/count" }
+          }
+        },
+        "items": { "type": "array", "items": { "type": "object" } }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "connected": { "const": false } }, "required": ["connected"] },
+          "then": {
+            "required": ["reason", "reason_code"],
+            "properties": {
+              "reason": { "type": "string", "minLength": 1 },
+              "reason_code": { "type": "string", "minLength": 1 },
+              "entries": false,
+              "denominator": false,
+              "denominator_definition": false,
+              "sample": false,
+              "empty_reason": false,
+              "items": false
+            }
+          },
+          "else": {
+            "required": ["entries", "denominator", "denominator_definition", "sample", "empty_reason", "items"],
+            "properties": {
+              "reason": false,
+              "reason_code": false,
+              "entries": { "type": "integer" },
+              "denominator": { "type": "integer" },
+              "denominator_definition": { "type": "string", "minLength": 1 },
+              "sample": { "type": "integer" },
+              "empty_reason": { "type": ["string", "null"] },
+              "items": { "type": "array" }
+            }
+          }
+        },
+        {
+          "description": "An empty connected surface has to say why it is empty, or a reader cannot tell a quiet queue from a broken producer.",
+          "if": { "properties": { "connected": { "const": true }, "sample": { "const": 0 } }, "required": ["connected", "sample"] },
+          "then": { "properties": { "empty_reason": { "type": "string", "minLength": 1 } } }
+        }
+      ]
+    },
+
     "count": { "type": "integer", "minimum": 0 },
     "nullableCount": { "type": ["integer", "null"], "minimum": 0 },
     "ratio": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
@@ -397,6 +554,35 @@
       "type": "object",
       "propertyNames": { "pattern": "^[a-zA-Z0-9._-]+$" },
       "additionalProperties": { "$ref": "#/$defs/count" }
+    },
+    "streamProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Identity of the population one stream was counted over. Required on every stream block so a count is never read against a denominator that belongs to a neighbour.",
+      "required": ["profile_id", "source_event", "record_schema", "runtime_version", "window_from", "window_to"],
+      "properties": {
+        "profile_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "source_event": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "record_schema": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "runtime_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "window_from": { "type": "string", "format": "date-time" },
+        "window_to": { "type": "string", "format": "date-time" }
+      }
+    },
+    "evaluationMetric": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A rate, or an honest refusal to state one. Shape produced by memoryEvaluationMetric, so the minimum sample below which a rate is not printed is shared with the evaluation surfaces rather than reinvented.",
+      "required": ["status", "value", "numerator", "denominator", "sample", "minimum_sample", "profile"],
+      "properties": {
+        "status": { "enum": ["measured", "insufficient_evidence"] },
+        "value": { "$ref": "#/$defs/ratio" },
+        "numerator": { "$ref": "#/$defs/nullableCount" },
+        "denominator": { "$ref": "#/$defs/count" },
+        "sample": { "$ref": "#/$defs/count" },
+        "minimum_sample": { "$ref": "#/$defs/count" },
+        "profile": { "$ref": "#/$defs/streamProfile" }
+      }
     },
     "distribution": {
       "type": "object",

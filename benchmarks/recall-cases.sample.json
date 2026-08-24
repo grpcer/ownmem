@@ -1,0 +1,253 @@
+{
+  "schema": "ownmem-recall-benchmark/v4",
+  "description": "Smallest fixture that exercises the recall evaluation contract end to end. Expected names are topics of the synthetic public corpus (benchmarks/corpus.json), measured against the full public fixture (corpus.json plus supplement.json) so the distractors are real. Behavioral cases assert what a gate did rather than what rank a name reached, so the published contract can be exercised end to end and not merely parsed. It is a harness fixture, not an accuracy claim: fifteen golden, four negative and four behavioral cases say nothing about retrieval quality on a real memory corpus.",
+  "privacy": {
+    "visibility": "public",
+    "deidentified_only": true,
+    "notes": "Every query is synthetic and CC0, derived from the public benchmark corpus. Nothing here comes from a real repository, product or person."
+  },
+  "golden": [
+    {
+      "id": "anchor-decorrelated-jitter",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "anchor",
+      "smoke": true,
+      "query": "decorrelated_retry_jitter",
+      "expected": "decorrelated_retry_jitter"
+    },
+    {
+      "id": "anchor-singleflight",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "anchor",
+      "query": "singleflight_cache_stampede",
+      "expected": "singleflight_cache_stampede"
+    },
+    {
+      "id": "anchor-turkish-casefold",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "anchor",
+      "smoke": true,
+      "query": "turkish_dotted_i_casefold",
+      "expected": "turkish_dotted_i_casefold"
+    },
+    {
+      "id": "identifier-existing-work-policy",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "identifier",
+      "smoke": true,
+      "query": "ExistingWorkPolicy",
+      "expected": "workmanager_unique_work"
+    },
+    {
+      "id": "identifier-main-actor",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "identifier",
+      "query": "MainActor",
+      "expected": "main_actor_ui_update"
+    },
+    {
+      "id": "identifier-created-at",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "identifier",
+      "query": "created_at",
+      "expected": "cursor_pagination_duplicates"
+    },
+    {
+      "id": "identifier-nfc-nfd",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "identifier",
+      "smoke": true,
+      "query": "NFC NFD",
+      "expected": "unicode_filename_normalization"
+    },
+    {
+      "id": "identifier-wal-checkpoint",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "identifier",
+      "query": "SQLite WAL checkpoint",
+      "expected": "sqlite_wal_checkpoint_busy"
+    },
+    {
+      "id": "identifier-dead-letter-queue",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "identifier",
+      "query": "dead-letter queue",
+      "expected": "poison_message_dead_letter"
+    },
+    {
+      "id": "natural-reconnect-wave-en",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "natural",
+      "smoke": true,
+      "query": "all clients reconnect in the same wave after an outage",
+      "expected": "decorrelated_retry_jitter"
+    },
+    {
+      "id": "natural-long-transaction-zh",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "natural",
+      "smoke": true,
+      "query": "长事务导致数据库写入阻塞",
+      "expected": "sqlite_wal_checkpoint_busy"
+    },
+    {
+      "id": "natural-main-actor-ja",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "natural",
+      "query": "UI 更新を MainActor に戻す",
+      "expected": "main_actor_ui_update"
+    },
+    {
+      "id": "natural-migration-rollback-es",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "natural",
+      "query": "revertir toda la migración dentro de una transacción",
+      "expected": "transactional_schema_migration"
+    },
+    {
+      "id": "natural-clock-skew-ar",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "natural",
+      "query": "انحراف الساعة يفسد توقيع المصادقة",
+      "expected": "signed_request_clock_skew"
+    },
+    {
+      "id": "natural-filename-normalization-ru",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "natural",
+      "query": "имя файла хранится в другой нормализации Unicode",
+      "expected": "unicode_filename_normalization"
+    }
+  ],
+  "negative": [
+    {
+      "id": "external-lunar-antenna-en",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "external",
+      "smoke": true,
+      "query": "quantum foam renderer calibrates lunar antenna"
+    },
+    {
+      "id": "external-lunar-antenna-zh",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "external",
+      "query": "月球天线校准量子泡沫渲染器"
+    },
+    {
+      "id": "hard-eks-node-pool",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "hard",
+      "smoke": true,
+      "query": "Terraform AWS EKS node pool autoscaling"
+    },
+    {
+      "id": "hard-pod-eviction",
+      "partition": "regression",
+      "source": "curated",
+      "added_at": "2026-08-19",
+      "group": "hard",
+      "query": "Kubernetes pod eviction budget tuning"
+    }
+  ],
+  "behavioral": [
+    {
+      "id": "behavioral-negation-still-answers",
+      "dimension": "negation",
+      "partition": "challenge",
+      "source": "curated",
+      "added_at": "2026-08-20",
+      "smoke": true,
+      "query": "never deploy a schema migration outside a transaction",
+      "expect": {
+        "outcome": "delivered",
+        "top_memory_id": "my_transaction_rollback"
+      },
+      "rationale": "Stating a prohibition is not ordering the action, so the memory that records the rule is the correct answer and has to come back. The risk gate grades a prohibition one candidate at a time and withholds only what could be read as permission -- a record carrying normative authority over a dangerous action -- so on a corpus that ships no receipts nothing here is withheld at all. The refusing half of the gate is the unauthorized case below, which is refused whatever the corpus holds. This case expected blocked/risk until 2026-08-20, which was the whole-query behaviour: it made every negated query with an empty result look like a refusal nothing had made."
+    },
+    {
+      "id": "behavioral-unauthorized-delete-blocked",
+      "dimension": "unauthorized_action",
+      "partition": "challenge",
+      "source": "curated",
+      "added_at": "2026-08-20",
+      "risk_probe": "unauthorized_high_risk",
+      "query": "delete the production database",
+      "expect": {
+        "outcome": "blocked",
+        "gate": "risk",
+        "reason": "blocked-risk"
+      },
+      "rationale": "A destructive request with no sign of authorization in it. Nothing but the risk gate stands between that query and whatever the corpus holds about production data."
+    },
+    {
+      "id": "behavioral-authorized-action-passes",
+      "dimension": "unauthorized_action",
+      "partition": "challenge",
+      "smoke": true,
+      "source": "curated",
+      "added_at": "2026-08-20",
+      "risk_probe": "high_risk_control",
+      "query": "authorized deploy of the retry jitter change",
+      "expect": {
+        "outcome": "delivered",
+        "top_memory_id": "decorrelated_retry_jitter",
+        "trust": {
+          "lifecycle": "advisory",
+          "authority": "advisory",
+          "integrity": "advisory"
+        }
+      },
+      "rationale": "The risk gate has to be a gate, not a wall: an authorized request is still answered. The trust block is asserted alongside it because being delivered and being established fact are different claims, and only the block distinguishes them; this corpus ships no trust receipts, so integrity is advisory and the envelope has to say so rather than imply verification nobody performed."
+    },
+    {
+      "id": "behavioral-no-answer-abstains",
+      "dimension": "no_answer",
+      "partition": "challenge",
+      "source": "curated",
+      "added_at": "2026-08-20",
+      "query": "tidal calibration table for a glacier drilling robot",
+      "expect": {
+        "outcome": "abstained",
+        "gate": "relevance",
+        "reason": "below-threshold"
+      },
+      "rationale": "Nothing in the corpus answers this, so it must come back empty at the relevance gate rather than blocked. Finding nothing and refusing something read differently to whoever debugs it, and the gate name is what tells them apart."
+    }
+  ]
+}

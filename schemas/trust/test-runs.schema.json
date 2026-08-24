@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ownmem-test-runs/v1",
+  "title": "OwnMem test execution ledger",
+  "description": "A side ledger of observed test runs. It is deliberately separate from the trust lock: a trust receipt binds evidence by shape, so adding an execution field to an evidence item would invalidate every receipt at once. Records are joined to test evidence by a stable key derived from the test file path and, when the run reported one, the test symbol.",
+  "type": "object",
+  "required": ["schema", "updated_at", "runners", "runs", "results"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "ownmem.test-runs/v1" },
+    "updated_at": { "$ref": "#/$defs/isoTimestamp" },
+    "runners": {
+      "description": "Every runner this project knows about, including the ones that have never been ingested. A runner missing from the roster would read as 'not applicable' rather than 'not connected'.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/runnerName" },
+      "additionalProperties": { "$ref": "#/$defs/runner" }
+    },
+    "runs": { "type": "array", "items": { "$ref": "#/$defs/run" } },
+    "results": {
+      "description": "Latest observed outcome per test key. A key is `<path>#<symbol>` for a named test and `<path>` for a whole-file roll-up.",
+      "type": "object",
+      "propertyNames": { "type": "string", "minLength": 1, "maxLength": 1000 },
+      "additionalProperties": { "$ref": "#/$defs/result" }
+    }
+  },
+  "$defs": {
+    "isoTimestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$" },
+    "gitHash": { "type": "string", "pattern": "^[a-f0-9]{40,64}$" },
+    "runId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "codeFingerprint": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "runnerName": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "repositoryPath": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+    "runner": {
+      "type": "object",
+      "required": ["status", "adapter", "runs", "last_run_at"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "description": "`ingested` only when this ledger actually holds a run for the runner. Anything else is `not-connected`, which is reported and never rendered as a coverage number.",
+          "enum": ["ingested", "not-connected"]
+        },
+        "adapter": {
+          "description": "`available` means an output parser exists for this runner; `unavailable` means the interface is declared but nothing can be ingested yet.",
+          "enum": ["available", "unavailable"]
+        },
+        "runs": { "type": "integer", "minimum": 0 },
+        "last_run_at": { "oneOf": [{ "$ref": "#/$defs/isoTimestamp" }, { "type": "null" }] }
+      }
+    },
+    "run": {
+      "type": "object",
+      "required": [
+        "run_id", "runner", "runner_version", "command", "cwd", "exit_code",
+        "started_at", "duration_ms", "git_commit", "recorded_results", "skipped_tests", "ingested_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "run_id": { "$ref": "#/$defs/runId" },
+        "runner": { "$ref": "#/$defs/runnerName" },
+        "runner_version": { "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 200 }, { "type": "null" }] },
+        "command": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "cwd": { "oneOf": [{ "$ref": "#/$defs/repositoryPath" }, { "type": "null" }] },
+        "exit_code": { "type": "integer" },
+        "started_at": { "$ref": "#/$defs/isoTimestamp" },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "git_commit": { "oneOf": [{ "$ref": "#/$defs/gitHash" }, { "type": "null" }] },
+        "recorded_results": { "type": "integer", "minimum": 0 },
+        "skipped_tests": { "type": "integer", "minimum": 0 },
+        "ingested_at": { "$ref": "#/$defs/isoTimestamp" }
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "run_id", "runner", "test_id", "path", "symbol", "fingerprint",
+        "fingerprint_symbol", "result", "duration_ms", "aggregate", "observed_tests", "skipped_tests"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "run_id": { "$ref": "#/$defs/runId" },
+        "runner": { "$ref": "#/$defs/runnerName" },
+        "test_id": {
+          "description": "The runner's own identifier for the unit, kept verbatim so a result can be traced back into the raw output.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "path": { "$ref": "#/$defs/repositoryPath" },
+        "symbol": { "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 500 }, { "type": "null" }] },
+        "fingerprint": {
+          "description": "Fingerprint of the tested file or symbol slice, taken at ingest time. A later change to it makes this record stale rather than passing.",
+          "$ref": "#/$defs/codeFingerprint"
+        },
+        "fingerprint_symbol": {
+          "description": "The symbol the fingerprint covers, or null when it covers the whole file. Verification must recompute the anchor with exactly this symbol.",
+          "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 500 }, { "type": "null" }]
+        },
+        "result": { "enum": ["passed", "failed"] },
+        "duration_ms": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+        "aggregate": {
+          "description": "True for a whole-file roll-up derived from the named results observed in the same run.",
+          "type": "boolean"
+        },
+        "observed_tests": { "type": "integer", "minimum": 1 },
+        "skipped_tests": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

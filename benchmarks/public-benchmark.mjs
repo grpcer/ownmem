@@ -13,7 +13,13 @@ import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { isMemoryCliEntry } from '../lib/memory-cli-entry.mjs';
-import { loadMemoryIndex, searchMemory } from '../lib/memory-markdown-index.mjs';
+import { compileMemoryIndex } from '../lib/memory-compiler.mjs';
+import {
+  createMemoryRecallRuntime,
+  MEMORY_RECALL_RUNTIME_VERSION,
+  memoryRankingProfileHash,
+  queryMemoryRuntime,
+} from '../lib/memory-runtime.mjs';
 import {
   createMemoryTokenizer,
   MEMORY_TOKENIZER_PROFILE,
@@ -129,7 +135,12 @@ function writeTopic(directory, topic) {
   writeFileSync(path.join(directory, `${topic.id}.md`), frontmatter, 'utf8');
 }
 
-function materializeCorpus(corpus, topicOrder = corpus.topics) {
+/**
+ * Writes the fixture out as a real memory directory. Exported because the retrieval engines are not
+ * the only consumers of this corpus: the evaluation fixture contract is proven against it too, and a
+ * second materializer would be a second definition of what the public corpus looks like on disk.
+ */
+export function materializePublicBenchmarkCorpus(corpus, topicOrder = corpus.topics) {
   const root = mkdtempSync(path.join(tmpdir(), 'ownmem-memory-public-benchmark-'));
   const memory = path.join(root, '.ownmem');
   mkdirSync(memory, { recursive: true });
@@ -173,7 +184,7 @@ function annotatePart(part, source, { allowExternalTopics = false } = {}) {
   };
 }
 
-function loadCorpus(corpusFile, supplementFile) {
+export function loadPublicBenchmarkCorpus(corpusFile = DEFAULT_CORPUS, supplementFile = DEFAULT_SUPPLEMENT) {
   const corpusText = readFileSync(corpusFile, 'utf8');
   const supplementText = readFileSync(supplementFile, 'utf8');
   const base = JSON.parse(corpusText);
@@ -288,7 +299,7 @@ function rankingDigest(rankings, negativeRankings) {
   return createHash('sha256').update(JSON.stringify({ rankings, negativeRankings })).digest('hex');
 }
 
-async function measureEngine({ name, search, corpus, iterations, dependencies, provenance, tokenizer = null }) {
+async function measureEngine({ name, search, corpus, iterations, dependencies, provenance, tokenizer = null, runtime = null }) {
   const rssBefore = process.memoryUsage().rss;
   const rankings = [];
   const negativeRankings = [];
@@ -332,6 +343,12 @@ async function measureEngine({ name, search, corpus, iterations, dependencies, p
     name,
     provenance,
     profile: tokenizer?.profile || null,
+    runtime: runtime ? {
+      version: MEMORY_RECALL_RUNTIME_VERSION,
+      engine_lane: 'canonical',
+      profile_id: runtime.planner.ranking.profile,
+      ranking_profile_hash: memoryRankingProfileHash(runtime.planner.ranking),
+    } : null,
     accuracy: accuracy(corpus.queries, rankings),
     negative_abstention: negativeAccuracy(corpus.negative_queries, negativeRankings),
     by_language: groupedMetrics(languages, corpus, rankings, negativeRankings, languageLatencies, 'language'),
@@ -390,8 +407,8 @@ function compareCandidates(left, right) {
   ]) {
     if (leftVector[key] !== rightVector[key]) return rightVector[key] - leftVector[key];
   }
-  if (leftVector.p95_ms !== rightVector.p95_ms) return leftVector.p95_ms - rightVector.p95_ms;
   if (leftVector.average_query_tokens !== rightVector.average_query_tokens) return leftVector.average_query_tokens - rightVector.average_query_tokens;
+  if (leftVector.p95_ms !== rightVector.p95_ms) return leftVector.p95_ms - rightVector.p95_ms;
   return left.name.localeCompare(right.name, 'en');
 }
 
@@ -479,12 +496,22 @@ async function loadEmbeddingAdapter(file) {
 }
 
 async function verifyOrderInvariance(corpus, profile, expectedDigest) {
-  const root = materializeCorpus(corpus, [...corpus.topics].reverse());
+  const root = materializePublicBenchmarkCorpus(corpus, [...corpus.topics].reverse());
   try {
     const tokenizer = createMemoryTokenizer(profile);
-    const index = loadMemoryIndex({ root, memoryDir: '.ownmem', tokenizer });
-    const rankings = corpus.queries.map(item => searchMemory(index, item.query, { limit: 5 }).map(result => result.document.name));
-    const negativeRankings = corpus.negative_queries.map(item => searchMemory(index, item.query, { limit: 5 }).map(result => result.document.name));
+    const indexDirectory = `.local-test/memory-index-${profile}`;
+    compileMemoryIndex({ root, memoryDir: '.ownmem', indexDirectory, tokenizer });
+    const runtime = createMemoryRecallRuntime({
+      root,
+      memoryDir: '.ownmem',
+      indexDirectory,
+      tokenizer,
+      observability: false,
+    });
+    const search = item => queryMemoryRuntime(runtime, item.query, { tier: 'expanded' })
+      .envelope.results.map(result => result.memory_id);
+    const rankings = corpus.queries.map(search);
+    const negativeRankings = corpus.negative_queries.map(search);
     return { reversed_topic_order: rankingDigest(rankings, negativeRankings) === expectedDigest };
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -497,27 +524,37 @@ export async function runPublicBenchmark({
   iterations = 5,
   embeddingAdapter = null,
 } = {}) {
-  const corpus = loadCorpus(corpusFile, supplementFile);
+  const corpus = loadPublicBenchmarkCorpus(corpusFile, supplementFile);
   validateCorpus(corpus);
-  const root = materializeCorpus(corpus);
+  const root = materializePublicBenchmarkCorpus(corpus);
   try {
     const candidates = [];
-    let defaultIndex = null;
+    let defaultRuntime = null;
     for (const profile of ALGORITHM_PROFILES) {
       const tokenizer = createMemoryTokenizer(profile);
-      const index = loadMemoryIndex({ root, memoryDir: '.ownmem', tokenizer });
-      if (profile === MEMORY_TOKENIZER_PROFILE) defaultIndex = index;
+      const indexDirectory = `.local-test/memory-index-${profile}`;
+      compileMemoryIndex({ root, memoryDir: '.ownmem', indexDirectory, tokenizer });
+      const runtime = createMemoryRecallRuntime({
+        root,
+        memoryDir: '.ownmem',
+        indexDirectory,
+        tokenizer,
+        observability: false,
+      });
+      if (profile === MEMORY_TOKENIZER_PROFILE) defaultRuntime = runtime;
       candidates.push(await measureEngine({
-        name: `bm25f-${profile}`,
+        name: `canonical-${profile}`,
         corpus,
         iterations,
         dependencies: 2,
         provenance: 'repository code under test',
         tokenizer,
-        search: async (query, limit) => searchMemory(index, query, { limit }).map(result => result.document.name),
+        runtime,
+        search: async query => queryMemoryRuntime(runtime, query, { tier: 'expanded' })
+          .envelope.results.map(result => result.memory_id),
       }));
     }
-    assert(defaultIndex, `default tokenizer profile ${MEMORY_TOKENIZER_PROFILE} is not in the candidate set`);
+    assert(defaultRuntime, `default tokenizer profile ${MEMORY_TOKENIZER_PROFILE} is not in the candidate set`);
     const rankedCandidates = [...candidates].sort(compareCandidates);
     const winner = rankedCandidates[0];
     winner.determinism = {
@@ -525,7 +562,10 @@ export async function runPublicBenchmark({
       ...(await verifyOrderInvariance(corpus, winner.profile, winner.determinism.digest)),
     };
 
-    const documents = defaultIndex.documents.map(document => ({ id: document.name, text: document.content }));
+    const documents = corpus.topics.map(topic => ({
+      id: topic.id,
+      text: [topic.description, ...topic.triggers, topic.body].join('\n'),
+    }));
     const grep = await measureEngine({
       name: 'grep-fixed-string',
       corpus,
@@ -589,11 +629,11 @@ export async function runPublicBenchmark({
         network_calls: 0,
         same_corpus: true,
         same_queries: true,
-        same_top_k: 5,
+        same_top_k: 3,
         corpus_order_perturbation: 'reversed topic manifest',
       },
       selection: {
-        rule: 'lexicographic-v1: worst-language R@1 > worst-language abstain > worst-script MRR > global R@1/R@5/MRR/abstain > determinism > P95 > token expansion',
+        rule: 'lexicographic-v2: worst-language R@1 > worst-language abstain > worst-script MRR > global R@1/R@5/MRR/abstain > determinism > token expansion > P95',
         candidates: rankedCandidates.map(candidate => candidate.profile),
         winner: winner.profile,
         expected_default: MEMORY_TOKENIZER_PROFILE,

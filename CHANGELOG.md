@@ -5,6 +5,52 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-27
+
+### Added
+
+- `correct_abstain` records the other way recall can be right: it returned
+  nothing, and nothing was the right answer. `correct` rejects an empty result
+  set, so until now a correct abstention could only be filed as `wrong` or
+  `coverage_gap` -- recall's successes were being counted as its failures, and
+  every operator's own error rate was inflated by exactly that much. It judges
+  recall's behaviour; `coverage_gap` judges the corpus, and both can be true of
+  one query: a question about an unrelated product is `correct_abstain` and no
+  gap at all, while a real question this repository has never written down is
+  both. It never takes `--expected`, and it is refused unless recall did in
+  fact return nothing.
+- The feedback reader exports `FEEDBACK_CORRECT_VERDICTS`. Three call sites
+  independently spelled "still needs a person" as `verdict !== 'correct'`, so a
+  second correct verdict would silently have been counted as outstanding work
+  in all three.
+- `readMissDismissalReceipts` reads an `ownmem-miss-dismissal-receipt/v1`
+  ledger, and `pendingTriggerBackfills` now excludes a miss recorded in it
+  rather than re-proposing it every run. A dismissal is deliberately not a
+  resolution: a resolution asserts the miss stopped reproducing, while a
+  dismissal only records that a person looked and decided no trigger edit can
+  reach it, so a queue with no terminal state re-grades that decision forever.
+  A receipt without a reason is rejected. The reader and the exclusion ship
+  first; no CLI command writes this ledger yet.
+
+### Fixed
+
+- A rejected telemetry event no longer leaves its feedback row behind. The
+  event is validated against a closed schema and can throw, and it used to be
+  built after the row had already been appended: the operator reads an error,
+  re-runs the command, and the ledger now holds the same verdict twice.
+- `lib/features/trust.mjs` refuses to run as a direct entry point instead of
+  loading, exporting everything and exiting 0 having done nothing at all. A
+  clean exit from a module that needs the defaults its wrapper supplies reads
+  as a successful run: two such invocations reported success while the ledger
+  stayed stale.
+
+### Migration
+
+- `ownmem-recall-feedback/v3` gains one enum value rather than a new schema id.
+  A 0.4.0 reader accepts every 0.3.0 ledger unchanged, but a 0.3.0 reader
+  rejects a row carrying `correct_abstain` as invalid. Upgrade every reader in
+  a repository before writing the new verdict into its ledger.
+
 ## [0.3.0] - 2026-08-24
 
 ### Added

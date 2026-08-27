@@ -4,8 +4,8 @@ title: "OwnMem: Git-Native Project Memory for AI Coding Agents"
 type: software
 authors:
   - name: grpcer
-version: 0.3.0
-date-released: 2026-08-18
+version: 0.4.0
+date-released: 2026-08-27
 repository-code: "https://github.com/grpcer/ownmem"
 url: "https://github.com/grpcer/ownmem"
 license: Apache-2.0

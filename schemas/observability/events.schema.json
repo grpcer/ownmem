@@ -249,7 +249,7 @@
       "additionalProperties": false,
       "required": ["verdict", "expected_in_top_k"],
       "properties": {
-        "verdict": { "enum": ["correct", "wrong", "retrieval_miss", "coverage_gap", "stale", "conflict"] },
+        "verdict": { "enum": ["correct", "correct_abstain", "wrong", "retrieval_miss", "coverage_gap", "stale", "conflict"] },
         "expected_in_top_k": { "type": ["boolean", "null"] }
       }
     },

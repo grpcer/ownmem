@@ -1,6 +1,6 @@
 {
   "name": "ownmem",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Git-native project memory for AI coding agents: deterministic local recall, evidence-governed trust, and bounded unattended evolution.",
   "type": "module",
   "license": "Apache-2.0",

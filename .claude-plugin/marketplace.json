@@ -10,7 +10,7 @@
       "name": "ownmem",
       "source": "./plugins/ownmem",
       "description": "Repo-owned project memory for AI coding agents: recall reviewed lessons locally and deterministically, with zero model calls and zero query-time tokens.",
-      "version": "0.3.0"
+      "version": "0.4.0"
     }
   ]
 }

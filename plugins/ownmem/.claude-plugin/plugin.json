@@ -1,8 +1,8 @@
 {
   "name": "ownmem",
   "displayName": "OwnMem",
-  "description": "Local deterministic memory for coding agents: recall past lessons before changing code, with zero model calls and zero query-time tokens.",
-  "version": "0.4.0",
+  "description": "Git-native project memory for AI coding agents, with deterministic local recall, evidence gates, and bounded evolution.",
+  "version": "0.5.0",
   "author": {
     "name": "grpcer",
     "url": "https://github.com/grpcer"

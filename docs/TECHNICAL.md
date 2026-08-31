@@ -1,6 +1,6 @@
-# OwnMem 0.3 technical design and research lineage
+# OwnMem technical design and research lineage
 
-OwnMem 0.3 is not a claim to have invented retrieval, hashing, rollback, or
+OwnMem is not a claim to have invented retrieval, hashing, rollback, or
 evaluation. Its contribution is the composition of those foundations into an
 executable protocol for **repository-scoped agent memory**: low-risk changes
 may run unattended, but every automatic write must be attributable,

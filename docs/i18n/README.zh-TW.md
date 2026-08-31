@@ -7,6 +7,8 @@
 `Git 原生` · `本機召回` · `多 Agent 共用` · `證據治理` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
 
@@ -42,11 +44,11 @@ OwnMem 把「寫下經驗」與「把經驗交給 Agent」拆成兩個受控流�
 - **交付前四道門。** 相關性、事實有效性、任務適用性與動作風險共同決定正常交付、advisory、隔離或棄答。
 - **有界無人值守演化。** 輪末協調器只自動晉升通過回放、受配額約束且可精確撤銷的 R0 中繼資料；R1–R5 進入複審。
 
-## 0.3 到底獨特在哪裡
+## OwnMem 如何治理 AI Agent 記憶
 
-差異不在某個排序公式，而在 OwnMem 0.3 把 Agent Memory 做成可驗證的演化協定：
+差異不在某個排序公式，而在 OwnMem 把程式 Agent 記憶做成可驗證的檢索與演化協定：
 
-| 機制 | OwnMem 0.3 做了什麼 |
+| 機制 | 如何強制執行 |
 | --- | --- |
 | **證據攜帶記憶** | 內容雜湊、證據根、生命週期、適用範圍、風險與前驅收據共同決定正文能否進入上下文。 |
 | **反事實晉升門** | 自動化必須證明「改前失敗、只因候選變更而恢復、既有通過語料零退步」。 |
@@ -101,12 +103,12 @@ OwnMem 自動化的是「機器能證明」的部分，不是「聽起來像對�
 | --- | --- |
 | 團隊希望專案知識與程式碼一起審閱、遷移。 | 需要跨儲存庫個人輪廓或全域使用者記憶。 |
 | 同一儲存庫輪流使用多個程式 Agent。 | 希望無差別自動保存所有對話，不接受證據門與風險邊界。 |
-| 重視本機、可重現、零查詢成本的召回。 | 需要大規模雲端向量搜尋或即時全域知識圖譜。 |
+| 重視本機、可重現且沒有檢索 API 帳單的召回。 | 需要大規模雲端向量搜尋或即時全域知識圖譜。 |
 | 錯誤記憶必須可歸因、可拒絕、可撤銷。 | 記憶數量比治理更重要。 |
 
 ## 預設本機優先
 
-- 預設召回只讀儲存庫檔案與本機快照：零 LLM 呼叫、零網路請求、零查詢 token 成本。
+- 預設排序只讀儲存庫檔案與本機快照：零 LLM 呼叫、零網路請求、沒有檢索 API 帳單。交付給 Agent 的摘要仍會占用上下文 token，並受設定的上下文預算限制。
 - 執行事件保存在 Git 忽略的本機目錄；沒有 outcome 樣本就顯示「暫無」，不偽裝成 0%。
 - 不該進入 Git 的金鑰、個人資料與生產祕密，也不該進入記憶。
 - embedding 通道是隔離的可選增強；只有儲存庫本機 A/B 證據通過安全門後才參與 weighted 排序。
@@ -132,7 +134,7 @@ OwnMem 不把這些基礎概念冒充原創；它的貢獻是把它們組成儲�
 | [Architecture](../ARCHITECTURE.md) | 套件邊界、快照、信任與演化 |
 | [Technical design](../TECHNICAL.md) | 機制、威脅模型與研究對應 |
 | [Plugins](../PLUGINS.md) | 可選宿主外掛安裝 |
-| [Updating](../UPDATING.md) | 安全更新與 0.2 → 0.3 遷移 |
+| [Updating](../UPDATING.md) | 安全更新與版本遷移 |
 | [Privacy](../PRIVACY.md) | 本機資料與可選通道邊界 |
 | [Changelog](../../CHANGELOG.md) | 版本變更 |
 | [License](../../LICENSE) | Apache-2.0 |

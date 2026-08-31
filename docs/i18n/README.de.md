@@ -7,6 +7,8 @@
 `Git-nativ` · `lokaler Recall` · `Multi-Agent` · `evidenzgesteuert` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
 
@@ -42,11 +44,11 @@ OwnMem trennt „Erfahrung aufschreiben“ von „sie einem Agent liefern“:
 - **Vier Auslieferungstore.** Relevanz, faktische Gültigkeit, Anwendbarkeit und Risiko führen zu normal, advisory, Quarantäne oder Abstention.
 - **Begrenzte autonome Evolution.** Am Turn-Ende wird nur bewiesenes, quota-begrenztes und exakt reversibles R0 promoviert; R1–R5 geht ins Review.
 
-## Was 0.3 besonders macht
+## Wie OwnMem AI-Agent-Memory steuert
 
-Der Unterschied ist keine einzelne Ranking-Formel. OwnMem 0.3 macht Agent Memory zu einem verifizierbaren Evolutionsprotokoll:
+Der Unterschied ist keine einzelne Ranking-Formel. OwnMem macht Coding-Agent-Memory zu einem verifizierbaren Retrieval- und Evolutionsprotokoll:
 
-| Mechanismus | OwnMem 0.3 |
+| Mechanismus | Durchsetzung |
 | --- | --- |
 | **Evidenztragendes Memory** | Hash, Evidenzwurzel, Lifecycle, Anwendbarkeit, Risiko und Vorgänger-Receipts entscheiden über Kontext. |
 | **Kontrafaktisches Promotion-Gate** | Baseline-Miss, nur durch den Kandidaten erzeugte Recovery und null Regression müssen bewiesen werden. |
@@ -101,12 +103,12 @@ OwnMem automatisiert, was eine Maschine beweisen kann, nicht was nur plausibel k
 | --- | --- |
 | Projektwissen soll mit Code reviewt und migriert werden. | Repository-übergreifendes persönliches Profil oder globales User Memory ist nötig. |
 | Mehrere Coding Agents wechseln sich in einem Repository ab. | Alle Gespräche sollen ohne Evidenz- oder Risikogrenze automatisch gespeichert werden. |
-| Lokaler, reproduzierbarer Recall ohne Query-Kosten zählt. | Große Cloud-Vektorsuche oder globaler Echtzeitgraph ist nötig. |
+| Lokaler, reproduzierbarer Recall ohne Retrieval-API-Rechnung zählt. | Große Cloud-Vektorsuche oder globaler Echtzeitgraph ist nötig. |
 | Falsches Memory muss zurechenbar, ablehnbar und reversibel sein. | Menge ist wichtiger als Governance. |
 
 ## Standardmäßig lokal
 
-- Standard-Recall liest nur Repository-Dateien und lokale Snapshots: null LLM-, Netzwerk- und Query-Token-Kosten.
+- Das Standard-Ranking liest nur Repository-Dateien und lokale Snapshots: keine LLM-Aufrufe, Netzwerkanfragen oder Retrieval-API-Rechnung. Gelieferte Auszüge belegen weiterhin Agent-Kontext und werden durch das konfigurierte Budget begrenzt.
 - Runtime-Events bleiben in einem von Git ignorierten lokalen Ordner. Ohne Outcomes erscheint „nicht verfügbar“, nie erfundene 0 %.
 - Secrets sowie persönliche oder Produktionsdaten, die nicht in Git gehören, gehören auch nicht ins Memory.
 - embedding ist optional und isoliert; weighted ranking beginnt erst nach lokalem A/B-Sicherheitsnachweis.
@@ -132,7 +134,7 @@ Die Zitate zeigen die Forschungslinie; sie bedeuten weder, dass diese Arbeiten O
 | [Architecture](../ARCHITECTURE.md) | Grenzen, Snapshots, Trust und Evolution |
 | [Technical design](../TECHNICAL.md) | Mechanismen, Bedrohungen und Forschung |
 | [Plugins](../PLUGINS.md) | Optionale Host-Plugins |
-| [Updating](../UPDATING.md) | Sicheres Update und 0.2 → 0.3 Migration |
+| [Updating](../UPDATING.md) | Sicheres Update und Versionsmigrationen |
 | [Privacy](../PRIVACY.md) | Lokale Daten und optionale Kanäle |
 | [Changelog](../../CHANGELOG.md) | Versionsverlauf |
 | [License](../../LICENSE) | Apache-2.0 |

@@ -1,12 +1,14 @@
 <div align="center">
 
-# OwnMem
+# OwnMem — Git-Native Memory for AI Coding Agents
 
-**Repository-owned memory for AI coding agents — local, deterministic, reviewable, and safely self-improving.**
+**Open-source project memory for Claude Code, Codex, Cursor, Gemini CLI, and other AI coding agents — local, deterministic, reviewable, and safely self-improving.**
 
-`Git-native` · `local recall` · `multi-agent` · `evidence-governed` · `Apache-2.0`
+`Git-native` · `AI agent memory` · `local recall` · `evidence-governed` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](./LICENSE)
 
@@ -16,7 +18,7 @@
 
 ## Why OwnMem
 
-Most memory systems optimize for remembering more. OwnMem starts with a different question: **who owns project knowledge, who may change it, and how can a bad memory be stopped before it changes an agent's actions?**
+Most AI agent memory systems optimize for remembering more. OwnMem starts with a different question: **who owns project knowledge, who may change it, and how can a bad memory be stopped before it changes a coding agent's actions?**
 
 | Advantage | What it means in practice |
 | --- | --- |
@@ -42,11 +44,11 @@ OwnMem separates writing experience from delivering it to an agent:
 - **Four independent delivery gates.** relevance, epistemic validity, task applicability, and action risk lead to normal delivery, advisory, quarantine, or abstention under a context budget.
 - **Bounded unattended evolution.** The end-of-turn coordinator may promote only replay-proven, quota-bounded, precisely reversible R0 metadata; R1–R5 becomes review material.
 
-## What is different in 0.3
+## How OwnMem governs AI agent memory
 
-The differentiator is not one ranking formula. OwnMem 0.3 turns agent memory into a verifiable evolution protocol:
+The differentiator is not one ranking formula. OwnMem turns coding-agent memory into a verifiable retrieval and evolution protocol:
 
-| Mechanism | OwnMem 0.3 |
+| Mechanism | How it is enforced |
 | --- | --- |
 | **Evidence-carrying memory** | Content hash, evidence root, lifecycle, applicability, risk, and predecessor receipts determine whether text may enter context. |
 | **Counterfactual promotion gate** | Automation must prove baseline miss, candidate-only recovery, and zero regression on the previously passing corpus. |
@@ -101,12 +103,12 @@ OwnMem automates the part it can prove, not the part that merely sounds plausibl
 | --- | --- |
 | A team wants project knowledge reviewed and migrated with code. | You need a cross-repository personal profile or global user memory. |
 | Several coding agents rotate through one repository. | You need to capture every conversation automatically with no evidence or risk boundary. |
-| Local, reproducible, zero-query-cost recall matters. | You need large-scale cloud vector search or a real-time global knowledge graph. |
+| Local, reproducible recall with no retrieval API bill matters. | You need large-scale cloud vector search or a real-time global knowledge graph. |
 | Bad memory must be attributable, rejectable, and reversible. | Maximum recall volume matters more than governance. |
 
 ## Local-first by default
 
-- Default recall reads repository files and local snapshots only: no LLM call, network request, or per-query token cost.
+- Default ranking reads repository files and local snapshots only: no LLM call, network request, or retrieval API bill. Delivered excerpts still use the host agent's context window and are capped by the configured context budget.
 - Runtime events stay in a Git-ignored local directory. Missing outcome samples are shown as unavailable, never fabricated as 0%.
 - Secrets and personal or production data that do not belong in Git do not belong in memory.
 - The embedding lane is optional and isolated. It joins weighted ranking only after repository-local A/B evidence passes the safety gate.
@@ -132,7 +134,7 @@ These citations describe the research lineage; they do not imply that the papers
 | [Architecture](./docs/ARCHITECTURE.md) | Package boundaries, snapshots, trust, and evolution |
 | [Technical design](./docs/TECHNICAL.md) | Mechanisms, threat model, and research mapping |
 | [Plugins](./docs/PLUGINS.md) | Optional host plugin installation |
-| [Updating](./docs/UPDATING.md) | Safe repository updates and 0.2 → 0.3 migration |
+| [Updating](./docs/UPDATING.md) | Safe repository updates and version migrations |
 | [Privacy](./docs/PRIVACY.md) | Local data and optional channel boundaries |
 | [Changelog](./CHANGELOG.md) | Version history |
 | [License](./LICENSE) | Apache-2.0 |

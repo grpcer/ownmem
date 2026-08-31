@@ -46,10 +46,10 @@ npx ownmem evolve run --force
 
 const COPY = {
   en: {
-    tagline: 'Repository-owned memory for AI coding agents — local, deterministic, reviewable, and safely self-improving.',
-    chips: '`Git-native` · `local recall` · `multi-agent` · `evidence-governed` · `Apache-2.0`',
-    headings: ['Why OwnMem', 'Architecture', 'What is different in 0.3', 'Quick start', 'Daily use', 'Trust and automation boundary', 'Where it fits', 'Local-first by default', 'Research lineage', 'Documentation'],
-    whyIntro: 'Most memory systems optimize for remembering more. OwnMem starts with a different question: **who owns project knowledge, who may change it, and how can a bad memory be stopped before it changes an agent\'s actions?**',
+    tagline: 'Open-source project memory for Claude Code, Codex, Cursor, Gemini CLI, and other AI coding agents — local, deterministic, reviewable, and safely self-improving.',
+    chips: '`Git-native` · `AI agent memory` · `local recall` · `evidence-governed` · `Apache-2.0`',
+    headings: ['Why OwnMem', 'Architecture', 'How OwnMem governs AI agent memory', 'Quick start', 'Daily use', 'Trust and automation boundary', 'Where it fits', 'Local-first by default', 'Research lineage', 'Documentation'],
+    whyIntro: 'Most AI agent memory systems optimize for remembering more. OwnMem starts with a different question: **who owns project knowledge, who may change it, and how can a bad memory be stopped before it changes a coding agent\'s actions?**',
     whyHeader: ['Advantage', 'What it means in practice'],
     whyRows: [
       ['**The repository owns memory**', 'Readable Markdown in `.ownmem/` travels through clone, review, and rollback with the code.'],
@@ -68,8 +68,8 @@ const COPY = {
       '**Four independent delivery gates.** relevance, epistemic validity, task applicability, and action risk lead to normal delivery, advisory, quarantine, or abstention under a context budget.',
       '**Bounded unattended evolution.** The end-of-turn coordinator may promote only replay-proven, quota-bounded, precisely reversible R0 metadata; R1–R5 becomes review material.',
     ],
-    techIntro: 'The differentiator is not one ranking formula. OwnMem 0.3 turns agent memory into a verifiable evolution protocol:',
-    techHeader: ['Mechanism', 'OwnMem 0.3'],
+    techIntro: 'The differentiator is not one ranking formula. OwnMem turns coding-agent memory into a verifiable retrieval and evolution protocol:',
+    techHeader: ['Mechanism', 'How it is enforced'],
     techRows: [
       ['**Evidence-carrying memory**', 'Content hash, evidence root, lifecycle, applicability, risk, and predecessor receipts determine whether text may enter context.'],
       ['**Counterfactual promotion gate**', 'Automation must prove baseline miss, candidate-only recovery, and zero regression on the previously passing corpus.'],
@@ -98,11 +98,11 @@ const COPY = {
     fitRows: [
       ['A team wants project knowledge reviewed and migrated with code.', 'You need a cross-repository personal profile or global user memory.'],
       ['Several coding agents rotate through one repository.', 'You need to capture every conversation automatically with no evidence or risk boundary.'],
-      ['Local, reproducible, zero-query-cost recall matters.', 'You need large-scale cloud vector search or a real-time global knowledge graph.'],
+      ['Local, reproducible recall with no retrieval API bill matters.', 'You need large-scale cloud vector search or a real-time global knowledge graph.'],
       ['Bad memory must be attributable, rejectable, and reversible.', 'Maximum recall volume matters more than governance.'],
     ],
     localItems: [
-      'Default recall reads repository files and local snapshots only: no LLM call, network request, or per-query token cost.',
+      'Default ranking reads repository files and local snapshots only: no LLM call, network request, or retrieval API bill. Delivered excerpts still use the host agent\'s context window and are capped by the configured context budget.',
       'Runtime events stay in a Git-ignored local directory. Missing outcome samples are shown as unavailable, never fabricated as 0%.',
       'Secrets and personal or production data that do not belong in Git do not belong in memory.',
       'The embedding lane is optional and isolated. It joins weighted ranking only after repository-local A/B evidence passes the safety gate.',
@@ -119,13 +119,13 @@ const COPY = {
     ],
     researchAfter: 'These citations describe the research lineage; they do not imply that the papers implement OwnMem or that OwnMem reproduces their experiments.',
     docsHeader: ['Document', 'Purpose'],
-    docsRows: [['architecture', 'Package boundaries, snapshots, trust, and evolution'], ['technical', 'Mechanisms, threat model, and research mapping'], ['plugins', 'Optional host plugin installation'], ['updating', 'Safe repository updates and 0.2 → 0.3 migration'], ['privacy', 'Local data and optional channel boundaries'], ['changelog', 'Version history'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', 'Package boundaries, snapshots, trust, and evolution'], ['technical', 'Mechanisms, threat model, and research mapping'], ['plugins', 'Optional host plugin installation'], ['updating', 'Safe repository updates and version migrations'], ['privacy', 'Local data and optional channel boundaries'], ['changelog', 'Version history'], ['license', 'Apache-2.0']],
     closing: 'OwnMem is open source. Reproducible issues and pull requests are welcome.',
   },
   'zh-CN': {
     tagline: '把 AI 编程 Agent 的项目记忆留在仓库里：本地、确定、可审阅，并能在安全边界内自我改进。',
     chips: '`Git 原生` · `本地召回` · `多 Agent 共用` · `证据治理` · `Apache-2.0`',
-    headings: ['为什么是 OwnMem', '总架构', '0.3 到底独特在哪里', '三分钟开始', '日常怎么用', '信任与自动化边界', '适合什么', '默认本地优先', '研究脉络', '文档'],
+    headings: ['为什么是 OwnMem', '总架构', 'OwnMem 如何治理 AI Agent 记忆', '三分钟开始', '日常怎么用', '信任与自动化边界', '适合什么', '默认本地优先', '研究脉络', '文档'],
     whyIntro: '大多数记忆方案先解决“记得更多”。OwnMem 先问另一件事：**项目知识由谁拥有，谁有权改变它，错误记忆怎样在影响 Agent 行动前被拦住？**',
     whyHeader: ['优势', '对实际开发意味着什么'],
     whyRows: [
@@ -145,8 +145,8 @@ const COPY = {
       '**交付前四道门。** 相关性、事实有效性、任务适用性和动作风险共同决定正常交付、advisory、隔离或弃答。',
       '**有界无人值守演化。** 轮末协调器只自动晋升经过回放、受配额约束且可精确撤销的 R0 元数据；R1–R5 进入复审。',
     ],
-    techIntro: '差异不在某一个排序公式，而在于 OwnMem 0.3 把 Agent Memory 做成一条可验证的演化协议：',
-    techHeader: ['机制', 'OwnMem 0.3 做了什么'],
+    techIntro: '差异不在某一个排序公式，而在于 OwnMem 把编程 Agent 记忆做成一条可验证的检索与演化协议：',
+    techHeader: ['机制', '如何强制执行'],
     techRows: [
       ['**证据携带记忆**', '内容哈希、证据根、生命周期、适用范围、风险和前驱收据共同决定正文能否进入上下文。'],
       ['**反事实晋升门**', '自动化必须证明“改前失败、只因候选改动而恢复、原有通过语料零回归”。'],
@@ -175,11 +175,11 @@ const COPY = {
     fitRows: [
       ['团队希望项目知识和代码一起评审、迁移。', '需要跨仓库个人画像或全局用户记忆。'],
       ['同一仓库轮换使用多个编程 Agent。', '希望无差别自动保存全部对话，不接受证据门与风险边界。'],
-      ['在意本地、可复现、零查询成本的召回。', '需要大规模云向量搜索或实时全局知识图谱。'],
+      ['在意本地、可复现且没有检索 API 账单的召回。', '需要大规模云向量搜索或实时全局知识图谱。'],
       ['错误记忆必须可归因、可拒绝、可撤销。', '记忆数量比治理更重要。'],
     ],
     localItems: [
-      '默认召回只读仓库文件和本地快照：零 LLM 调用、零网络请求、零查询 token 成本。',
+      '默认排序只读仓库文件和本地快照：零 LLM 调用、零网络请求、没有检索 API 账单。交付给 Agent 的摘要仍会占用上下文 token，并受配置的上下文预算限制。',
       '运行事件保存在 Git 忽略的本机目录；没有 outcome 样本就显示“暂无”，不会伪装成 0%。',
       '不该进入 Git 的密钥、个人信息和生产秘密，也不该进入记忆。',
       'embedding 通道是隔离的可选增强；只有仓库本地 A/B 证据过安全门后才参与 weighted 排序。',
@@ -196,13 +196,13 @@ const COPY = {
     ],
     researchAfter: '这些引用只说明研究脉络，不表示相关论文实现了 OwnMem，也不表示 OwnMem 复现了论文实验。',
     docsHeader: ['文档', '内容'],
-    docsRows: [['architecture', '包边界、快照、信任与演化'], ['technical', '机制、威胁模型与研究对应'], ['plugins', '可选宿主插件安装'], ['updating', '安全更新与 0.2 → 0.3 迁移'], ['privacy', '本地数据和可选通道边界'], ['changelog', '版本变化'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', '包边界、快照、信任与演化'], ['technical', '机制、威胁模型与研究对应'], ['plugins', '可选宿主插件安装'], ['updating', '安全更新与版本迁移'], ['privacy', '本地数据和可选通道边界'], ['changelog', '版本变化'], ['license', 'Apache-2.0']],
     closing: 'OwnMem 是开源项目，欢迎提交带可复现证据的 issue 和 pull request。',
   },
   'zh-TW': {
     tagline: '把 AI 程式 Agent 的專案記憶留在儲存庫：本機、確定、可審閱，並能在安全邊界內自我改進。',
     chips: '`Git 原生` · `本機召回` · `多 Agent 共用` · `證據治理` · `Apache-2.0`',
-    headings: ['為什麼是 OwnMem', '總架構', '0.3 到底獨特在哪裡', '三分鐘開始', '日常怎麼用', '信任與自動化邊界', '適合什麼', '預設本機優先', '研究脈絡', '文件'],
+    headings: ['為什麼是 OwnMem', '總架構', 'OwnMem 如何治理 AI Agent 記憶', '三分鐘開始', '日常怎麼用', '信任與自動化邊界', '適合什麼', '預設本機優先', '研究脈絡', '文件'],
     whyIntro: '多數記憶方案先解決「記得更多」。OwnMem 先問另一件事：**專案知識由誰擁有，誰有權改變它，錯誤記憶如何在影響 Agent 行動前被攔下？**',
     whyHeader: ['優勢', '對實際開發的意義'],
     whyRows: [
@@ -222,8 +222,8 @@ const COPY = {
       '**交付前四道門。** 相關性、事實有效性、任務適用性與動作風險共同決定正常交付、advisory、隔離或棄答。',
       '**有界無人值守演化。** 輪末協調器只自動晉升通過回放、受配額約束且可精確撤銷的 R0 中繼資料；R1–R5 進入複審。',
     ],
-    techIntro: '差異不在某個排序公式，而在 OwnMem 0.3 把 Agent Memory 做成可驗證的演化協定：',
-    techHeader: ['機制', 'OwnMem 0.3 做了什麼'],
+    techIntro: '差異不在某個排序公式，而在 OwnMem 把程式 Agent 記憶做成可驗證的檢索與演化協定：',
+    techHeader: ['機制', '如何強制執行'],
     techRows: [
       ['**證據攜帶記憶**', '內容雜湊、證據根、生命週期、適用範圍、風險與前驅收據共同決定正文能否進入上下文。'],
       ['**反事實晉升門**', '自動化必須證明「改前失敗、只因候選變更而恢復、既有通過語料零退步」。'],
@@ -252,11 +252,11 @@ const COPY = {
     fitRows: [
       ['團隊希望專案知識與程式碼一起審閱、遷移。', '需要跨儲存庫個人輪廓或全域使用者記憶。'],
       ['同一儲存庫輪流使用多個程式 Agent。', '希望無差別自動保存所有對話，不接受證據門與風險邊界。'],
-      ['重視本機、可重現、零查詢成本的召回。', '需要大規模雲端向量搜尋或即時全域知識圖譜。'],
+      ['重視本機、可重現且沒有檢索 API 帳單的召回。', '需要大規模雲端向量搜尋或即時全域知識圖譜。'],
       ['錯誤記憶必須可歸因、可拒絕、可撤銷。', '記憶數量比治理更重要。'],
     ],
     localItems: [
-      '預設召回只讀儲存庫檔案與本機快照：零 LLM 呼叫、零網路請求、零查詢 token 成本。',
+      '預設排序只讀儲存庫檔案與本機快照：零 LLM 呼叫、零網路請求、沒有檢索 API 帳單。交付給 Agent 的摘要仍會占用上下文 token，並受設定的上下文預算限制。',
       '執行事件保存在 Git 忽略的本機目錄；沒有 outcome 樣本就顯示「暫無」，不偽裝成 0%。',
       '不該進入 Git 的金鑰、個人資料與生產祕密，也不該進入記憶。',
       'embedding 通道是隔離的可選增強；只有儲存庫本機 A/B 證據通過安全門後才參與 weighted 排序。',
@@ -273,13 +273,13 @@ const COPY = {
     ],
     researchAfter: '這些引用只說明研究脈絡，不表示相關論文實作了 OwnMem，也不表示 OwnMem 重現了論文實驗。',
     docsHeader: ['文件', '內容'],
-    docsRows: [['architecture', '套件邊界、快照、信任與演化'], ['technical', '機制、威脅模型與研究對應'], ['plugins', '可選宿主外掛安裝'], ['updating', '安全更新與 0.2 → 0.3 遷移'], ['privacy', '本機資料與可選通道邊界'], ['changelog', '版本變更'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', '套件邊界、快照、信任與演化'], ['technical', '機制、威脅模型與研究對應'], ['plugins', '可選宿主外掛安裝'], ['updating', '安全更新與版本遷移'], ['privacy', '本機資料與可選通道邊界'], ['changelog', '版本變更'], ['license', 'Apache-2.0']],
     closing: 'OwnMem 是開源專案，歡迎提交附可重現證據的 issue 與 pull request。',
   },
   ja: {
     tagline: 'AI コーディングエージェントのプロジェクト記憶をリポジトリに置く。ローカル、決定的、レビュー可能、そして安全な範囲で自己改善。',
     chips: '`Git ネイティブ` · `ローカル想起` · `マルチエージェント` · `証拠ガバナンス` · `Apache-2.0`',
-    headings: ['なぜ OwnMem なのか', '全体アーキテクチャ', '0.3 の独自性', '3 分で始める', '日常の使い方', '信頼と自動化の境界', '適している場面', 'ローカルファースト', '研究上の系譜', 'ドキュメント'],
+    headings: ['なぜ OwnMem なのか', '全体アーキテクチャ', 'OwnMem が AI Agent Memory を管理する方法', '3 分で始める', '日常の使い方', '信頼と自動化の境界', '適している場面', 'ローカルファースト', '研究上の系譜', 'ドキュメント'],
     whyIntro: '多くの記憶システムは「より多く覚える」ことを最適化します。OwnMem は先に、**プロジェクト知識を誰が所有し、誰が変更でき、誤った記憶を行動の前にどう止めるか**を問います。',
     whyHeader: ['強み', '実開発での意味'],
     whyRows: [
@@ -299,8 +299,8 @@ const COPY = {
       '**配信前の 4 gate。** relevance、factual validity、task applicability、action risk が通常配信、advisory、quarantine、abstention を決めます。',
       '**制限付き無人進化。** turn 終了時に replay 済み・quota 内・正確に戻せる R0 だけを自動昇格し、R1–R5 はレビューへ送ります。',
     ],
-    techIntro: '違いは単一の ranking 式ではありません。OwnMem 0.3 は Agent Memory を検証可能な進化プロトコルにします。',
-    techHeader: ['仕組み', 'OwnMem 0.3 の動作'],
+    techIntro: '違いは単一の ranking 式ではありません。OwnMem は Coding Agent Memory を検証可能な検索・進化プロトコルにします。',
+    techHeader: ['仕組み', '強制方法'],
     techRows: [
       ['**証拠を伴う記憶**', 'content hash、evidence root、lifecycle、applicability、risk、predecessor receipt が注入可否を決めます。'],
       ['**反実仮想 promotion gate**', '基準で miss、候補だけで回復、既存合格 corpus は無回帰であることを証明します。'],
@@ -329,11 +329,11 @@ const COPY = {
     fitRows: [
       ['プロジェクト知識をコードと一緒に review・移行したい。', 'リポジトリ横断の個人 profile や global user memory が必要。'],
       ['同じリポジトリで複数の coding Agent を使う。', '証拠や risk boundary なしで全会話を自動保存したい。'],
-      ['ローカル、再現可能、query cost 0 の recall が重要。', '大規模 cloud vector search や realtime global knowledge graph が必要。'],
+      ['ローカルで再現可能、retrieval API 課金なしの recall が重要。', '大規模 cloud vector search や realtime global knowledge graph が必要。'],
       ['誤った記憶を追跡、拒否、撤回できる必要がある。', 'governance より記憶量を優先する。'],
     ],
     localItems: [
-      '既定 recall はリポジトリ file と local snapshot だけを読み、LLM・network・query token cost は 0 です。',
+      '既定の ranking はリポジトリ file と local snapshot だけを読み、LLM・network・retrieval API 課金はありません。Agent に渡す抜粋は context token を使い、設定された context budget で制限されます。',
       'runtime event は Git-ignore された local directory に保存。outcome sample がなければ 0% ではなく「利用不可」と表示します。',
       'Git に置けない secret、個人情報、本番 data は memory にも置きません。',
       'embedding lane は任意かつ隔離。repository-local A/B evidence が safety gate を通って初めて weighted ranking に参加します。',
@@ -350,13 +350,13 @@ const COPY = {
     ],
     researchAfter: '引用は研究上の系譜を示すもので、各論文が OwnMem を実装した、または OwnMem が実験を再現したという意味ではありません。',
     docsHeader: ['文書', '内容'],
-    docsRows: [['architecture', 'package 境界、snapshot、trust、evolution'], ['technical', 'mechanism、threat model、research mapping'], ['plugins', '任意 host plugin の導入'], ['updating', '安全な更新と 0.2 → 0.3 migration'], ['privacy', 'local data と optional channel'], ['changelog', 'version history'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', 'package 境界、snapshot、trust、evolution'], ['technical', 'mechanism、threat model、research mapping'], ['plugins', '任意 host plugin の導入'], ['updating', '安全な更新と version migration'], ['privacy', 'local data と optional channel'], ['changelog', 'version history'], ['license', 'Apache-2.0']],
     closing: 'OwnMem はオープンソースです。再現可能な issue と pull request を歓迎します。',
   },
   ko: {
     tagline: 'AI 코딩 에이전트의 프로젝트 메모리를 저장소에 둡니다. 로컬·결정적·검토 가능하며 안전한 범위에서 스스로 개선됩니다.',
     chips: '`Git 네이티브` · `로컬 회상` · `멀티 에이전트` · `증거 거버넌스` · `Apache-2.0`',
-    headings: ['왜 OwnMem인가', '전체 아키텍처', '0.3의 차별점', '3분 만에 시작', '일상 사용', '신뢰와 자동화 경계', '적합한 경우', '기본은 로컬 우선', '연구 계보', '문서'],
+    headings: ['왜 OwnMem인가', '전체 아키텍처', 'OwnMem의 AI Agent Memory 관리 방식', '3분 만에 시작', '일상 사용', '신뢰와 자동화 경계', '적합한 경우', '기본은 로컬 우선', '연구 계보', '문서'],
     whyIntro: '대부분의 메모리 시스템은 “더 많이 기억하기”를 최적화합니다. OwnMem은 먼저 **프로젝트 지식을 누가 소유하고, 누가 바꿀 수 있으며, 잘못된 메모리를 행동 전에 어떻게 막을지** 묻습니다.',
     whyHeader: ['장점', '실제 개발에서의 의미'],
     whyRows: [
@@ -376,8 +376,8 @@ const COPY = {
       '**전달 전 4개 gate.** relevance, factual validity, task applicability, action risk가 정상 전달, advisory, quarantine, abstention을 정합니다.',
       '**제한된 무인 진화.** turn 종료 coordinator는 replay 입증·quota 내·정확히 되돌릴 수 있는 R0만 자동 승격하고 R1–R5는 검토로 보냅니다.',
     ],
-    techIntro: '차이는 하나의 ranking 공식이 아닙니다. OwnMem 0.3은 Agent Memory를 검증 가능한 진화 프로토콜로 만듭니다.',
-    techHeader: ['메커니즘', 'OwnMem 0.3의 동작'],
+    techIntro: '차이는 하나의 ranking 공식이 아닙니다. OwnMem은 Coding Agent Memory를 검증 가능한 검색 및 진화 프로토콜로 만듭니다.',
+    techHeader: ['메커니즘', '강제 방식'],
     techRows: [
       ['**증거를 지닌 메모리**', 'content hash, evidence root, lifecycle, applicability, risk, predecessor receipt가 context 진입을 결정합니다.'],
       ['**반사실 promotion gate**', 'baseline miss, 후보로만 복구, 기존 통과 corpus의 무회귀를 증명해야 합니다.'],
@@ -406,11 +406,11 @@ const COPY = {
     fitRows: [
       ['프로젝트 지식을 코드와 함께 검토·이동하고 싶다.', '저장소를 넘는 개인 profile이나 global user memory가 필요하다.'],
       ['한 저장소에서 여러 coding Agent를 번갈아 쓴다.', '증거·risk boundary 없이 모든 대화를 자동 저장하고 싶다.'],
-      ['로컬·재현 가능·query cost 0 recall이 중요하다.', '대규모 cloud vector search나 realtime global knowledge graph가 필요하다.'],
+      ['로컬·재현 가능하고 retrieval API 비용이 없는 recall이 중요하다.', '대규모 cloud vector search나 realtime global knowledge graph가 필요하다.'],
       ['잘못된 메모리를 추적·거절·철회할 수 있어야 한다.', 'governance보다 메모리 양이 중요하다.'],
     ],
     localItems: [
-      '기본 recall은 저장소 파일과 local snapshot만 읽어 LLM·network·query token cost가 0입니다.',
+      '기본 ranking은 저장소 파일과 local snapshot만 읽어 LLM 호출·network 요청·retrieval API 비용이 없습니다. Agent에 전달되는 발췌문은 context token을 사용하며 설정된 예산으로 제한됩니다.',
       'runtime event는 Git-ignore된 local directory에 저장됩니다. outcome sample이 없으면 0%가 아니라 “없음”으로 표시합니다.',
       'Git에 둘 수 없는 secret, 개인정보, production data는 memory에도 두지 않습니다.',
       'embedding lane은 선택적·격리형입니다. repository-local A/B evidence가 safety gate를 통과해야 weighted ranking에 참여합니다.',
@@ -427,13 +427,13 @@ const COPY = {
     ],
     researchAfter: '인용은 연구 계보를 설명할 뿐 해당 논문이 OwnMem을 구현했거나 OwnMem이 실험을 재현했다는 뜻이 아닙니다.',
     docsHeader: ['문서', '내용'],
-    docsRows: [['architecture', 'package 경계, snapshot, trust, evolution'], ['technical', 'mechanism, threat model, research mapping'], ['plugins', '선택적 host plugin 설치'], ['updating', '안전한 업데이트와 0.2 → 0.3 migration'], ['privacy', 'local data와 optional channel'], ['changelog', 'version history'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', 'package 경계, snapshot, trust, evolution'], ['technical', 'mechanism, threat model, research mapping'], ['plugins', '선택적 host plugin 설치'], ['updating', '안전한 업데이트와 version migration'], ['privacy', 'local data와 optional channel'], ['changelog', 'version history'], ['license', 'Apache-2.0']],
     closing: 'OwnMem은 오픈 소스입니다. 재현 가능한 issue와 pull request를 환영합니다.',
   },
   es: {
     tagline: 'Memoria de proyecto para agentes de programación: local, determinista, revisable y capaz de mejorar dentro de límites seguros.',
     chips: '`Nativo de Git` · `recall local` · `multiagente` · `gobierno por evidencia` · `Apache-2.0`',
-    headings: ['Por qué OwnMem', 'Arquitectura', 'Qué distingue a la versión 0.3', 'Inicio en tres minutos', 'Uso diario', 'Límite entre confianza y automatización', 'Cuándo encaja', 'Local por defecto', 'Linaje de investigación', 'Documentación'],
+    headings: ['Por qué OwnMem', 'Arquitectura', 'Cómo gobierna OwnMem la memoria de agentes de IA', 'Inicio en tres minutos', 'Uso diario', 'Límite entre confianza y automatización', 'Cuándo encaja', 'Local por defecto', 'Linaje de investigación', 'Documentación'],
     whyIntro: 'La mayoría de los sistemas optimiza «recordar más». OwnMem empieza por otra pregunta: **¿quién posee el conocimiento del proyecto, quién puede cambiarlo y cómo se detiene un recuerdo erróneo antes de que altere las acciones del agente?**',
     whyHeader: ['Ventaja', 'Qué significa en la práctica'],
     whyRows: [
@@ -453,8 +453,8 @@ const COPY = {
       '**Cuatro puertas de entrega.** relevancia, validez factual, aplicabilidad y riesgo deciden entrega normal, advisory, cuarentena o abstención.',
       '**Evolución desatendida y acotada.** Al final del turno solo se promueve R0 demostrado, dentro de cuota y reversible; R1–R5 pasa a revisión.',
     ],
-    techIntro: 'La diferencia no es una fórmula de ranking. OwnMem 0.3 convierte la memoria del agente en un protocolo de evolución verificable:',
-    techHeader: ['Mecanismo', 'Qué hace OwnMem 0.3'],
+    techIntro: 'La diferencia no es una fórmula de ranking. OwnMem convierte la memoria de agentes de programación en un protocolo verificable de recuperación y evolución:',
+    techHeader: ['Mecanismo', 'Cómo se aplica'],
     techRows: [
       ['**Memoria con evidencia**', 'Hash, raíz de evidencia, ciclo de vida, ámbito, riesgo y receipts previos deciden si el texto entra en contexto.'],
       ['**Puerta contrafactual de promoción**', 'Debe probar fallo base, recuperación causada solo por el candidato y cero regresiones en el corpus aprobado.'],
@@ -483,11 +483,11 @@ const COPY = {
     fitRows: [
       ['El conocimiento debe revisarse y migrar con el código.', 'Necesitas un perfil personal o memoria global entre repositorios.'],
       ['Varios agentes trabajan por turnos en un repositorio.', 'Quieres capturar toda conversación sin límites de evidencia o riesgo.'],
-      ['Importa el recall local, reproducible y sin coste por consulta.', 'Necesitas búsqueda vectorial cloud masiva o un grafo global en tiempo real.'],
+      ['Importa el recall local y reproducible sin factura de API de recuperación.', 'Necesitas búsqueda vectorial cloud masiva o un grafo global en tiempo real.'],
       ['La memoria errónea debe poder atribuirse, rechazarse y revertirse.', 'La cantidad importa más que el gobierno.'],
     ],
     localItems: [
-      'El recall predeterminado solo lee archivos y snapshots locales: cero LLM, red y tokens por consulta.',
+      'El ranking predeterminado solo lee archivos y snapshots locales: cero llamadas LLM, cero red y ninguna factura de API de recuperación. Los extractos entregados sí ocupan contexto del agente y están limitados por el presupuesto configurado.',
       'Los eventos quedan en un directorio local ignorado por Git. Sin outcomes se muestra «no disponible», nunca un 0 % inventado.',
       'Secretos y datos personales o de producción que no deben ir a Git tampoco deben ir a memoria.',
       'embedding es opcional y aislado; solo entra en ranking weighted tras superar evidencia A/B local.',
@@ -504,13 +504,13 @@ const COPY = {
     ],
     researchAfter: 'Las citas describen el linaje; no implican que esos trabajos implementen OwnMem ni que OwnMem reproduzca sus experimentos.',
     docsHeader: ['Documento', 'Contenido'],
-    docsRows: [['architecture', 'Límites, snapshots, confianza y evolución'], ['technical', 'Mecanismos, amenazas e investigación'], ['plugins', 'Instalación opcional de plugins'], ['updating', 'Actualización segura y migración 0.2 → 0.3'], ['privacy', 'Datos locales y canales opcionales'], ['changelog', 'Historial de versiones'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', 'Límites, snapshots, confianza y evolución'], ['technical', 'Mecanismos, amenazas e investigación'], ['plugins', 'Instalación opcional de plugins'], ['updating', 'Actualización segura y migraciones de versión'], ['privacy', 'Datos locales y canales opcionales'], ['changelog', 'Historial de versiones'], ['license', 'Apache-2.0']],
     closing: 'OwnMem es código abierto. Se agradecen issues y pull requests reproducibles.',
   },
   fr: {
     tagline: 'La mémoire de projet des agents de code reste dans le dépôt : locale, déterministe, révisable et capable de progresser dans des limites sûres.',
     chips: '`Natif Git` · `rappel local` · `multi-agent` · `gouverné par les preuves` · `Apache-2.0`',
-    headings: ['Pourquoi OwnMem', 'Architecture', 'Ce qui distingue la version 0.3', 'Démarrer en trois minutes', 'Usage quotidien', 'Frontière entre confiance et automatisation', 'Quand OwnMem convient', 'Local par défaut', 'Filiation scientifique', 'Documentation'],
+    headings: ['Pourquoi OwnMem', 'Architecture', 'Comment OwnMem gouverne la mémoire des agents IA', 'Démarrer en trois minutes', 'Usage quotidien', 'Frontière entre confiance et automatisation', 'Quand OwnMem convient', 'Local par défaut', 'Filiation scientifique', 'Documentation'],
     whyIntro: 'La plupart des mémoires cherchent d’abord à « retenir plus ». OwnMem pose une autre question : **qui possède le savoir du projet, qui peut le modifier et comment arrêter un mauvais souvenir avant qu’il influence l’agent ?**',
     whyHeader: ['Avantage', 'Conséquence pratique'],
     whyRows: [
@@ -530,8 +530,8 @@ const COPY = {
       '**Quatre portes de livraison.** pertinence, validité, applicabilité et risque mènent à livraison, advisory, quarantaine ou abstention.',
       '**Évolution autonome bornée.** En fin de tour, seul R0 prouvé, sous quota et exactement réversible est promu ; R1–R5 est relu.',
     ],
-    techIntro: 'La différence n’est pas une formule de ranking. OwnMem 0.3 transforme la mémoire agent en protocole d’évolution vérifiable :',
-    techHeader: ['Mécanisme', 'OwnMem 0.3'],
+    techIntro: 'La différence n’est pas une formule de ranking. OwnMem transforme la mémoire des agents de code en protocole vérifiable de retrieval et d’évolution :',
+    techHeader: ['Mécanisme', 'Mode d’application'],
     techRows: [
       ['**Mémoire porteuse de preuves**', 'Hash, racine de preuve, cycle de vie, applicabilité, risque et receipts précédents décident de l’injection.'],
       ['**Porte de promotion contrefactuelle**', 'Il faut prouver l’échec initial, la récupération causée seulement par le candidat et zéro régression.'],
@@ -560,11 +560,11 @@ const COPY = {
     fitRows: [
       ['Le savoir doit être relu et migrer avec le code.', 'Il faut un profil personnel ou une mémoire globale entre dépôts.'],
       ['Plusieurs agents alternent sur un même dépôt.', 'Toute conversation doit être capturée sans limite de preuve ni de risque.'],
-      ['Le rappel local, reproductible et sans coût compte.', 'Il faut une recherche vectorielle cloud massive ou un graphe mondial temps réel.'],
+      ['Le rappel local et reproductible sans facture d’API de retrieval compte.', 'Il faut une recherche vectorielle cloud massive ou un graphe mondial temps réel.'],
       ['Une mauvaise mémoire doit être traçable, rejetable et réversible.', 'Le volume prime sur la gouvernance.'],
     ],
     localItems: [
-      'Le rappel par défaut ne lit que fichiers et snapshots locaux : zéro LLM, réseau ou token par requête.',
+      'Le ranking par défaut ne lit que fichiers et snapshots locaux : aucun appel LLM, aucune requête réseau ni facture d’API de retrieval. Les extraits livrés utilisent tout de même le contexte de l’agent, dans la limite du budget configuré.',
       'Les événements restent dans un dossier local ignoré par Git. Sans outcome, l’interface affiche « indisponible », pas un faux 0 %.',
       'Secrets et données personnelles ou de production interdits dans Git le sont aussi dans la mémoire.',
       'embedding est optionnel et isolé ; il rejoint le ranking weighted seulement après preuve A/B locale.',
@@ -581,13 +581,13 @@ const COPY = {
     ],
     researchAfter: 'Ces citations indiquent une filiation ; elles ne signifient ni que ces travaux implémentent OwnMem ni qu’OwnMem reproduit leurs expériences.',
     docsHeader: ['Document', 'Contenu'],
-    docsRows: [['architecture', 'Frontières, snapshots, confiance et évolution'], ['technical', 'Mécanismes, menaces et recherche'], ['plugins', 'Installation optionnelle des plugins'], ['updating', 'Mise à jour sûre et migration 0.2 → 0.3'], ['privacy', 'Données locales et canaux optionnels'], ['changelog', 'Historique des versions'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', 'Frontières, snapshots, confiance et évolution'], ['technical', 'Mécanismes, menaces et recherche'], ['plugins', 'Installation optionnelle des plugins'], ['updating', 'Mise à jour sûre et migrations de version'], ['privacy', 'Données locales et canaux optionnels'], ['changelog', 'Historique des versions'], ['license', 'Apache-2.0']],
     closing: 'OwnMem est open source. Les issues et pull requests reproductibles sont bienvenues.',
   },
   de: {
     tagline: 'Projektgedächtnis für Coding Agents im Repository: lokal, deterministisch, reviewbar und innerhalb sicherer Grenzen selbstverbessernd.',
     chips: '`Git-nativ` · `lokaler Recall` · `Multi-Agent` · `evidenzgesteuert` · `Apache-2.0`',
-    headings: ['Warum OwnMem', 'Architektur', 'Was 0.3 besonders macht', 'In drei Minuten starten', 'Tägliche Nutzung', 'Grenze von Vertrauen und Automatisierung', 'Wann es passt', 'Standardmäßig lokal', 'Forschungslinie', 'Dokumentation'],
+    headings: ['Warum OwnMem', 'Architektur', 'Wie OwnMem AI-Agent-Memory steuert', 'In drei Minuten starten', 'Tägliche Nutzung', 'Grenze von Vertrauen und Automatisierung', 'Wann es passt', 'Standardmäßig lokal', 'Forschungslinie', 'Dokumentation'],
     whyIntro: 'Die meisten Memory-Systeme optimieren „mehr erinnern“. OwnMem fragt zuerst: **Wem gehört Projektwissen, wer darf es ändern und wie stoppen wir eine falsche Erinnerung, bevor sie Agent-Aktionen beeinflusst?**',
     whyHeader: ['Vorteil', 'Praktische Bedeutung'],
     whyRows: [
@@ -607,8 +607,8 @@ const COPY = {
       '**Vier Auslieferungstore.** Relevanz, faktische Gültigkeit, Anwendbarkeit und Risiko führen zu normal, advisory, Quarantäne oder Abstention.',
       '**Begrenzte autonome Evolution.** Am Turn-Ende wird nur bewiesenes, quota-begrenztes und exakt reversibles R0 promoviert; R1–R5 geht ins Review.',
     ],
-    techIntro: 'Der Unterschied ist keine einzelne Ranking-Formel. OwnMem 0.3 macht Agent Memory zu einem verifizierbaren Evolutionsprotokoll:',
-    techHeader: ['Mechanismus', 'OwnMem 0.3'],
+    techIntro: 'Der Unterschied ist keine einzelne Ranking-Formel. OwnMem macht Coding-Agent-Memory zu einem verifizierbaren Retrieval- und Evolutionsprotokoll:',
+    techHeader: ['Mechanismus', 'Durchsetzung'],
     techRows: [
       ['**Evidenztragendes Memory**', 'Hash, Evidenzwurzel, Lifecycle, Anwendbarkeit, Risiko und Vorgänger-Receipts entscheiden über Kontext.'],
       ['**Kontrafaktisches Promotion-Gate**', 'Baseline-Miss, nur durch den Kandidaten erzeugte Recovery und null Regression müssen bewiesen werden.'],
@@ -637,11 +637,11 @@ const COPY = {
     fitRows: [
       ['Projektwissen soll mit Code reviewt und migriert werden.', 'Repository-übergreifendes persönliches Profil oder globales User Memory ist nötig.'],
       ['Mehrere Coding Agents wechseln sich in einem Repository ab.', 'Alle Gespräche sollen ohne Evidenz- oder Risikogrenze automatisch gespeichert werden.'],
-      ['Lokaler, reproduzierbarer Recall ohne Query-Kosten zählt.', 'Große Cloud-Vektorsuche oder globaler Echtzeitgraph ist nötig.'],
+      ['Lokaler, reproduzierbarer Recall ohne Retrieval-API-Rechnung zählt.', 'Große Cloud-Vektorsuche oder globaler Echtzeitgraph ist nötig.'],
       ['Falsches Memory muss zurechenbar, ablehnbar und reversibel sein.', 'Menge ist wichtiger als Governance.'],
     ],
     localItems: [
-      'Standard-Recall liest nur Repository-Dateien und lokale Snapshots: null LLM-, Netzwerk- und Query-Token-Kosten.',
+      'Das Standard-Ranking liest nur Repository-Dateien und lokale Snapshots: keine LLM-Aufrufe, Netzwerkanfragen oder Retrieval-API-Rechnung. Gelieferte Auszüge belegen weiterhin Agent-Kontext und werden durch das konfigurierte Budget begrenzt.',
       'Runtime-Events bleiben in einem von Git ignorierten lokalen Ordner. Ohne Outcomes erscheint „nicht verfügbar“, nie erfundene 0 %.',
       'Secrets sowie persönliche oder Produktionsdaten, die nicht in Git gehören, gehören auch nicht ins Memory.',
       'embedding ist optional und isoliert; weighted ranking beginnt erst nach lokalem A/B-Sicherheitsnachweis.',
@@ -658,13 +658,13 @@ const COPY = {
     ],
     researchAfter: 'Die Zitate zeigen die Forschungslinie; sie bedeuten weder, dass diese Arbeiten OwnMem implementieren, noch dass OwnMem ihre Experimente reproduziert.',
     docsHeader: ['Dokument', 'Inhalt'],
-    docsRows: [['architecture', 'Grenzen, Snapshots, Trust und Evolution'], ['technical', 'Mechanismen, Bedrohungen und Forschung'], ['plugins', 'Optionale Host-Plugins'], ['updating', 'Sicheres Update und 0.2 → 0.3 Migration'], ['privacy', 'Lokale Daten und optionale Kanäle'], ['changelog', 'Versionsverlauf'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', 'Grenzen, Snapshots, Trust und Evolution'], ['technical', 'Mechanismen, Bedrohungen und Forschung'], ['plugins', 'Optionale Host-Plugins'], ['updating', 'Sicheres Update und Versionsmigrationen'], ['privacy', 'Lokale Daten und optionale Kanäle'], ['changelog', 'Versionsverlauf'], ['license', 'Apache-2.0']],
     closing: 'OwnMem ist Open Source. Reproduzierbare Issues und Pull Requests sind willkommen.',
   },
   'pt-BR': {
     tagline: 'Memória de projeto para agentes de programação no repositório: local, determinística, revisável e capaz de evoluir dentro de limites seguros.',
     chips: '`Nativo do Git` · `recall local` · `multiagente` · `governado por evidência` · `Apache-2.0`',
-    headings: ['Por que OwnMem', 'Arquitetura', 'O diferencial da versão 0.3', 'Comece em três minutos', 'Uso diário', 'Limite entre confiança e automação', 'Quando usar', 'Local por padrão', 'Linhagem de pesquisa', 'Documentação'],
+    headings: ['Por que OwnMem', 'Arquitetura', 'Como o OwnMem governa memória de agentes de IA', 'Comece em três minutos', 'Uso diário', 'Limite entre confiança e automação', 'Quando usar', 'Local por padrão', 'Linhagem de pesquisa', 'Documentação'],
     whyIntro: 'A maioria dos sistemas otimiza “lembrar mais”. O OwnMem começa por outra pergunta: **quem possui o conhecimento do projeto, quem pode alterá-lo e como impedir uma memória errada antes que ela mude as ações do agente?**',
     whyHeader: ['Vantagem', 'O que significa na prática'],
     whyRows: [
@@ -684,8 +684,8 @@ const COPY = {
       '**Quatro portões de entrega.** relevância, validade factual, aplicabilidade e risco resultam em entrega, advisory, quarentena ou abstenção.',
       '**Evolução autônoma limitada.** No fim do turno, só R0 comprovado, dentro da cota e exatamente reversível é promovido; R1–R5 vai para revisão.',
     ],
-    techIntro: 'O diferencial não é uma fórmula de ranking. O OwnMem 0.3 transforma memória de agente em um protocolo de evolução verificável:',
-    techHeader: ['Mecanismo', 'OwnMem 0.3'],
+    techIntro: 'O diferencial não é uma fórmula de ranking. O OwnMem transforma memória de agentes de programação em um protocolo verificável de recuperação e evolução:',
+    techHeader: ['Mecanismo', 'Como é aplicado'],
     techRows: [
       ['**Memória com evidência**', 'Hash, raiz de evidência, ciclo de vida, aplicabilidade, risco e receipts anteriores decidem a entrada no contexto.'],
       ['**Portão contrafactual de promoção**', 'É preciso provar falha na base, recuperação só pelo candidato e zero regressão no corpus aprovado.'],
@@ -714,11 +714,11 @@ const COPY = {
     fitRows: [
       ['O conhecimento deve ser revisado e migrar com o código.', 'Você precisa de perfil pessoal ou memória global entre repositórios.'],
       ['Vários agentes se alternam em um repositório.', 'Você quer capturar toda conversa sem limites de evidência ou risco.'],
-      ['Recall local, reproduzível e sem custo por consulta importa.', 'Você precisa de busca vetorial cloud em escala ou grafo global em tempo real.'],
+      ['Recall local e reproduzível sem cobrança de API de recuperação importa.', 'Você precisa de busca vetorial cloud em escala ou grafo global em tempo real.'],
       ['Memória errada deve ser atribuível, rejeitável e reversível.', 'Quantidade importa mais que governança.'],
     ],
     localItems: [
-      'O recall padrão lê apenas arquivos e snapshots locais: zero LLM, rede e tokens por consulta.',
+      'O ranking padrão lê apenas arquivos e snapshots locais: zero chamadas LLM, zero rede e nenhuma cobrança de API de recuperação. Os trechos entregues ainda usam o contexto do agente e são limitados pelo orçamento configurado.',
       'Eventos ficam em diretório local ignorado pelo Git. Sem outcomes, aparece “indisponível”, nunca 0% inventado.',
       'Segredos e dados pessoais ou de produção que não pertencem ao Git também não pertencem à memória.',
       'embedding é opcional e isolado; só entra no ranking weighted após evidência A/B local.',
@@ -735,7 +735,7 @@ const COPY = {
     ],
     researchAfter: 'As citações mostram a linhagem; não significam que esses trabalhos implementem o OwnMem nem que o OwnMem reproduza seus experimentos.',
     docsHeader: ['Documento', 'Conteúdo'],
-    docsRows: [['architecture', 'Limites, snapshots, confiança e evolução'], ['technical', 'Mecanismos, ameaças e pesquisa'], ['plugins', 'Instalação opcional de plugins'], ['updating', 'Atualização segura e migração 0.2 → 0.3'], ['privacy', 'Dados locais e canais opcionais'], ['changelog', 'Histórico de versões'], ['license', 'Apache-2.0']],
+    docsRows: [['architecture', 'Limites, snapshots, confiança e evolução'], ['technical', 'Mecanismos, ameaças e pesquisa'], ['plugins', 'Instalação opcional de plugins'], ['updating', 'Atualização segura e migrações de versão'], ['privacy', 'Dados locais e canais opcionais'], ['changelog', 'Histórico de versões'], ['license', 'Apache-2.0']],
     closing: 'OwnMem é código aberto. Issues e pull requests reproduzíveis são bem-vindos.',
   },
 };
@@ -777,19 +777,22 @@ function documentTargets(file, locale) {
 
 function render(locale, file) {
   const t = COPY[locale];
+  const title = locale === 'en' ? 'OwnMem — Git-Native Memory for AI Coding Agents' : 'OwnMem';
   const assetBase = relativeLink(file, 'docs/assets').replace(/\/$/, '');
   const docs = documentTargets(file, locale);
   const suffix = locale === 'en' ? '' : `-${locale}`;
   const docRows = t.docsRows.map(([key, purpose]) => [`[${DOCUMENT_LABELS[key]}](${docs[key]})`, purpose]);
   return `<div align="center">
 
-# OwnMem
+# ${title}
 
 **${t.tagline}**
 
 ${t.chips}
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](${docs.license})
 

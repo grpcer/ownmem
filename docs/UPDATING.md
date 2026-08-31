@@ -17,7 +17,18 @@ npx ownmem compile
 lock, generated adapters, and intentional memory changes together so every
 agent and CI environment uses the same version.
 
-## Moving from 0.2.x to 0.3.x
+## Moving from 0.4.x to 0.5.x
+
+Version 0.5 aligns the published query contract with `ownmem-query-result/v5`,
+separates telemetry under the current `0.10.0` runtime identity, observes
+query-span coverage without enabling an unsafe multilingual threshold, and
+short-circuits exact path and identifier queries before broad recovery lanes.
+
+There is no manual data migration. Run the normal update commands above; the
+compiler rebuilds an incompatible derived snapshot from the Markdown source of
+truth. Local observability remains local and reports runtime cohorts separately.
+
+## Legacy migration: 0.2.x to 0.3.x
 
 Version 0.3 adds content-bound trust receipts, canonical compiled recall,
 separate delivery verdicts, and bounded unattended R0 evolution.

@@ -1,7 +1,7 @@
 {
   "name": "ownmem",
-  "version": "0.4.0",
-  "description": "Git-native project memory for AI coding agents: deterministic local recall, evidence-governed trust, and bounded unattended evolution.",
+  "version": "0.5.0",
+  "description": "Git-native project memory for AI coding agents. Deterministic local recall and evidence-governed evolution for Claude Code, Codex, Cursor, and Gemini CLI.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "grpcer",
@@ -52,9 +52,12 @@
   "keywords": [
     "agent-memory",
     "agent-memory-system",
+    "agentic-memory",
     "ai-agent-memory",
     "ai-agent-memory-system",
     "ai",
+    "ai-coding-agent",
+    "ai-coding-assistant",
     "ai-memory",
     "ai-memory-system",
     "antigravity",
@@ -66,6 +69,7 @@
     "coding-agents",
     "codex",
     "codex-memory",
+    "context-management",
     "cursor",
     "deterministic-retrieval",
     "engineering-memory",
@@ -74,12 +78,15 @@
     "grok-cli",
     "llm-memory",
     "local-first",
+    "long-term-memory",
     "markdown-memory",
     "memory",
     "offline-memory",
     "ownmem",
     "persistent-memory",
     "project-memory",
-    "repository-memory"
+    "repository-context",
+    "repository-memory",
+    "software-engineering-memory"
   ]
 }

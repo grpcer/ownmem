@@ -187,7 +187,7 @@
         "rrf_candidates": { "$ref": "#/$defs/nonNegativeInteger" },
         "abstained": { "type": "boolean" },
         "abstain_reason": {
-          "enum": [null, "no-trusted-candidate", "below-threshold", "budget-empty", "all-candidates-excluded"]
+          "enum": [null, "no-trusted-candidate", "below-threshold", "below-coverage", "budget-empty", "all-candidates-excluded"]
         },
         "returned_topics": { "$ref": "#/$defs/topicNames" },
         "estimated_tokens": { "$ref": "#/$defs/nonNegativeInteger" },

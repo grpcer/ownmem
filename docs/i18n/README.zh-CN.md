@@ -7,6 +7,8 @@
 `Git 原生` · `本地召回` · `多 Agent 共用` · `证据治理` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
 
@@ -42,11 +44,11 @@ OwnMem 把“写下经验”和“把经验交给 Agent”分成两个受控流�
 - **交付前四道门。** 相关性、事实有效性、任务适用性和动作风险共同决定正常交付、advisory、隔离或弃答。
 - **有界无人值守演化。** 轮末协调器只自动晋升经过回放、受配额约束且可精确撤销的 R0 元数据；R1–R5 进入复审。
 
-## 0.3 到底独特在哪里
+## OwnMem 如何治理 AI Agent 记忆
 
-差异不在某一个排序公式，而在于 OwnMem 0.3 把 Agent Memory 做成一条可验证的演化协议：
+差异不在某一个排序公式，而在于 OwnMem 把编程 Agent 记忆做成一条可验证的检索与演化协议：
 
-| 机制 | OwnMem 0.3 做了什么 |
+| 机制 | 如何强制执行 |
 | --- | --- |
 | **证据携带记忆** | 内容哈希、证据根、生命周期、适用范围、风险和前驱收据共同决定正文能否进入上下文。 |
 | **反事实晋升门** | 自动化必须证明“改前失败、只因候选改动而恢复、原有通过语料零回归”。 |
@@ -101,12 +103,12 @@ OwnMem 自动化的是“机器能证明”的部分，不是“听起来像对�
 | --- | --- |
 | 团队希望项目知识和代码一起评审、迁移。 | 需要跨仓库个人画像或全局用户记忆。 |
 | 同一仓库轮换使用多个编程 Agent。 | 希望无差别自动保存全部对话，不接受证据门与风险边界。 |
-| 在意本地、可复现、零查询成本的召回。 | 需要大规模云向量搜索或实时全局知识图谱。 |
+| 在意本地、可复现且没有检索 API 账单的召回。 | 需要大规模云向量搜索或实时全局知识图谱。 |
 | 错误记忆必须可归因、可拒绝、可撤销。 | 记忆数量比治理更重要。 |
 
 ## 默认本地优先
 
-- 默认召回只读仓库文件和本地快照：零 LLM 调用、零网络请求、零查询 token 成本。
+- 默认排序只读仓库文件和本地快照：零 LLM 调用、零网络请求、没有检索 API 账单。交付给 Agent 的摘要仍会占用上下文 token，并受配置的上下文预算限制。
 - 运行事件保存在 Git 忽略的本机目录；没有 outcome 样本就显示“暂无”，不会伪装成 0%。
 - 不该进入 Git 的密钥、个人信息和生产秘密，也不该进入记忆。
 - embedding 通道是隔离的可选增强；只有仓库本地 A/B 证据过安全门后才参与 weighted 排序。
@@ -132,7 +134,7 @@ OwnMem 不把这些基础概念冒充原创；它的贡献是把它们组合成�
 | [Architecture](../ARCHITECTURE.md) | 包边界、快照、信任与演化 |
 | [Technical design](./TECHNICAL.zh-CN.md) | 机制、威胁模型与研究对应 |
 | [Plugins](../PLUGINS.md) | 可选宿主插件安装 |
-| [Updating](../UPDATING.md) | 安全更新与 0.2 → 0.3 迁移 |
+| [Updating](../UPDATING.md) | 安全更新与版本迁移 |
 | [Privacy](../PRIVACY.md) | 本地数据和可选通道边界 |
 | [Changelog](../../CHANGELOG.md) | 版本变化 |
 | [License](../../LICENSE) | Apache-2.0 |

@@ -5,6 +5,55 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-31
+
+### Added
+
+- Recall results now expose normalized query-span coverage as an observable
+  ranking feature. The accompanying conjunctive abstention floor remains
+  disabled by default until multilingual holdout evidence can support a safe
+  threshold; this release measures the signal without silently changing
+  recall decisions.
+- The public benchmark now reports an answer-ablation partition so false
+  answers on queries with no gold memory are visible instead of being hidden
+  by saturated positive fixtures.
+
+### Changed
+
+- The root README and all eight localized READMEs now use version-independent
+  architecture language, current host and migration guidance, searchable AI
+  coding-agent terminology, and an explicit distinction between zero-call
+  local ranking and the bounded context tokens consumed by delivered excerpts.
+- Full-index compilation now avoids `Intl.Segmenter` for plain letter and
+  number runs whose graphemes are already individual Unicode code points, and
+  builds n-grams without per-window array slices. Combining marks and
+  decomposed Hangul still use the standards-based grapheme path, preserving
+  multilingual token output while reducing full-build allocation pressure.
+- Benchmark floors are enforced per evidence-bearing group rather than as
+  per-case zero-tolerance assertions, leaving measurable headroom without
+  weakening the aggregate quality lock.
+- Pure repository-path recalls now stop after exact path and basename evidence.
+  They no longer expand an exact topic through shared L2 or evidence graph
+  nodes, which could turn one file match into fifty unrelated candidates and
+  make trust revalidation dominate every matching edit. Mixed path-plus-prose
+  queries retain graph expansion.
+- Recall and compiler stack identity advances to `0.10.0`. Ranking/schema
+  changes after 0.4.0 had incorrectly kept the `0.8.0` identity, merging
+  before/after telemetry cohorts and allowing stale A/B evidence to appear
+  current.
+- Exact single-class identifier and error queries now skip broad lexical and
+  typo-recovery lanes after structural evidence resolves them, while genuine
+  typos and mixed prose keep those lanes. Graph traversal also stops treating
+  an L2 routing index as a semantic relay to every topic in its platform
+  bucket; direct topic, code, document, and test relations remain available.
+
+### Fixed
+
+- Holdout case details are withheld unless an operator explicitly requests
+  them, preventing routine gate runs from training against the sealed set.
+- `ownmem recall --help` now names the `ownmem-query-result/v5` contract it
+  actually emits instead of the retired v1 schema.
+
 ## [0.4.0] - 2026-08-27
 
 ### Added

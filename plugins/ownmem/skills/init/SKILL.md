@@ -15,7 +15,8 @@ npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --c
 
 Adjust the flags before running:
 
-- `--hosts`: `claude`, `codex`, or `claude,codex` — match the tools the team uses.
+- `--hosts`: any comma-separated combination of `claude`, `codex`, `cursor`,
+  `gemini`, and `generic` — match the tools the team uses.
 - `--layers`: `core`, `gates`, `compiler`, or `dashboard` — `dashboard` adds the local Web console.
 - Drop `--hook` if the team does not want the Claude Code PreToolUse recall guard.
 

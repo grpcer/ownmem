@@ -7,6 +7,8 @@
 `Nativo de Git` · `recall local` · `multiagente` · `gobierno por evidencia` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
 
@@ -42,11 +44,11 @@ OwnMem separa «escribir la experiencia» de «entregarla a un agente»:
 - **Cuatro puertas de entrega.** relevancia, validez factual, aplicabilidad y riesgo deciden entrega normal, advisory, cuarentena o abstención.
 - **Evolución desatendida y acotada.** Al final del turno solo se promueve R0 demostrado, dentro de cuota y reversible; R1–R5 pasa a revisión.
 
-## Qué distingue a la versión 0.3
+## Cómo gobierna OwnMem la memoria de agentes de IA
 
-La diferencia no es una fórmula de ranking. OwnMem 0.3 convierte la memoria del agente en un protocolo de evolución verificable:
+La diferencia no es una fórmula de ranking. OwnMem convierte la memoria de agentes de programación en un protocolo verificable de recuperación y evolución:
 
-| Mecanismo | Qué hace OwnMem 0.3 |
+| Mecanismo | Cómo se aplica |
 | --- | --- |
 | **Memoria con evidencia** | Hash, raíz de evidencia, ciclo de vida, ámbito, riesgo y receipts previos deciden si el texto entra en contexto. |
 | **Puerta contrafactual de promoción** | Debe probar fallo base, recuperación causada solo por el candidato y cero regresiones en el corpus aprobado. |
@@ -101,12 +103,12 @@ OwnMem automatiza lo que una máquina puede demostrar, no lo que solo parece pla
 | --- | --- |
 | El conocimiento debe revisarse y migrar con el código. | Necesitas un perfil personal o memoria global entre repositorios. |
 | Varios agentes trabajan por turnos en un repositorio. | Quieres capturar toda conversación sin límites de evidencia o riesgo. |
-| Importa el recall local, reproducible y sin coste por consulta. | Necesitas búsqueda vectorial cloud masiva o un grafo global en tiempo real. |
+| Importa el recall local y reproducible sin factura de API de recuperación. | Necesitas búsqueda vectorial cloud masiva o un grafo global en tiempo real. |
 | La memoria errónea debe poder atribuirse, rechazarse y revertirse. | La cantidad importa más que el gobierno. |
 
 ## Local por defecto
 
-- El recall predeterminado solo lee archivos y snapshots locales: cero LLM, red y tokens por consulta.
+- El ranking predeterminado solo lee archivos y snapshots locales: cero llamadas LLM, cero red y ninguna factura de API de recuperación. Los extractos entregados sí ocupan contexto del agente y están limitados por el presupuesto configurado.
 - Los eventos quedan en un directorio local ignorado por Git. Sin outcomes se muestra «no disponible», nunca un 0 % inventado.
 - Secretos y datos personales o de producción que no deben ir a Git tampoco deben ir a memoria.
 - embedding es opcional y aislado; solo entra en ranking weighted tras superar evidencia A/B local.
@@ -132,7 +134,7 @@ Las citas describen el linaje; no implican que esos trabajos implementen OwnMem 
 | [Architecture](../ARCHITECTURE.md) | Límites, snapshots, confianza y evolución |
 | [Technical design](../TECHNICAL.md) | Mecanismos, amenazas e investigación |
 | [Plugins](../PLUGINS.md) | Instalación opcional de plugins |
-| [Updating](../UPDATING.md) | Actualización segura y migración 0.2 → 0.3 |
+| [Updating](../UPDATING.md) | Actualización segura y migraciones de versión |
 | [Privacy](../PRIVACY.md) | Datos locales y canales opcionales |
 | [Changelog](../../CHANGELOG.md) | Historial de versiones |
 | [License](../../LICENSE) | Apache-2.0 |

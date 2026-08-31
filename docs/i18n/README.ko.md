@@ -7,6 +7,8 @@
 `Git 네이티브` · `로컬 회상` · `멀티 에이전트` · `증거 거버넌스` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
 
@@ -42,11 +44,11 @@ OwnMem은 “경험을 기록하는 일”과 “Agent에게 전달하는 일”
 - **전달 전 4개 gate.** relevance, factual validity, task applicability, action risk가 정상 전달, advisory, quarantine, abstention을 정합니다.
 - **제한된 무인 진화.** turn 종료 coordinator는 replay 입증·quota 내·정확히 되돌릴 수 있는 R0만 자동 승격하고 R1–R5는 검토로 보냅니다.
 
-## 0.3의 차별점
+## OwnMem의 AI Agent Memory 관리 방식
 
-차이는 하나의 ranking 공식이 아닙니다. OwnMem 0.3은 Agent Memory를 검증 가능한 진화 프로토콜로 만듭니다.
+차이는 하나의 ranking 공식이 아닙니다. OwnMem은 Coding Agent Memory를 검증 가능한 검색 및 진화 프로토콜로 만듭니다.
 
-| 메커니즘 | OwnMem 0.3의 동작 |
+| 메커니즘 | 강제 방식 |
 | --- | --- |
 | **증거를 지닌 메모리** | content hash, evidence root, lifecycle, applicability, risk, predecessor receipt가 context 진입을 결정합니다. |
 | **반사실 promotion gate** | baseline miss, 후보로만 복구, 기존 통과 corpus의 무회귀를 증명해야 합니다. |
@@ -101,12 +103,12 @@ OwnMem이 자동화하는 것은 “기계가 증명할 수 있는 부분”이�
 | --- | --- |
 | 프로젝트 지식을 코드와 함께 검토·이동하고 싶다. | 저장소를 넘는 개인 profile이나 global user memory가 필요하다. |
 | 한 저장소에서 여러 coding Agent를 번갈아 쓴다. | 증거·risk boundary 없이 모든 대화를 자동 저장하고 싶다. |
-| 로컬·재현 가능·query cost 0 recall이 중요하다. | 대규모 cloud vector search나 realtime global knowledge graph가 필요하다. |
+| 로컬·재현 가능하고 retrieval API 비용이 없는 recall이 중요하다. | 대규모 cloud vector search나 realtime global knowledge graph가 필요하다. |
 | 잘못된 메모리를 추적·거절·철회할 수 있어야 한다. | governance보다 메모리 양이 중요하다. |
 
 ## 기본은 로컬 우선
 
-- 기본 recall은 저장소 파일과 local snapshot만 읽어 LLM·network·query token cost가 0입니다.
+- 기본 ranking은 저장소 파일과 local snapshot만 읽어 LLM 호출·network 요청·retrieval API 비용이 없습니다. Agent에 전달되는 발췌문은 context token을 사용하며 설정된 예산으로 제한됩니다.
 - runtime event는 Git-ignore된 local directory에 저장됩니다. outcome sample이 없으면 0%가 아니라 “없음”으로 표시합니다.
 - Git에 둘 수 없는 secret, 개인정보, production data는 memory에도 두지 않습니다.
 - embedding lane은 선택적·격리형입니다. repository-local A/B evidence가 safety gate를 통과해야 weighted ranking에 참여합니다.
@@ -132,7 +134,7 @@ OwnMem은 기초 기술을 발명했다고 주장하지 않습니다. 기여는 
 | [Architecture](../ARCHITECTURE.md) | package 경계, snapshot, trust, evolution |
 | [Technical design](../TECHNICAL.md) | mechanism, threat model, research mapping |
 | [Plugins](../PLUGINS.md) | 선택적 host plugin 설치 |
-| [Updating](../UPDATING.md) | 안전한 업데이트와 0.2 → 0.3 migration |
+| [Updating](../UPDATING.md) | 안전한 업데이트와 version migration |
 | [Privacy](../PRIVACY.md) | local data와 optional channel |
 | [Changelog](../../CHANGELOG.md) | version history |
 | [License](../../LICENSE) | Apache-2.0 |

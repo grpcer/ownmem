@@ -7,6 +7,8 @@
 `Nativo do Git` · `recall local` · `multiagente` · `governado por evidência` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
 
@@ -42,11 +44,11 @@ O OwnMem separa “registrar a experiência” de “entregá-la a um agente”:
 - **Quatro portões de entrega.** relevância, validade factual, aplicabilidade e risco resultam em entrega, advisory, quarentena ou abstenção.
 - **Evolução autônoma limitada.** No fim do turno, só R0 comprovado, dentro da cota e exatamente reversível é promovido; R1–R5 vai para revisão.
 
-## O diferencial da versão 0.3
+## Como o OwnMem governa memória de agentes de IA
 
-O diferencial não é uma fórmula de ranking. O OwnMem 0.3 transforma memória de agente em um protocolo de evolução verificável:
+O diferencial não é uma fórmula de ranking. O OwnMem transforma memória de agentes de programação em um protocolo verificável de recuperação e evolução:
 
-| Mecanismo | OwnMem 0.3 |
+| Mecanismo | Como é aplicado |
 | --- | --- |
 | **Memória com evidência** | Hash, raiz de evidência, ciclo de vida, aplicabilidade, risco e receipts anteriores decidem a entrada no contexto. |
 | **Portão contrafactual de promoção** | É preciso provar falha na base, recuperação só pelo candidato e zero regressão no corpus aprovado. |
@@ -101,12 +103,12 @@ O OwnMem automatiza o que a máquina consegue provar, não o que apenas parece p
 | --- | --- |
 | O conhecimento deve ser revisado e migrar com o código. | Você precisa de perfil pessoal ou memória global entre repositórios. |
 | Vários agentes se alternam em um repositório. | Você quer capturar toda conversa sem limites de evidência ou risco. |
-| Recall local, reproduzível e sem custo por consulta importa. | Você precisa de busca vetorial cloud em escala ou grafo global em tempo real. |
+| Recall local e reproduzível sem cobrança de API de recuperação importa. | Você precisa de busca vetorial cloud em escala ou grafo global em tempo real. |
 | Memória errada deve ser atribuível, rejeitável e reversível. | Quantidade importa mais que governança. |
 
 ## Local por padrão
 
-- O recall padrão lê apenas arquivos e snapshots locais: zero LLM, rede e tokens por consulta.
+- O ranking padrão lê apenas arquivos e snapshots locais: zero chamadas LLM, zero rede e nenhuma cobrança de API de recuperação. Os trechos entregues ainda usam o contexto do agente e são limitados pelo orçamento configurado.
 - Eventos ficam em diretório local ignorado pelo Git. Sem outcomes, aparece “indisponível”, nunca 0% inventado.
 - Segredos e dados pessoais ou de produção que não pertencem ao Git também não pertencem à memória.
 - embedding é opcional e isolado; só entra no ranking weighted após evidência A/B local.
@@ -132,7 +134,7 @@ As citações mostram a linhagem; não significam que esses trabalhos implemente
 | [Architecture](../ARCHITECTURE.md) | Limites, snapshots, confiança e evolução |
 | [Technical design](../TECHNICAL.md) | Mecanismos, ameaças e pesquisa |
 | [Plugins](../PLUGINS.md) | Instalação opcional de plugins |
-| [Updating](../UPDATING.md) | Atualização segura e migração 0.2 → 0.3 |
+| [Updating](../UPDATING.md) | Atualização segura e migrações de versão |
 | [Privacy](../PRIVACY.md) | Dados locais e canais opcionais |
 | [Changelog](../../CHANGELOG.md) | Histórico de versões |
 | [License](../../LICENSE) | Apache-2.0 |

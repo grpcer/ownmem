@@ -297,6 +297,7 @@
             null,
             "no-trusted-candidate",
             "below-threshold",
+            "below-coverage",
             "blocked-validity",
             "blocked-applicability",
             "blocked-risk",
@@ -418,6 +419,7 @@
                 "enum": [
                   "no-trusted-candidate",
                   "below-threshold",
+                  "below-coverage",
                   "blocked-validity",
                   "blocked-applicability",
                   "blocked-risk",

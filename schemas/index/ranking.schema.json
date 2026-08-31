@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ownmem-index.ranking/v3",
+  "$id": "ownmem-index.ranking/v4",
   "title": "OwnMem deterministic ranking manifest",
   "type": "object",
   "required": [
@@ -13,13 +13,14 @@
     "rrf",
     "features",
     "thresholds",
+    "coverage_floor",
     "mmr",
     "conflicts",
     "trust",
     "quality_source"
   ],
   "properties": {
-    "schema": { "const": "ownmem-index.ranking/v3" },
+    "schema": { "const": "ownmem-index.ranking/v4" },
     "profile": { "const": "deterministic-ranker-v1" },
     "compiler_version": { "$ref": "#/$defs/semver" },
     "tokenizer_profile": { "type": "string", "minLength": 1, "maxLength": 128 },
@@ -89,6 +90,7 @@
             "approximate_anchor",
             "embedding_similarity",
             "query_coverage",
+            "query_span_coverage",
             "matched_terms",
             "high_signal_concepts",
             "high_signal_terms",
@@ -106,6 +108,7 @@
             "approximate_anchor": { "$ref": "#/$defs/nonNegativeNumber" },
             "embedding_similarity": { "$ref": "#/$defs/nonNegativeNumber" },
             "query_coverage": { "$ref": "#/$defs/nonNegativeNumber" },
+            "query_span_coverage": { "$ref": "#/$defs/nonNegativeNumber" },
             "matched_terms": { "$ref": "#/$defs/nonNegativeNumber" },
             "high_signal_concepts": { "$ref": "#/$defs/nonNegativeNumber" },
             "high_signal_terms": { "$ref": "#/$defs/nonNegativeNumber" },
@@ -236,6 +239,7 @@
       },
       "additionalProperties": false
     },
+    "coverage_floor": { "$ref": "#/$defs/unitNumber" },
     "mmr": {
       "type": "object",
       "required": ["lambda", "similarity_threshold", "default_limit", "maximum_limit"],

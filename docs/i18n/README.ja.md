@@ -7,6 +7,8 @@
 `Git ネイティブ` · `ローカル想起` · `マルチエージェント` · `証拠ガバナンス` · `Apache-2.0`
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
+[![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
 
@@ -42,11 +44,11 @@ OwnMem は「経験を書くこと」と「Agent に渡すこと」を分離し�
 - **配信前の 4 gate。** relevance、factual validity、task applicability、action risk が通常配信、advisory、quarantine、abstention を決めます。
 - **制限付き無人進化。** turn 終了時に replay 済み・quota 内・正確に戻せる R0 だけを自動昇格し、R1–R5 はレビューへ送ります。
 
-## 0.3 の独自性
+## OwnMem が AI Agent Memory を管理する方法
 
-違いは単一の ranking 式ではありません。OwnMem 0.3 は Agent Memory を検証可能な進化プロトコルにします。
+違いは単一の ranking 式ではありません。OwnMem は Coding Agent Memory を検証可能な検索・進化プロトコルにします。
 
-| 仕組み | OwnMem 0.3 の動作 |
+| 仕組み | 強制方法 |
 | --- | --- |
 | **証拠を伴う記憶** | content hash、evidence root、lifecycle、applicability、risk、predecessor receipt が注入可否を決めます。 |
 | **反実仮想 promotion gate** | 基準で miss、候補だけで回復、既存合格 corpus は無回帰であることを証明します。 |
@@ -101,12 +103,12 @@ OwnMem が自動化するのは「機械で証明できる部分」であり、�
 | --- | --- |
 | プロジェクト知識をコードと一緒に review・移行したい。 | リポジトリ横断の個人 profile や global user memory が必要。 |
 | 同じリポジトリで複数の coding Agent を使う。 | 証拠や risk boundary なしで全会話を自動保存したい。 |
-| ローカル、再現可能、query cost 0 の recall が重要。 | 大規模 cloud vector search や realtime global knowledge graph が必要。 |
+| ローカルで再現可能、retrieval API 課金なしの recall が重要。 | 大規模 cloud vector search や realtime global knowledge graph が必要。 |
 | 誤った記憶を追跡、拒否、撤回できる必要がある。 | governance より記憶量を優先する。 |
 
 ## ローカルファースト
 
-- 既定 recall はリポジトリ file と local snapshot だけを読み、LLM・network・query token cost は 0 です。
+- 既定の ranking はリポジトリ file と local snapshot だけを読み、LLM・network・retrieval API 課金はありません。Agent に渡す抜粋は context token を使い、設定された context budget で制限されます。
 - runtime event は Git-ignore された local directory に保存。outcome sample がなければ 0% ではなく「利用不可」と表示します。
 - Git に置けない secret、個人情報、本番 data は memory にも置きません。
 - embedding lane は任意かつ隔離。repository-local A/B evidence が safety gate を通って初めて weighted ranking に参加します。
@@ -132,7 +134,7 @@ OwnMem は基礎技術の発明を主張しません。貢献は、それらを�
 | [Architecture](../ARCHITECTURE.md) | package 境界、snapshot、trust、evolution |
 | [Technical design](../TECHNICAL.md) | mechanism、threat model、research mapping |
 | [Plugins](../PLUGINS.md) | 任意 host plugin の導入 |
-| [Updating](../UPDATING.md) | 安全な更新と 0.2 → 0.3 migration |
+| [Updating](../UPDATING.md) | 安全な更新と version migration |
 | [Privacy](../PRIVACY.md) | local data と optional channel |
 | [Changelog](../../CHANGELOG.md) | version history |
 | [License](../../LICENSE) | Apache-2.0 |

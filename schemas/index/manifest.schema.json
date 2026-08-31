@@ -110,7 +110,7 @@
               "type": "object",
               "properties": {
                 "file": { "const": "ranking.json" },
-                "schema": { "const": "ownmem-index.ranking/v3" }
+                "schema": { "const": "ownmem-index.ranking/v4" }
               }
             }
           ]

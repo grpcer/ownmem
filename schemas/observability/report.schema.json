@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/grpcer/ownmem/main/schemas/observability/report.schema.json",
-  "title": "OwnMem local memory report v7",
+  "title": "OwnMem local memory report v8",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "generated_at", "environment", "window", "metric_roles", "samples", "delivery", "adoption", "performance", "quality", "context", "maintenance", "governance", "gates", "data_quality", "recommendations"],
   "properties": {
-    "schema": { "const": "ownmem-report/v7" },
+    "schema": { "const": "ownmem-report/v8" },
     "generated_at": { "type": "string", "format": "date-time" },
     "environment": {
       "type": "object",
@@ -227,13 +227,23 @@
           "type": "object",
           "additionalProperties": false,
           "description": "Stream 1: did recall return the right thing, judged by whoever deliberately recorded a verdict.",
-          "required": ["stream", "total", "verdicts", "denominator", "denominator_definition", "sample", "profile", "wrong_miss_rate", "expected_in_top_k_rate", "accuracy_measurable", "accuracy_unmeasurable_reason"],
+          "required": ["stream", "total", "verdicts", "wrong_result_shape", "denominator", "denominator_definition", "sample", "profile", "wrong_miss_rate", "expected_in_top_k_rate", "accuracy_measurable", "accuracy_unmeasurable_reason"],
           "properties": {
             "stream": { "const": "retrieval_verdict" },
             "total": { "$ref": "#/$defs/count" },
             "verdicts": {
               "$ref": "#/$defs/countMap",
               "description": "One bucket per verdict the retrieval-feedback module accepts, seeded to 0 and produced by its own summarizer. The vocabulary is deliberately NOT restated here: a second inventory of verdict names is what turned the `miss` -> `retrieval_miss` rename into a report that failed its own schema the first time the new verdict was recorded."
+            },
+            "wrong_result_shape": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["returned", "abstained", "unknown"],
+              "properties": {
+                "returned": { "$ref": "#/$defs/count", "description": "Wrong verdicts paired to a recall that returned at least one memory: precision failures." },
+                "abstained": { "$ref": "#/$defs/count", "description": "Wrong verdicts paired to an empty recall: missing-retrieval or corpus failures, not false-positive deliveries." },
+                "unknown": { "$ref": "#/$defs/count", "description": "Legacy wrong verdicts whose recall trace is unavailable; never guessed into either direction." }
+              }
             },
             "denominator": { "$ref": "#/$defs/count" },
             "denominator_definition": { "type": "string", "minLength": 1 },

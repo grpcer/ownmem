@@ -5,6 +5,20 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-09-01
+
+### Fixed
+
+- Reports now separate a `wrong` verdict recorded after a delivered memory from one recorded after
+  an abstention. The former is a precision failure; the latter is missing retrieval or missing
+  corpus coverage. Paired recall traces reconstruct the direction without adding raw queries to
+  telemetry, and legacy unpaired verdicts remain explicitly unknown. The closed report contract is
+  now `ownmem-report/v8`.
+
+- Session-report self-tests now build balanced fixtures exclusively through production recorders;
+  concurrent local telemetry can no longer split a recall/delivery pair at a moving tail boundary
+  and create a false release failure.
+
 ## [0.5.0] - 2026-08-31
 
 ### Added

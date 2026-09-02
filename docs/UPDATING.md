@@ -17,6 +17,12 @@ npx ownmem compile
 lock, generated adapters, and intentional memory changes together so every
 agent and CI environment uses the same version.
 
+Host plugins (Claude Code, Codex, Grok, Gemini) are optional shortcuts. They
+do not replace this repository update, and they do not auto-update on every
+host. See [PLUGINS.md](./PLUGINS.md) for per-host refresh steps. After the
+package bump, `init --update` refreshes the in-repo adapters those hosts
+actually follow.
+
 ## Moving from 0.4.x to 0.5.x
 
 Version 0.5 aligns the published query contract with `ownmem-query-result/v5`,

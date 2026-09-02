@@ -5,6 +5,26 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-02
+
+### Fixed
+
+- Host plugin and Gemini skills no longer embed recall-feedback protocol details
+  that go stale when a marketplace plugin lags behind the npm engine. They route
+  to `npx ownmem` and tell the agent to read CLI help for the current contract.
+- The dashboard skill no longer redirects `--json` output to `/tmp`. That file
+  contained a long-lived access token and was world-readable on typical umasks.
+- Negated high-risk recall now reads the authority ceiling granted by the trust
+  receipt, not the post-drift effective authority. Evidence drift must not let a
+  normative R5 prohibition leak through as if it were no longer a licence.
+
+### Changed
+
+- Plugin installation docs now state that host plugins do not auto-update on
+  every host, how to enable Claude Code marketplace auto-update, and that
+  `npm install ownmem@latest` plus `npx ownmem init --update` remains the
+  version path.
+
 ## [0.5.1] - 2026-09-01
 
 ### Fixed

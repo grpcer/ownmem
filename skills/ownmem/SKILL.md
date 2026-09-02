@@ -14,8 +14,6 @@ use the init skill from this plugin first.
 
 ## Recall before changing code
 
-Run one recall for the problem, path, or symbol you are about to touch:
-
 ```bash
 npx ownmem recall -- "problem, path, or symbol"
 ```
@@ -30,52 +28,23 @@ npx ownmem recall --multi -- "symptom in plain words" "root-cause term" "english
 Open a hit's full topic file before relying on it, then verify against live
 code: memories record what was true when they were written.
 
-## The three feedback streams
+## Do not implement memory logic here
 
-Three different questions, three separate local files, three separate
-denominators. Nothing here is uploaded, and no stream may stand in for another.
+This skill only routes to the CLI. Flags, feedback names, and contracts belong
+to the **installed package**, not to this plugin. Host plugins are optional
+shortcuts and do not auto-update on every host, so a stale copy of this file
+must not teach a retired protocol.
 
-**1. Retrieval verdict** — did recall return the right thing?
-
-```bash
-npx ownmem recall --feedback correct -- "query that matched"
-npx ownmem recall --feedback retrieval_miss --expected memory_name -- "query that should have matched"
-```
-
-`retrieval_miss` means the right memory is active but fell outside the top-k,
-so it must name it. `coverage_gap` means no right memory exists yet, so it
-never takes `--expected`. `wrong`, `stale` and `conflict` may name one.
-
-**2. Outcome receipt** — what happened after a memory was used? Record it only
-when the user or the host actually confirmed it; an agent's own opinion is
-refused here on purpose. Only the digest of the confirming statement is stored,
-never its text.
-
-```bash
-npx ownmem outcome --memory memory_name --outcome applied \
-  --confirmed-by user --confirmation "yes, that fixed it"
-```
-
-This is the only honest measure of actual application. Until receipts
-accumulate, a full-text open still means only that a body was read.
-
-**3. Weak self-attribution** — at the end of a turn in which memory was
-injected, and only when a memory clearly helped or clearly misled you:
-
-```bash
-npx ownmem attribute --memory memory_name --label useful
-```
-
-Record nothing when the turn was neutral. Because the sample selects itself,
-these labels are counts and never a rate: an unlabelled turn is unknown, not
-neutral.
+Use `npx ownmem --help` and `npx ownmem <command> --help` for the current
+surface. After a version bump, update the repository package and run
+`npx ownmem init --update`.
 
 ## Keep the memory healthy
 
 ```bash
-npx ownmem audit              # schema, quota, boundary, and duplicate gates
-npx ownmem report --since 7d  # adoption and recall-quality report
-npx ownmem dashboard --open   # local Web console
+npx ownmem audit
+npx ownmem report --since 7d
+npx ownmem dashboard --open
 ```
 
 Write a new memory only for lessons that reading the code cannot recover —

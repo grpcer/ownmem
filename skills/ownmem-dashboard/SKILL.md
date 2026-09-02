@@ -15,25 +15,35 @@ init skill), then retry.
 
 ## Start it for the user
 
-The server stays resident, so run it in the background and read the JSON it
-prints. If an instance is already running, the same command returns it with
-`"reused": true` instead of starting a second one:
+The server stays resident. Start it in the background; if an instance is
+already running, the same command returns `"reused": true` instead of starting
+a second one.
+
+Do **not** redirect `--json` output to `/tmp` or any other shared directory.
+That JSON contains a long-lived access token, and `/tmp` is commonly
+world-readable.
+
+In Claude Code, use the Bash tool with `run_in_background: true`. In other
+hosts, start the process in the background without capturing the token to a
+world-readable file:
 
 ```bash
-npx ownmem dashboard --json > /tmp/ownmem-dashboard.json 2>&1 &
-sleep 2 && cat /tmp/ownmem-dashboard.json
+npx ownmem dashboard --json
 ```
 
-In Claude Code, prefer the Bash tool's `run_in_background: true` over `&`.
-
-Then open the `url` field in the browser:
+Then read the URL from the private instance record (mode 0600 under
+`.local-test/`):
 
 ```bash
-open "<url>"
+npx ownmem dashboard --status --json
 ```
 
-Keep the `#t=` fragment — the access token lives in the URL fragment (it
-never reaches the server); without it the page only shows an access notice.
+Open the `url` field in the browser. Keep the `#t=` fragment — the access
+token lives in the URL fragment and never reaches the server; without it the
+page only shows an access notice.
+
+The CLI defaults to a random port. Pass `--port 45300` (or another free local
+port) when the user needs a stable bookmark, and keep using that port later.
 
 After opening, run `npx ownmem report --since 7d` once and give the user a
 one-line summary: adoption north star, latency P50/P95, and the most notable
@@ -43,7 +53,7 @@ metrics up as adoption.
 ## Lifecycle
 
 ```bash
-npx ownmem dashboard --status --json   # is an instance running?
-npx ownmem dashboard --stop            # stop it
-npx ownmem dashboard --open            # foreground + auto-open, for a human terminal
+npx ownmem dashboard --status --json
+npx ownmem dashboard --stop
+npx ownmem dashboard --open
 ```

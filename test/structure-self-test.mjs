@@ -189,6 +189,18 @@ function skillManifests(files, directory) {
   return files.filter(file => file.startsWith(`${directory}/`) && file.endsWith('/SKILL.md')).sort();
 }
 
+function checkPluginSkillHygiene(files) {
+  const skills = files.filter(file => file.endsWith('/SKILL.md')
+    && (file.startsWith('plugins/') || file.startsWith('skills/')));
+  for (const file of skills) {
+    const content = readFileSync(path.join(ROOT, file), 'utf8');
+    assert(!content.includes('/tmp/'),
+      `${file} must not write dashboard tokens or other secrets under /tmp`);
+    assert(!/--feedback\s+\S+/.test(content),
+      `${file} must not hard-code recall feedback flags; route to CLI help`);
+  }
+}
+
 function checkSkillMirrors(files) {
   const extensionSkills = skillManifests(files, 'skills');
   const pluginSkills = skillManifests(files, 'plugins/ownmem/skills');
@@ -258,6 +270,7 @@ checkPackageManifest(checkout);
 if (repositoryTree) {
   checkMarkdownLinks(files);
   checkSkillMirrors(files);
+  checkPluginSkillHygiene(files);
   checkReleaseVersions();
 }
 checkModuleImports(files);

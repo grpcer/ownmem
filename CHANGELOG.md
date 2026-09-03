@@ -5,6 +5,15 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-09-03
+
+### Added
+
+- `swift-test` is a known test runner in the test-execution ledger, for
+  projects whose tests run through SwiftPM's `swift test --xunit-output`.
+- `ingestTestRun` accepts any runner the caller supplies an adapter for, so a
+  project can connect a toolchain of its own without editing the known list.
+
 ## [0.5.3] - 2026-09-03
 
 ### Fixed

@@ -2,7 +2,7 @@
   "name": "ownmem",
   "displayName": "OwnMem",
   "description": "Git-native project memory for AI coding agents, with deterministic local recall, evidence gates, and bounded evolution.",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "author": {
     "name": "grpcer",
     "url": "https://github.com/grpcer"

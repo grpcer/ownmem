@@ -1,6 +1,6 @@
 {
   "name": "ownmem",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Git-native project memory for AI coding agents, with deterministic local recall, evidence gates, and bounded evolution.",
   "author": {
     "name": "grpcer",

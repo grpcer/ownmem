@@ -5,6 +5,23 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-09-03
+
+### Fixed
+
+- Trust receipts no longer bind a test anchor to a file inside a nested checkout
+  (a linked git worktree such as `.claude/worktrees/<agent>/`, a submodule, a
+  nested clone). The lookup by suite name descended into those copies, `.claude`
+  sorted ahead of the real directory, and once the worktree was cleaned up the
+  memory was quarantined as `missing-path` with its test untouched in the main
+  tree. Any directory carrying its own `.git` entry is now skipped, and the path
+  a memory declares next to its test locator takes precedence over the
+  repository-wide lookup.
+- Directory-anchor fingerprints skip nested checkouts for the same reason.
+- A suite-level test anchor, whose symbol is the file's own type name, now
+  resolves to that file's roll-up in the test-execution ledger instead of
+  reading `never-run` forever: no runner reports a case by the suite's name.
+
 ## [0.5.2] - 2026-09-02
 
 ### Fixed

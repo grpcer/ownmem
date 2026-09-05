@@ -5,6 +5,20 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-09-06
+
+### Fixed
+
+- A filtered test rerun no longer shrinks a file's roll-up in the test-execution
+  ledger. Selecting one case of a forty-case file derived a roll-up of one, and
+  because the latest record per key won, a memory citing the suite then read
+  `passed` on the strength of that single case. On an unchanged file a passing
+  roll-up that observed fewer cases now leaves the wider record standing; a
+  failure, a wider run, or a change to the tested file still lands.
+- `ownmem` health no longer prints `0 query(s), 0.0% abstained` for an install
+  that never wrote a usage log. The usage log is opt-in (`recall --usage-file`),
+  so its absence is reported as unavailable rather than as a measurement.
+
 ## [0.5.4] - 2026-09-03
 
 ### Added

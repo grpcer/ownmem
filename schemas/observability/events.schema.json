@@ -32,6 +32,14 @@
     },
     "snapshot_id": { "type": ["string", "null"], "minLength": 1, "maxLength": 128 },
     "process": { "$ref": "#/$defs/process" },
+    "agent": {
+      "description": "Which coding agent produced this row. Orthogonal to the payload's `surface`, which is the entry point: `hook` + `codex` and `hook` + `claude` are the same surface asked by two different agents. Optional rather than required because rows written before this field existed carry no honest answer -- those days really were mixed, and inferring an agent for them would be a guess dressed as data, so reports count them as legacy instead. Every producer in this build writes it.",
+      "enum": ["claude", "grok", "codex", "unknown"]
+    },
+    "nested": {
+      "description": "More than one host's environment markers were present, which happens when one agent launches another. `agent` still follows the innermost-first order, but this flag lets analysis drop the ambiguous rows rather than trust that ordering.",
+      "type": "boolean"
+    },
     "payload": { "type": "object" }
   },
   "allOf": [
@@ -153,7 +161,7 @@
         "episode_id"
       ],
       "properties": {
-        "surface": { "enum": ["claude-hook", "cli"] },
+        "surface": { "enum": ["hook", "claude-hook", "cli"] },
         "consumption_eligible": { "type": "boolean" },
         "episode_id": {
           "description": "The user turn this recall happened in, keyed locally. Null for surfaces with no notion of a turn -- a command-line recall has none, and inventing one from a timestamp would make episode membership a guess rather than a fact.",
@@ -230,7 +238,7 @@
       "properties": {
         "topics": { "$ref": "#/$defs/topicNames" },
         "authority_followed": { "type": ["boolean", "null"] },
-        "via": { "enum": ["claude-hook", "cli", "manual"] },
+        "via": { "enum": ["hook", "claude-hook", "cli", "manual"] },
         "match": { "enum": ["session", "recent", "declared"] }
       }
     },
@@ -239,7 +247,7 @@
       "additionalProperties": false,
       "required": ["surface", "topics"],
       "properties": {
-        "surface": { "enum": ["claude-hook", "cli"] },
+        "surface": { "enum": ["hook", "claude-hook", "cli"] },
         "topics": { "$ref": "#/$defs/topicNames" }
       }
     },

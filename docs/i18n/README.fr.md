@@ -67,10 +67,16 @@ Node.js 20.6 ou plus récent est requis. Exécutez ceci dans le dépôt qui doit
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
+npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
 ```
 
 Rouvrez l’agent après l’initialisation. OwnMem crée `.ownmem/` et ne modifie que les zones marquées comme gérées. Pour un seul adaptateur, utilisez `--hosts claude`, `--hosts codex`, `--hosts cursor` ou `--hosts gemini` ; prévisualisez avec `npx ownmem init --check`.
+
+- **Claude Code** et **Grok CLI** lisent le même `.claude/settings.json`. Grok exige en plus que ce dossier soit approuvé une fois (`/hooks-trust` dans grok, ou démarrage avec `grok --trust`) ; sans cela il n’exécute aucun de ces hooks, sans le signaler.
+- **Codex** lit `<projet>/.codex/hooks.json`, mais derrière trois autorisations distinctes : (1) `hooks = true` sous `[features]` dans `~/.codex/config.toml` ; (2) le projet lui-même approuvé — le Codex interactif le demande la première fois qu’il l’ouvre, ou ajoutez `[projects."<chemin>"]` avec `trust_level = "trusted"` ; (3) l’invite de confiance du hook à la première détection. Un projet non approuvé échoue en silence : il ne découvre jamais le fichier, et ni `--dangerously-bypass-hook-trust` ni une surcharge `-c projects...` n’atteignent cette couche. Le processus du hook s’exécute à la racine du projet, avec `node_modules/.bin` dans le PATH et le même JSON sur stdin que celui envoyé par Claude Code, mais sans aucune variable `CODEX_*` : chaque commande déclare donc son host explicitement.
+- **Cursor** et **Gemini CLI** ne reçoivent que des adaptateurs d’instructions. Aucun des deux n’expose de surface de hooks : ils consultent la mémoire mais n’alimentent aucune collecte.
+
+Mise à jour depuis 0.5.x : la configuration des hooks est désormais en v2. Exécutez `npx ownmem init --update` une fois. Les commandes antérieures sont remplacées sur place, les hooks que vous avez écrits ne sont jamais touchés, et tant que ce n’est pas fait la passe de démarrage de session continue de signaler une configuration obsolète.
 
 ## Usage quotidien
 
@@ -87,6 +93,22 @@ npx ownmem dashboard --open
 npx ownmem evolve status
 npx ownmem evolve run --force
 ```
+
+## Télémétrie et passe quotidienne
+
+Les événements d’exécution expirent au bout de trente jours et ne quittent jamais la machine qui les a écrits. La passe quotidienne réduit chaque journée terminée à un paquet de compteurs assez petit pour être versionné, afin qu’une autre machine — et un rapport lancé des mois plus tard — puisse encore le lire :
+
+```bash
+npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
+npx ownmem archive --backfill          # reduce every day still on disk to a counted package
+npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+```
+
+- **Ce que contient un paquet :** compteurs, regroupements, percentiles de latence, motifs d’abstention, empreintes du quota et du jeu de référence, et noms de topics déjà présents dans l’index public.
+- **Ce qu’il ne contient jamais :** le texte de la requête ni son condensé, le corps des topics, les chemins de fichiers, les noms de machine ou de compte, ni d’horodatage plus fin que la journée.
+- **Il se valide lui-même.** Les paquets sont indexés dans un index privé, avec des chemins explicites et un compare-and-swap sur HEAD : une passe ne peut donc jamais emporter le travail indexé par une autre session. Mettez `telemetry.auto_commit` à `false` dans `<memory-dir>/config.json`, ou passez `--no-commit`, pour archiver sans valider.
+- **Il fait pointer `core.hooksPath`** vers `<memory-dir>/git-hooks/`, où `ownmem init` génère le filet post-commit, et uniquement tant que ce réglage est vide ou pointe vers un répertoire de hooks par défaut intact. Mettez `telemetry.manage_hooks_path` à `false` pour qu’il n’y touche pas.
+- **Entre machines**, `report --fleet` fusionne les paquets de chacune et nomme les journées qui ont des commits mais aucun paquet, au lieu de présenter la semaine d’un seul poste comme l’historique complet.
 
 ## Frontière entre confiance et automatisation
 

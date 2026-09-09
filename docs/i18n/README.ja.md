@@ -67,10 +67,16 @@ Node.js 20.6 以上が必要です。記憶を所有させるリポジトリで�
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
+npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
 ```
 
 初期化後に Agent を開き直してください。OwnMem は `.ownmem/` を作成し、host ファイルの管理 marker 内だけを変更します。adapter が 1 つなら `--hosts claude`、`--hosts codex`、`--hosts cursor`、`--hosts gemini` を使い、`npx ownmem init --check` で事前確認できます。
+
+- **Claude Code** と **Grok CLI** は同じ `.claude/settings.json` を読みます。grok ではこのフォルダを一度信頼する必要があり（grok 内で `/hooks-trust`、または `grok --trust` で起動）、信頼しないとこれらの hook は何も言わずに実行されません。
+- **Codex** は `<プロジェクト>/.codex/hooks.json` を読みますが、独立した 3 つの許可が必要です。(1) `~/.codex/config.toml` の `[features]` に `hooks = true`、(2) プロジェクト自体の信頼——対話型 Codex は初めて開くときに確認します。`[projects."<パス>"]` に `trust_level = "trusted"` を書いても構いません——(3) hook を最初に検出したときの信頼プロンプト。信頼されていないプロジェクトでは何も表示されません。ファイル自体を発見せず、`--dangerously-bypass-hook-trust` も `-c projects...` の上書きもこの層には届きません。hook プロセスはプロジェクトルートで実行され、PATH に `node_modules/.bin` を含み、stdin には Claude Code と同じ JSON が渡りますが、`CODEX_*` 環境変数は一切与えられません。そのため各コマンドは host を明示的に宣言します。
+- **Cursor** と **Gemini CLI** には指示アダプタのみを配置します。どちらも hook 面を持たないため、召回はできますが収集には寄与しません。
+
+0.5.x からの更新：hook 設定は v2 になりました。`npx ownmem init --update` を一度実行してください。旧版のコマンドはその場で置き換えられ、自分で書いた hook には触れません。実行するまでは、セッション開始時に設定が古い旨が毎回報告されます。
 
 ## 日常の使い方
 
@@ -87,6 +93,22 @@ npx ownmem dashboard --open
 npx ownmem evolve status
 npx ownmem evolve run --force
 ```
+
+## テレメトリと日次パス
+
+実行時イベントは 30 日で失効し、書き込んだマシンから出ることはありません。日次パスは終了した各日をコミットできる大きさの集計パッケージにまとめるので、別のマシンからも、数か月後のレポートからも参照できます：
+
+```bash
+npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
+npx ownmem archive --backfill          # reduce every day still on disk to a counted package
+npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+```
+
+- **パッケージに入るもの：** 件数、バケット、レイテンシのパーセンタイル、棄権理由、クォータとゴールデンセットのハッシュ、そして公開インデックスに既に載っている topic 名。
+- **決して入らないもの：** クエリ本文とそのダイジェスト、topic 本文、ファイルパス、マシン名やアカウント名。タイムスタンプも日単位より細かくはなりません。
+- **自分でコミットします。** パッケージは専用 index と明示パスでステージされ、HEAD に対して compare-and-swap を行うため、他セッションがステージした変更を巻き込むことはありません。コミットせず保存だけしたい場合は `<memory-dir>/config.json` の `telemetry.auto_commit` を `false` にするか、`--no-commit` を付けてください。
+- **`core.hooksPath` を `<memory-dir>/git-hooks/` に向けます**（post-commit のフォールバックは `ownmem init` がそこに生成します）。ただし未設定か、手つかずの既定 hook ディレクトリを指している場合に限ります。触らせたくない場合は `telemetry.manage_hooks_path` を `false` にしてください。
+- **複数マシンでは** `report --fleet` が各マシンのパッケージを統合し、コミットはあるのにパッケージが無い日を名指しします。1 台のノート PC の一週間を全履歴のように見せることはありません。
 
 ## 信頼と自動化の境界
 

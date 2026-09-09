@@ -23,6 +23,43 @@ host. See [PLUGINS.md](./PLUGINS.md) for per-host refresh steps. After the
 package bump, `init --update` refreshes the in-repo adapters those hosts
 actually follow.
 
+## Moving from 0.5.x to 0.6.0
+
+Events record `surface` as `hook` rather than `claude-hook`, and carry two new
+top-level fields: `agent`, the coding agent that produced the row, and `nested`,
+set when more than one host marker was present and attribution is refused rather
+than guessed. Rows written before the upgrade keep `claude-hook` and are reported
+as a separate legacy bucket; nothing is re-attributed after the fact. Anything
+that reads the event files directly, or that buckets the report's output, has to
+be updated.
+
+`init --update` installs the unattended daily pass on `SessionStart` and `Stop`,
+and generates `<memory-dir>/git-hooks/post-commit` as a third trigger. That pass
+commits the telemetry packages it writes under `<memory-dir>/telemetry/`, and it
+points `core.hooksPath` at the generated hook directory while that setting is
+empty, or names a directory that is empty or absent -- a hooks path that installs
+no hook displaces nothing by being claimed. A directory that exists and holds
+hooks is reported and left where it is. Both behaviours are disclosed at install
+time. To switch them off, set `telemetry.auto_commit` or
+`telemetry.manage_hooks_path` to `false` in `<memory-dir>/config.json`, or pass
+`ownmem daily --no-commit`.
+
+The hook configuration is now v2 and the installed version is recorded in
+`<memory-dir>/config.json`, so run `ownmem init --update` once. v1 entries are
+replaced where they stand rather than appended beside, and hooks written by hand
+are left untouched. `init --check` reports an installation that is still on v1.
+
+Codex hooks take three separate permissions before they run: `hooks = true` under
+`[features]` in `~/.codex/config.toml`, the project trusted in that same file,
+and the hook trust prompt on first sight. A project missing any of them is silent
+rather than failing. Grok runs a repository's hooks only while the checkout is in
+its trusted-folder list. `init --check` reports both.
+
+`PostToolUse` and `Stop` never ran under 0.5.x, because v1 registered subcommand
+names the CLI does not have. Command outcomes and turn corrections start being
+collected at this upgrade. A report covering days before it shows those two
+empty because they were never collected, not because anything was lost.
+
 ## Moving from 0.4.x to 0.5.x
 
 Version 0.5 aligns the published query contract with `ownmem-query-result/v5`,

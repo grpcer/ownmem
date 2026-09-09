@@ -67,10 +67,16 @@ OwnMem 把「寫下經驗」與「把經驗交給 Agent」拆成兩個受控流�
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
+npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
 ```
 
 初始化後重新開啟 Agent。OwnMem 會建立 `.ownmem/`，且只修改宿主檔案中受管理的標記區。只需要一個適配器時使用 `--hosts claude`、`--hosts codex`、`--hosts cursor` 或 `--hosts gemini`；`npx ownmem init --check` 可先預覽。
+
+- **Claude Code** 與 **Grok CLI** 讀同一份 `.claude/settings.json`。grok 還需要先信任本目錄一次——在 grok 裡執行 `/hooks-trust`，或以 `grok --trust` 啟動——否則它會不聲不響地完全不跑這些 hook。
+- **Codex** 讀 `<專案>/.codex/hooks.json`，但要通過三道各自獨立的關卡：(1) 在 `~/.codex/config.toml` 的 `[features]` 下寫 `hooks = true`；(2) 專案本身被授信——互動式 Codex 第一次開啟該專案時會詢問，也可以手寫 `[projects."<路徑>"]` 加上 `trust_level = "trusted"`；(3) 首次看到 hook 時的信任提示。未授信的專案是靜默失敗：它根本不會發現這個檔案，`--dangerously-bypass-hook-trust` 與 `-c projects...` 覆寫都到不了這一層。hook 行程在專案根目錄執行，PATH 帶 `node_modules/.bin`，stdin 收到與 Claude Code 相同的 JSON，但沒有任何 `CODEX_*` 環境變數，因此每條命令都明確宣告自己的 host。
+- **Cursor** 與 **Gemini CLI** 只安裝說明配接器：兩者都沒有 hook 介面，能召回但不產生採集。
+
+從 0.5.x 升級：hook 設定已是 v2，執行一次 `npx ownmem init --update`。舊版命令會就地取代，你自己寫的 hook 不會被更動；在你執行之前，每次工作階段開始都會提示設定已過期。
 
 ## 日常怎麼用
 
@@ -87,6 +93,22 @@ npx ownmem dashboard --open
 npx ownmem evolve status
 npx ownmem evolve run --force
 ```
+
+## 遙測與每日封存
+
+執行期事件 30 天後過期，而且從不離開寫下它的那台機器。每日封存把每個已結束的日子壓成一個小到可以提交的計數包，另一台機器——以及幾個月後才跑的報告——才看得到它：
+
+```bash
+npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
+npx ownmem archive --backfill          # reduce every day still on disk to a counted package
+npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+```
+
+- **包裡有什麼：** 計數、分桶、延遲分位、棄答原因、配額與黃金集雜湊，以及本來就在公開索引裡的 topic 名稱。
+- **包裡絕不會有：** 查詢原文與其摘要值、topic 正文、檔案路徑、機器名稱與帳號名稱，時間戳也不細於「日」。
+- **它會自己提交。** 封存包以獨立 index、明確路徑暫存，並對 HEAD 做 compare-and-swap，因此絕不會捲走其他工作階段已暫存的變更。若只想封存不提交，把 `<記憶目錄>/config.json` 的 `telemetry.auto_commit` 設為 `false`，或加上 `--no-commit`。
+- **它會把 `core.hooksPath` 指向 `<memory-dir>/git-hooks/`**（post-commit 備援就由 `ownmem init` 產生在那裡），且僅限該設定為空、或指向原樣未動的預設 hook 目錄時。把 `telemetry.manage_hooks_path` 設為 `false` 即可讓它不要碰。
+- **跨機器時**，`report --fleet` 會合併每台機器的封存包，並點名「有提交卻沒有封存包」的日子，而不是把一台筆電的一週當成全部歷史。
 
 ## 信任與自動化邊界
 

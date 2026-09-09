@@ -22,7 +22,12 @@ const LANGUAGES = [
 const COMMON = {
   install: `\`\`\`bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
+npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
+\`\`\``,
+  telemetry: `\`\`\`bash
+npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
+npx ownmem archive --backfill          # reduce every day still on disk to a counted package
+npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
 \`\`\``,
   evolution: `\`\`\`bash
 npx ownmem dashboard --open
@@ -48,7 +53,7 @@ const COPY = {
   en: {
     tagline: 'Open-source project memory for Claude Code, Codex, Cursor, Gemini CLI, and other AI coding agents — local, deterministic, reviewable, and safely self-improving.',
     chips: '`Git-native` · `AI agent memory` · `local recall` · `evidence-governed` · `Apache-2.0`',
-    headings: ['Why OwnMem', 'Architecture', 'How OwnMem governs AI agent memory', 'Quick start', 'Daily use', 'Trust and automation boundary', 'Where it fits', 'Local-first by default', 'Research lineage', 'Documentation'],
+    headings: ['Why OwnMem', 'Architecture', 'How OwnMem governs AI agent memory', 'Quick start', 'Daily use', 'Trust and automation boundary', 'Where it fits', 'Local-first by default', 'Research lineage', 'Documentation', 'Telemetry and the daily pass'],
     whyIntro: 'Most AI agent memory systems optimize for remembering more. OwnMem starts with a different question: **who owns project knowledge, who may change it, and how can a bad memory be stopped before it changes a coding agent\'s actions?**',
     whyHeader: ['Advantage', 'What it means in practice'],
     whyRows: [
@@ -87,6 +92,20 @@ const COPY = {
     rememberQuote: '> “Remember this: staging deployment timeouts come from the pool cap, not too few workers. Check both together next time.”',
     recallQuote: '> “Before changing this, check whether the project memory has seen the same failure.”',
     dailyAfter: 'The host recalls before scoped work and schedules one locked, debounced evolution pass at the end of a turn. You normally do not need to chain promotion, trust, audit, or compile commands. Open the local console or inspect the coordinator when you want visibility:',
+    hostNotes: [
+      '**Claude Code** and **Grok CLI** both read `.claude/settings.json`. Grok additionally needs this folder trusted once — run `/hooks-trust` inside grok, or start it with `grok --trust` — otherwise it silently runs none of these hooks.',
+      '**Codex** reads `<project>/.codex/hooks.json` behind three separate permissions: (1) `hooks = true` under `[features]` in `~/.codex/config.toml`, (2) the project itself trusted — interactive Codex asks the first time it opens it, or add `[projects."<path>"]` with `trust_level = "trusted"` — and (3) the hook trust prompt on first sight. An untrusted project is silent: it never discovers the file, and neither `--dangerously-bypass-hook-trust` nor a `-c projects...` override reaches that layer. The hook process runs at the project root with `node_modules/.bin` on PATH and the same JSON on stdin that Claude Code sends, but with no `CODEX_*` variable of any kind, so every command declares its host explicitly.',
+      '**Cursor** and **Gemini CLI** receive instruction adapters only. Neither exposes a hook surface, so they recall from memory but contribute no collection.',
+    ],
+    upgradeNote: 'Upgrading from 0.5.x: the hook configuration is now v2. Run `npx ownmem init --update` once. Commands that predate it are replaced where they stand, hooks you wrote yourself are never touched, and the session-start pass keeps saying the configuration is out of date until you do.',
+    telemetryIntro: 'Runtime events expire after thirty days and never leave the machine that wrote them. The daily pass reduces each finished day to a counted package small enough to commit, so a second machine — and a report run months later — can still see it:',
+    telemetryItems: [
+      '**What a package holds:** counts, buckets, latency percentiles, abstain reasons, the quota and golden-set hashes, and topic names that are already in the public index.',
+      '**What it never holds:** query text or its digest, topic bodies, file paths, machine or account names, and no timestamp finer than the day.',
+      '**It commits itself.** Packages are staged against a private index with explicit paths and a compare-and-swap on HEAD, so a pass can never carry away another session\’s staged work. Set `telemetry.auto_commit` to `false` in `<memory-dir>/config.json`, or pass `--no-commit`, to archive without committing.',
+      '**It points `core.hooksPath`** at `<memory-dir>/git-hooks/`, where `ownmem init` generates the post-commit fallback, and only while that setting is empty or points at an untouched default hook directory. Set `telemetry.manage_hooks_path` to `false` to leave it alone.',
+      '**Across machines,** `report --fleet` merges every machine\’s packages and names the days that have commits but no package, instead of quietly presenting one laptop\’s week as the whole history.',
+    ],
     trustIntro: 'OwnMem automates the part it can prove, not the part that merely sounds plausible.',
     trustItems: [
       '**Automatic:** deterministic recall, candidate scanning, tripwire checks, counterfactual replay, R0 trigger backfill, machine trust receipt, audit, compile, observation, quarantine, and exact rollback.',
@@ -125,7 +144,7 @@ const COPY = {
   'zh-CN': {
     tagline: '把 AI 编程 Agent 的项目记忆留在仓库里：本地、确定、可审阅，并能在安全边界内自我改进。',
     chips: '`Git 原生` · `本地召回` · `多 Agent 共用` · `证据治理` · `Apache-2.0`',
-    headings: ['为什么是 OwnMem', '总架构', 'OwnMem 如何治理 AI Agent 记忆', '三分钟开始', '日常怎么用', '信任与自动化边界', '适合什么', '默认本地优先', '研究脉络', '文档'],
+    headings: ['为什么是 OwnMem', '总架构', 'OwnMem 如何治理 AI Agent 记忆', '三分钟开始', '日常怎么用', '信任与自动化边界', '适合什么', '默认本地优先', '研究脉络', '文档', '遥测与每日封存'],
     whyIntro: '大多数记忆方案先解决“记得更多”。OwnMem 先问另一件事：**项目知识由谁拥有，谁有权改变它，错误记忆怎样在影响 Agent 行动前被拦住？**',
     whyHeader: ['优势', '对实际开发意味着什么'],
     whyRows: [
@@ -164,6 +183,20 @@ const COPY = {
     rememberQuote: '> “记住：staging 部署超时来自连接池上限，不是 worker 太少。下次两者一起检查。”',
     recallQuote: '> “改之前先看看项目记忆里有没有遇到同一种故障。”',
     dailyAfter: '宿主会在相关工作前召回，并在每轮结束后调度一次带锁、防抖的演化。通常不需要手工串联 promotion、trust、audit 和 compile。想查看时打开本地控制台或检查协调器：',
+    hostNotes: [
+      '**Claude Code** 与 **Grok CLI** 读同一份 `.claude/settings.json`。grok 还需要把本目录信任一次——在 grok 里执行 `/hooks-trust`，或用 `grok --trust` 启动——否则它会一声不响地不跑这些 hook。',
+      '**Codex** 读 `<项目>/.codex/hooks.json`，但要过三道各自独立的门：(1) `~/.codex/config.toml` 的 `[features]` 下写 `hooks = true`；(2) 项目本身被授信——交互式 Codex 第一次打开该项目时会问，也可以手写 `[projects."<路径>"]` 加 `trust_level = "trusted"`；(3) 首次看到 hook 时的信任提示。未授信的项目是静默失败：它根本不会发现这个文件，`--dangerously-bypass-hook-trust` 和 `-c projects...` 覆盖都到不了这一层。hook 进程在项目根目录运行，PATH 带 `node_modules/.bin`，stdin 收到与 Claude Code 相同的 JSON，但没有任何 `CODEX_*` 环境变量，所以每条命令都显式声明自己的 host。',
+      '**Cursor** 与 **Gemini CLI** 只装说明适配器：两者都没有 hook 接口，能召回但不产生采集。',
+    ],
+    upgradeNote: '从 0.5.x 升级：hook 配置已经是 v2，跑一次 `npx ownmem init --update`。旧版命令会被原位替换，你自己写的 hook 不会被动，不跑它的话每次会话开始都会提示配置已过期。',
+    telemetryIntro: '运行期事件 30 天后过期，且从不离开写下它的那台机器。每日封存把每个已结束的日子压成一个小到可以提交的计数包，另一台机器——以及几个月后再跑的报告——才看得见它：',
+    telemetryItems: [
+      '**包里有什么：** 计数、分桶、延迟分位、弃答原因、配额与黄金集哈希，以及本来就在公开索引里的 topic 名。',
+      '**包里绝不会有：** 查询原文及其摘要值、topic 正文、文件路径、机器名与账号名，时间戳也不细于「日」。',
+      '**它会自己提交。** 封存包用独立 index、显式路径暂存，并对 HEAD 做 compare-and-swap，所以绝不会卷走别的 session 已暂存的改动。想只封存不提交，把 `<记忆目录>/config.json` 的 `telemetry.auto_commit` 设为 `false`，或加 `--no-commit`。',
+      '**它会把 `core.hooksPath` 指向 `<memory-dir>/git-hooks/`**（post-commit 兜底就由 `ownmem init` 生成在那里），且仅限该配置为空、或指向一个原样未动的默认 hook 目录时。把 `telemetry.manage_hooks_path` 设为 `false` 即可让它别碰。',
+      '**跨机器时**，`report --fleet` 合并每台机器的封存包，并点名「有提交却没有封存包」的日子，而不是把一台笔记本的一周当成全部历史。',
+    ],
     trustIntro: 'OwnMem 自动化的是“机器能证明”的部分，不是“听起来像对”的部分。',
     trustItems: [
       '**自动完成：** 确定性召回、候选扫描、tripwire、反事实回放、R0 trigger 回填、机器信任收据、审计、编译、观察、隔离和精确回滚。',
@@ -202,7 +235,7 @@ const COPY = {
   'zh-TW': {
     tagline: '把 AI 程式 Agent 的專案記憶留在儲存庫：本機、確定、可審閱，並能在安全邊界內自我改進。',
     chips: '`Git 原生` · `本機召回` · `多 Agent 共用` · `證據治理` · `Apache-2.0`',
-    headings: ['為什麼是 OwnMem', '總架構', 'OwnMem 如何治理 AI Agent 記憶', '三分鐘開始', '日常怎麼用', '信任與自動化邊界', '適合什麼', '預設本機優先', '研究脈絡', '文件'],
+    headings: ['為什麼是 OwnMem', '總架構', 'OwnMem 如何治理 AI Agent 記憶', '三分鐘開始', '日常怎麼用', '信任與自動化邊界', '適合什麼', '預設本機優先', '研究脈絡', '文件', '遙測與每日封存'],
     whyIntro: '多數記憶方案先解決「記得更多」。OwnMem 先問另一件事：**專案知識由誰擁有，誰有權改變它，錯誤記憶如何在影響 Agent 行動前被攔下？**',
     whyHeader: ['優勢', '對實際開發的意義'],
     whyRows: [
@@ -241,6 +274,20 @@ const COPY = {
     rememberQuote: '> 「記住：staging 部署逾時來自連線池上限，不是 worker 太少。下次兩者一起檢查。」',
     recallQuote: '> 「修改前先看看專案記憶是否遇過同一種故障。」',
     dailyAfter: '宿主會在相關工作前召回，並在每輪結束後排程一次帶鎖、防抖的演化。通常不必手動串接 promotion、trust、audit 與 compile。想查看時開啟本機主控台或檢查協調器：',
+    hostNotes: [
+      '**Claude Code** 與 **Grok CLI** 讀同一份 `.claude/settings.json`。grok 還需要先信任本目錄一次——在 grok 裡執行 `/hooks-trust`，或以 `grok --trust` 啟動——否則它會不聲不響地完全不跑這些 hook。',
+      '**Codex** 讀 `<專案>/.codex/hooks.json`，但要通過三道各自獨立的關卡：(1) 在 `~/.codex/config.toml` 的 `[features]` 下寫 `hooks = true`；(2) 專案本身被授信——互動式 Codex 第一次開啟該專案時會詢問，也可以手寫 `[projects."<路徑>"]` 加上 `trust_level = "trusted"`；(3) 首次看到 hook 時的信任提示。未授信的專案是靜默失敗：它根本不會發現這個檔案，`--dangerously-bypass-hook-trust` 與 `-c projects...` 覆寫都到不了這一層。hook 行程在專案根目錄執行，PATH 帶 `node_modules/.bin`，stdin 收到與 Claude Code 相同的 JSON，但沒有任何 `CODEX_*` 環境變數，因此每條命令都明確宣告自己的 host。',
+      '**Cursor** 與 **Gemini CLI** 只安裝說明配接器：兩者都沒有 hook 介面，能召回但不產生採集。',
+    ],
+    upgradeNote: '從 0.5.x 升級：hook 設定已是 v2，執行一次 `npx ownmem init --update`。舊版命令會就地取代，你自己寫的 hook 不會被更動；在你執行之前，每次工作階段開始都會提示設定已過期。',
+    telemetryIntro: '執行期事件 30 天後過期，而且從不離開寫下它的那台機器。每日封存把每個已結束的日子壓成一個小到可以提交的計數包，另一台機器——以及幾個月後才跑的報告——才看得到它：',
+    telemetryItems: [
+      '**包裡有什麼：** 計數、分桶、延遲分位、棄答原因、配額與黃金集雜湊，以及本來就在公開索引裡的 topic 名稱。',
+      '**包裡絕不會有：** 查詢原文與其摘要值、topic 正文、檔案路徑、機器名稱與帳號名稱，時間戳也不細於「日」。',
+      '**它會自己提交。** 封存包以獨立 index、明確路徑暫存，並對 HEAD 做 compare-and-swap，因此絕不會捲走其他工作階段已暫存的變更。若只想封存不提交，把 `<記憶目錄>/config.json` 的 `telemetry.auto_commit` 設為 `false`，或加上 `--no-commit`。',
+      '**它會把 `core.hooksPath` 指向 `<memory-dir>/git-hooks/`**（post-commit 備援就由 `ownmem init` 產生在那裡），且僅限該設定為空、或指向原樣未動的預設 hook 目錄時。把 `telemetry.manage_hooks_path` 設為 `false` 即可讓它不要碰。',
+      '**跨機器時**，`report --fleet` 會合併每台機器的封存包，並點名「有提交卻沒有封存包」的日子，而不是把一台筆電的一週當成全部歷史。',
+    ],
     trustIntro: 'OwnMem 自動化的是「機器能證明」的部分，不是「聽起來像對」的部分。',
     trustItems: [
       '**自動完成：** 確定性召回、候選掃描、tripwire、反事實回放、R0 trigger 回填、機器信任收據、稽核、編譯、觀察、隔離與精確回復。',
@@ -279,7 +326,7 @@ const COPY = {
   ja: {
     tagline: 'AI コーディングエージェントのプロジェクト記憶をリポジトリに置く。ローカル、決定的、レビュー可能、そして安全な範囲で自己改善。',
     chips: '`Git ネイティブ` · `ローカル想起` · `マルチエージェント` · `証拠ガバナンス` · `Apache-2.0`',
-    headings: ['なぜ OwnMem なのか', '全体アーキテクチャ', 'OwnMem が AI Agent Memory を管理する方法', '3 分で始める', '日常の使い方', '信頼と自動化の境界', '適している場面', 'ローカルファースト', '研究上の系譜', 'ドキュメント'],
+    headings: ['なぜ OwnMem なのか', '全体アーキテクチャ', 'OwnMem が AI Agent Memory を管理する方法', '3 分で始める', '日常の使い方', '信頼と自動化の境界', '適している場面', 'ローカルファースト', '研究上の系譜', 'ドキュメント', 'テレメトリと日次パス'],
     whyIntro: '多くの記憶システムは「より多く覚える」ことを最適化します。OwnMem は先に、**プロジェクト知識を誰が所有し、誰が変更でき、誤った記憶を行動の前にどう止めるか**を問います。',
     whyHeader: ['強み', '実開発での意味'],
     whyRows: [
@@ -318,6 +365,20 @@ const COPY = {
     rememberQuote: '> 「覚えておいて。staging deploy の timeout は worker 不足ではなく pool cap が原因。次回は両方確認する。」',
     recallQuote: '> 「変更前に、同じ障害をプロジェクト記憶で経験していないか確認して。」',
     dailyAfter: 'host は関連作業前に recall し、turn 終了時に lock・debounce 付きの進化を 1 回予約します。promotion、trust、audit、compile を手作業で連結する必要は通常ありません。可視化にはローカル console と coordinator status を使います。',
+    hostNotes: [
+      '**Claude Code** と **Grok CLI** は同じ `.claude/settings.json` を読みます。grok ではこのフォルダを一度信頼する必要があり（grok 内で `/hooks-trust`、または `grok --trust` で起動）、信頼しないとこれらの hook は何も言わずに実行されません。',
+      '**Codex** は `<プロジェクト>/.codex/hooks.json` を読みますが、独立した 3 つの許可が必要です。(1) `~/.codex/config.toml` の `[features]` に `hooks = true`、(2) プロジェクト自体の信頼——対話型 Codex は初めて開くときに確認します。`[projects."<パス>"]` に `trust_level = "trusted"` を書いても構いません——(3) hook を最初に検出したときの信頼プロンプト。信頼されていないプロジェクトでは何も表示されません。ファイル自体を発見せず、`--dangerously-bypass-hook-trust` も `-c projects...` の上書きもこの層には届きません。hook プロセスはプロジェクトルートで実行され、PATH に `node_modules/.bin` を含み、stdin には Claude Code と同じ JSON が渡りますが、`CODEX_*` 環境変数は一切与えられません。そのため各コマンドは host を明示的に宣言します。',
+      '**Cursor** と **Gemini CLI** には指示アダプタのみを配置します。どちらも hook 面を持たないため、召回はできますが収集には寄与しません。',
+    ],
+    upgradeNote: '0.5.x からの更新：hook 設定は v2 になりました。`npx ownmem init --update` を一度実行してください。旧版のコマンドはその場で置き換えられ、自分で書いた hook には触れません。実行するまでは、セッション開始時に設定が古い旨が毎回報告されます。',
+    telemetryIntro: '実行時イベントは 30 日で失効し、書き込んだマシンから出ることはありません。日次パスは終了した各日をコミットできる大きさの集計パッケージにまとめるので、別のマシンからも、数か月後のレポートからも参照できます：',
+    telemetryItems: [
+      '**パッケージに入るもの：** 件数、バケット、レイテンシのパーセンタイル、棄権理由、クォータとゴールデンセットのハッシュ、そして公開インデックスに既に載っている topic 名。',
+      '**決して入らないもの：** クエリ本文とそのダイジェスト、topic 本文、ファイルパス、マシン名やアカウント名。タイムスタンプも日単位より細かくはなりません。',
+      '**自分でコミットします。** パッケージは専用 index と明示パスでステージされ、HEAD に対して compare-and-swap を行うため、他セッションがステージした変更を巻き込むことはありません。コミットせず保存だけしたい場合は `<memory-dir>/config.json` の `telemetry.auto_commit` を `false` にするか、`--no-commit` を付けてください。',
+      '**`core.hooksPath` を `<memory-dir>/git-hooks/` に向けます**（post-commit のフォールバックは `ownmem init` がそこに生成します）。ただし未設定か、手つかずの既定 hook ディレクトリを指している場合に限ります。触らせたくない場合は `telemetry.manage_hooks_path` を `false` にしてください。',
+      '**複数マシンでは** `report --fleet` が各マシンのパッケージを統合し、コミットはあるのにパッケージが無い日を名指しします。1 台のノート PC の一週間を全履歴のように見せることはありません。',
+    ],
     trustIntro: 'OwnMem が自動化するのは「機械で証明できる部分」であり、「もっともらしい部分」ではありません。',
     trustItems: [
       '**自動：** 決定的 recall、candidate scan、tripwire、反実仮想 replay、R0 trigger backfill、machine trust receipt、audit、compile、観測、隔離、正確な rollback。',
@@ -356,7 +417,7 @@ const COPY = {
   ko: {
     tagline: 'AI 코딩 에이전트의 프로젝트 메모리를 저장소에 둡니다. 로컬·결정적·검토 가능하며 안전한 범위에서 스스로 개선됩니다.',
     chips: '`Git 네이티브` · `로컬 회상` · `멀티 에이전트` · `증거 거버넌스` · `Apache-2.0`',
-    headings: ['왜 OwnMem인가', '전체 아키텍처', 'OwnMem의 AI Agent Memory 관리 방식', '3분 만에 시작', '일상 사용', '신뢰와 자동화 경계', '적합한 경우', '기본은 로컬 우선', '연구 계보', '문서'],
+    headings: ['왜 OwnMem인가', '전체 아키텍처', 'OwnMem의 AI Agent Memory 관리 방식', '3분 만에 시작', '일상 사용', '신뢰와 자동화 경계', '적합한 경우', '기본은 로컬 우선', '연구 계보', '문서', '텔레메트리와 일일 패스'],
     whyIntro: '대부분의 메모리 시스템은 “더 많이 기억하기”를 최적화합니다. OwnMem은 먼저 **프로젝트 지식을 누가 소유하고, 누가 바꿀 수 있으며, 잘못된 메모리를 행동 전에 어떻게 막을지** 묻습니다.',
     whyHeader: ['장점', '실제 개발에서의 의미'],
     whyRows: [
@@ -395,6 +456,20 @@ const COPY = {
     rememberQuote: '> “기억해 둬. staging 배포 timeout은 worker 부족이 아니라 pool cap 때문이야. 다음에는 둘 다 확인해.”',
     recallQuote: '> “바꾸기 전에 프로젝트 메모리에 같은 장애가 있었는지 확인해.”',
     dailyAfter: 'host는 관련 작업 전 recall하고 turn 끝에 lock·debounce가 적용된 evolution을 한 번 예약합니다. promotion, trust, audit, compile을 수동으로 연결할 필요는 보통 없습니다. 로컬 console이나 coordinator status로 확인할 수 있습니다.',
+    hostNotes: [
+      '**Claude Code** 와 **Grok CLI** 는 같은 `.claude/settings.json` 을 읽습니다. grok 은 이 폴더를 한 번 신뢰해야 하며(grok 안에서 `/hooks-trust` 실행, 또는 `grok --trust` 로 시작), 그렇지 않으면 아무 말 없이 이 hook 들을 전혀 실행하지 않습니다.',
+      '**Codex** 는 `<프로젝트>/.codex/hooks.json` 을 읽지만, 서로 독립된 세 가지 허가가 필요합니다. (1) `~/.codex/config.toml` 의 `[features]` 아래 `hooks = true`, (2) 프로젝트 자체의 신뢰 — 대화형 Codex 가 처음 열 때 물어보며, `[projects."<경로>"]` 에 `trust_level = "trusted"` 를 직접 써도 됩니다 — (3) hook 을 처음 발견할 때의 신뢰 프롬프트. 신뢰되지 않은 프로젝트에서는 아무 말도 없습니다. 파일 자체를 발견하지 못하며, `--dangerously-bypass-hook-trust` 도 `-c projects...` 재정의도 그 층까지 닿지 않습니다. hook 프로세스는 프로젝트 루트에서 실행되고 PATH 에 `node_modules/.bin` 이 있으며 stdin 으로 Claude Code 와 같은 JSON 을 받지만, `CODEX_*` 환경 변수는 전혀 주어지지 않습니다. 그래서 모든 명령이 host 를 명시적으로 선언합니다.',
+      '**Cursor** 와 **Gemini CLI** 에는 지시 어댑터만 설치됩니다. 둘 다 hook 표면이 없어 회상은 하지만 수집에는 기여하지 않습니다.',
+    ],
+    upgradeNote: '0.5.x 에서 올라올 때: hook 설정이 v2 가 되었습니다. `npx ownmem init --update` 를 한 번 실행하세요. 이전 명령은 자리를 지킨 채 교체되고, 직접 작성한 hook 은 건드리지 않습니다. 실행하기 전까지는 세션 시작마다 설정이 오래되었다고 알립니다.',
+    telemetryIntro: '런타임 이벤트는 30 일이 지나면 만료되며, 기록한 머신을 벗어나지 않습니다. 일일 패스는 끝난 하루를 커밋할 수 있을 만큼 작은 집계 패키지로 줄여 두므로, 다른 머신에서도 몇 달 뒤의 리포트에서도 그 하루를 볼 수 있습니다:',
+    telemetryItems: [
+      '**패키지에 들어가는 것:** 횟수, 버킷, 지연 백분위, 기권 사유, 쿼터와 골든셋 해시, 그리고 이미 공개 색인에 있는 topic 이름.',
+      '**절대 들어가지 않는 것:** 질의 원문과 그 다이제스트, topic 본문, 파일 경로, 머신 이름과 계정 이름. 타임스탬프도 일 단위보다 세밀하지 않습니다.',
+      '**스스로 커밋합니다.** 패키지는 전용 index 와 명시적 경로로 스테이징되고 HEAD 에 대해 compare-and-swap 을 하므로, 다른 세션이 스테이징한 작업을 함께 가져가는 일은 없습니다. 커밋 없이 보관만 하려면 `<memory-dir>/config.json` 의 `telemetry.auto_commit` 을 `false` 로 두거나 `--no-commit` 을 쓰세요.',
+      '**`core.hooksPath` 를 `<memory-dir>/git-hooks/` 로 가리킵니다**(post-commit 폴백은 `ownmem init` 이 그곳에 생성합니다). 다만 그 설정이 비어 있거나 손대지 않은 기본 hook 디렉터리를 가리킬 때만 그렇습니다. 그대로 두려면 `telemetry.manage_hooks_path` 를 `false` 로 설정하세요.',
+      '**여러 머신에서는** `report --fleet` 가 각 머신의 패키지를 합치고, 커밋은 있는데 패키지가 없는 날을 이름으로 지목합니다. 노트북 한 대의 한 주를 전체 이력처럼 보여주지 않습니다.',
+    ],
     trustIntro: 'OwnMem이 자동화하는 것은 “기계가 증명할 수 있는 부분”이지 “그럴듯한 부분”이 아닙니다.',
     trustItems: [
       '**자동:** 결정적 recall, candidate scan, tripwire, 반사실 replay, R0 trigger backfill, machine trust receipt, audit, compile, 관찰, 격리, 정확한 rollback.',
@@ -433,7 +508,7 @@ const COPY = {
   es: {
     tagline: 'Memoria de proyecto para agentes de programación: local, determinista, revisable y capaz de mejorar dentro de límites seguros.',
     chips: '`Nativo de Git` · `recall local` · `multiagente` · `gobierno por evidencia` · `Apache-2.0`',
-    headings: ['Por qué OwnMem', 'Arquitectura', 'Cómo gobierna OwnMem la memoria de agentes de IA', 'Inicio en tres minutos', 'Uso diario', 'Límite entre confianza y automatización', 'Cuándo encaja', 'Local por defecto', 'Linaje de investigación', 'Documentación'],
+    headings: ['Por qué OwnMem', 'Arquitectura', 'Cómo gobierna OwnMem la memoria de agentes de IA', 'Inicio en tres minutos', 'Uso diario', 'Límite entre confianza y automatización', 'Cuándo encaja', 'Local por defecto', 'Linaje de investigación', 'Documentación', 'Telemetría y pase diario'],
     whyIntro: 'La mayoría de los sistemas optimiza «recordar más». OwnMem empieza por otra pregunta: **¿quién posee el conocimiento del proyecto, quién puede cambiarlo y cómo se detiene un recuerdo erróneo antes de que altere las acciones del agente?**',
     whyHeader: ['Ventaja', 'Qué significa en la práctica'],
     whyRows: [
@@ -472,6 +547,20 @@ const COPY = {
     rememberQuote: '> «Recuerda: el timeout de staging viene del límite del pool, no de pocos workers. Comprueba ambos la próxima vez.»',
     recallQuote: '> «Antes de cambiar esto, revisa si la memoria del proyecto ya vio el mismo fallo.»',
     dailyAfter: 'El host hace recall antes del trabajo relevante y programa una evolución bloqueada y con debounce al final del turno. Normalmente no hay que encadenar promotion, trust, audit y compile. Para observarlo abre la consola local o consulta el coordinador:',
+    hostNotes: [
+      '**Claude Code** y **Grok CLI** leen el mismo `.claude/settings.json`. Grok además exige confiar en esta carpeta una vez (ejecuta `/hooks-trust` dentro de grok o inícialo con `grok --trust`); si no, no ejecuta ninguno de estos hooks y no lo dice.',
+      '**Codex** lee `<proyecto>/.codex/hooks.json`, pero detrás de tres permisos independientes: (1) `hooks = true` bajo `[features]` en `~/.codex/config.toml`; (2) el propio proyecto confiado —el Codex interactivo lo pregunta la primera vez que lo abre, o añade `[projects."<ruta>"]` con `trust_level = "trusted"`—; y (3) el aviso de confianza del hook la primera vez que lo ve. Un proyecto sin confianza falla en silencio: nunca descubre el archivo, y ni `--dangerously-bypass-hook-trust` ni una anulación `-c projects...` llegan a esa capa. El proceso del hook se ejecuta en la raíz del proyecto, con `node_modules/.bin` en el PATH y el mismo JSON por stdin que envía Claude Code, pero sin ninguna variable `CODEX_*`, así que cada comando declara su host de forma explícita.',
+      '**Cursor** y **Gemini CLI** reciben solo adaptadores de instrucciones. Ninguno expone una superficie de hooks, así que consultan la memoria pero no aportan recolección.',
+    ],
+    upgradeNote: 'Al actualizar desde 0.5.x: la configuración de hooks es ahora v2. Ejecuta `npx ownmem init --update` una vez. Los comandos anteriores se sustituyen en su sitio, los hooks que escribiste tú no se tocan, y hasta entonces el pase de inicio de sesión seguirá avisando de que la configuración está desactualizada.',
+    telemetryIntro: 'Los eventos de ejecución caducan a los treinta días y nunca salen de la máquina que los escribió. El pase diario reduce cada día terminado a un paquete de recuentos lo bastante pequeño para versionarlo, de modo que otra máquina —y un informe ejecutado meses después— aún pueda verlo:',
+    telemetryItems: [
+      '**Qué contiene un paquete:** recuentos, agrupaciones, percentiles de latencia, motivos de abstención, los hashes de la cuota y del conjunto dorado, y nombres de topic que ya están en el índice público.',
+      '**Qué no contiene nunca:** el texto de la consulta ni su resumen, el cuerpo de los topics, rutas de archivo, nombres de máquina o de cuenta, ni marcas de tiempo más finas que el día.',
+      '**Se confirma solo.** Los paquetes se preparan contra un índice privado con rutas explícitas y un compare-and-swap sobre HEAD, así que un pase nunca puede llevarse el trabajo preparado por otra sesión. Pon `telemetry.auto_commit` en `false` en `<memory-dir>/config.json`, o usa `--no-commit`, para archivar sin confirmar.',
+      '**Apunta `core.hooksPath`** a `<memory-dir>/git-hooks/`, donde `ownmem init` genera el respaldo post-commit, y solo mientras ese ajuste esté vacío o apunte a un directorio de hooks por defecto intacto. Pon `telemetry.manage_hooks_path` en `false` para que no lo toque.',
+      '**Entre máquinas**, `report --fleet` fusiona los paquetes de todas ellas y nombra los días que tienen commits pero ningún paquete, en vez de presentar la semana de un portátil como si fuera todo el historial.',
+    ],
     trustIntro: 'OwnMem automatiza lo que una máquina puede demostrar, no lo que solo parece plausible.',
     trustItems: [
       '**Automático:** recall determinista, escaneo, tripwire, replay contrafactual, backfill R0, receipt de máquina, audit, compile, observación, cuarentena y rollback exacto.',
@@ -510,7 +599,7 @@ const COPY = {
   fr: {
     tagline: 'La mémoire de projet des agents de code reste dans le dépôt : locale, déterministe, révisable et capable de progresser dans des limites sûres.',
     chips: '`Natif Git` · `rappel local` · `multi-agent` · `gouverné par les preuves` · `Apache-2.0`',
-    headings: ['Pourquoi OwnMem', 'Architecture', 'Comment OwnMem gouverne la mémoire des agents IA', 'Démarrer en trois minutes', 'Usage quotidien', 'Frontière entre confiance et automatisation', 'Quand OwnMem convient', 'Local par défaut', 'Filiation scientifique', 'Documentation'],
+    headings: ['Pourquoi OwnMem', 'Architecture', 'Comment OwnMem gouverne la mémoire des agents IA', 'Démarrer en trois minutes', 'Usage quotidien', 'Frontière entre confiance et automatisation', 'Quand OwnMem convient', 'Local par défaut', 'Filiation scientifique', 'Documentation', 'Télémétrie et passe quotidienne'],
     whyIntro: 'La plupart des mémoires cherchent d’abord à « retenir plus ». OwnMem pose une autre question : **qui possède le savoir du projet, qui peut le modifier et comment arrêter un mauvais souvenir avant qu’il influence l’agent ?**',
     whyHeader: ['Avantage', 'Conséquence pratique'],
     whyRows: [
@@ -549,6 +638,20 @@ const COPY = {
     rememberQuote: '> « Mémorise ceci : le timeout de staging vient de la limite du pool, pas d’un manque de workers. Vérifie les deux la prochaine fois. »',
     recallQuote: '> « Avant de modifier, regarde si la mémoire du projet a déjà rencontré la même panne. »',
     dailyAfter: 'Le host rappelle avant le travail concerné et planifie une évolution verrouillée et debounced en fin de tour. Inutile d’enchaîner manuellement promotion, trust, audit et compile. La console locale et le statut du coordinateur rendent le tout visible :',
+    hostNotes: [
+      '**Claude Code** et **Grok CLI** lisent le même `.claude/settings.json`. Grok exige en plus que ce dossier soit approuvé une fois (`/hooks-trust` dans grok, ou démarrage avec `grok --trust`) ; sans cela il n’exécute aucun de ces hooks, sans le signaler.',
+      '**Codex** lit `<projet>/.codex/hooks.json`, mais derrière trois autorisations distinctes : (1) `hooks = true` sous `[features]` dans `~/.codex/config.toml` ; (2) le projet lui-même approuvé — le Codex interactif le demande la première fois qu’il l’ouvre, ou ajoutez `[projects."<chemin>"]` avec `trust_level = "trusted"` ; (3) l’invite de confiance du hook à la première détection. Un projet non approuvé échoue en silence : il ne découvre jamais le fichier, et ni `--dangerously-bypass-hook-trust` ni une surcharge `-c projects...` n’atteignent cette couche. Le processus du hook s’exécute à la racine du projet, avec `node_modules/.bin` dans le PATH et le même JSON sur stdin que celui envoyé par Claude Code, mais sans aucune variable `CODEX_*` : chaque commande déclare donc son host explicitement.',
+      '**Cursor** et **Gemini CLI** ne reçoivent que des adaptateurs d’instructions. Aucun des deux n’expose de surface de hooks : ils consultent la mémoire mais n’alimentent aucune collecte.',
+    ],
+    upgradeNote: 'Mise à jour depuis 0.5.x : la configuration des hooks est désormais en v2. Exécutez `npx ownmem init --update` une fois. Les commandes antérieures sont remplacées sur place, les hooks que vous avez écrits ne sont jamais touchés, et tant que ce n’est pas fait la passe de démarrage de session continue de signaler une configuration obsolète.',
+    telemetryIntro: 'Les événements d’exécution expirent au bout de trente jours et ne quittent jamais la machine qui les a écrits. La passe quotidienne réduit chaque journée terminée à un paquet de compteurs assez petit pour être versionné, afin qu’une autre machine — et un rapport lancé des mois plus tard — puisse encore le lire :',
+    telemetryItems: [
+      '**Ce que contient un paquet :** compteurs, regroupements, percentiles de latence, motifs d’abstention, empreintes du quota et du jeu de référence, et noms de topics déjà présents dans l’index public.',
+      '**Ce qu’il ne contient jamais :** le texte de la requête ni son condensé, le corps des topics, les chemins de fichiers, les noms de machine ou de compte, ni d’horodatage plus fin que la journée.',
+      '**Il se valide lui-même.** Les paquets sont indexés dans un index privé, avec des chemins explicites et un compare-and-swap sur HEAD : une passe ne peut donc jamais emporter le travail indexé par une autre session. Mettez `telemetry.auto_commit` à `false` dans `<memory-dir>/config.json`, ou passez `--no-commit`, pour archiver sans valider.',
+      '**Il fait pointer `core.hooksPath`** vers `<memory-dir>/git-hooks/`, où `ownmem init` génère le filet post-commit, et uniquement tant que ce réglage est vide ou pointe vers un répertoire de hooks par défaut intact. Mettez `telemetry.manage_hooks_path` à `false` pour qu’il n’y touche pas.',
+      '**Entre machines**, `report --fleet` fusionne les paquets de chacune et nomme les journées qui ont des commits mais aucun paquet, au lieu de présenter la semaine d’un seul poste comme l’historique complet.',
+    ],
     trustIntro: 'OwnMem automatise ce que la machine peut prouver, pas ce qui semble seulement plausible.',
     trustItems: [
       '**Automatique :** rappel déterministe, scan, tripwire, replay contrefactuel, backfill R0, receipt machine, audit, compile, observation, quarantaine et rollback exact.',
@@ -587,7 +690,7 @@ const COPY = {
   de: {
     tagline: 'Projektgedächtnis für Coding Agents im Repository: lokal, deterministisch, reviewbar und innerhalb sicherer Grenzen selbstverbessernd.',
     chips: '`Git-nativ` · `lokaler Recall` · `Multi-Agent` · `evidenzgesteuert` · `Apache-2.0`',
-    headings: ['Warum OwnMem', 'Architektur', 'Wie OwnMem AI-Agent-Memory steuert', 'In drei Minuten starten', 'Tägliche Nutzung', 'Grenze von Vertrauen und Automatisierung', 'Wann es passt', 'Standardmäßig lokal', 'Forschungslinie', 'Dokumentation'],
+    headings: ['Warum OwnMem', 'Architektur', 'Wie OwnMem AI-Agent-Memory steuert', 'In drei Minuten starten', 'Tägliche Nutzung', 'Grenze von Vertrauen und Automatisierung', 'Wann es passt', 'Standardmäßig lokal', 'Forschungslinie', 'Dokumentation', 'Telemetrie und täglicher Durchlauf'],
     whyIntro: 'Die meisten Memory-Systeme optimieren „mehr erinnern“. OwnMem fragt zuerst: **Wem gehört Projektwissen, wer darf es ändern und wie stoppen wir eine falsche Erinnerung, bevor sie Agent-Aktionen beeinflusst?**',
     whyHeader: ['Vorteil', 'Praktische Bedeutung'],
     whyRows: [
@@ -626,6 +729,20 @@ const COPY = {
     rememberQuote: '> „Merke dir: Das staging timeout kommt vom pool cap, nicht von zu wenigen workers. Prüfe nächstes Mal beides.“',
     recallQuote: '> „Bevor du das änderst, prüfe, ob das Projektgedächtnis denselben Fehler kennt.“',
     dailyAfter: 'Der Host ruft vor relevanter Arbeit ab und plant am Turn-Ende eine gesperrte, entprellte Evolution. promotion, trust, audit und compile müssen normalerweise nicht manuell verkettet werden. Lokale Konsole und Coordinator-Status zeigen den Zustand:',
+    hostNotes: [
+      '**Claude Code** und **Grok CLI** lesen dieselbe `.claude/settings.json`. Grok verlangt zusätzlich, diesen Ordner einmal zu vertrauen (`/hooks-trust` in grok, oder Start mit `grok --trust`); sonst führt es keinen dieser Hooks aus und sagt nichts dazu.',
+      '**Codex** liest `<Projekt>/.codex/hooks.json`, aber erst nach drei getrennten Freigaben: (1) `hooks = true` unter `[features]` in `~/.codex/config.toml`; (2) das Projekt selbst als vertrauenswürdig — das interaktive Codex fragt beim ersten Öffnen danach, alternativ `[projects."<Pfad>"]` mit `trust_level = "trusted"` eintragen; und (3) die Hook-Vertrauensabfrage beim ersten Auftreten. Ein nicht freigegebenes Projekt scheitert lautlos: Es findet die Datei überhaupt nicht, und weder `--dangerously-bypass-hook-trust` noch eine `-c projects...`-Überschreibung reichen bis zu dieser Schicht. Der Hook-Prozess läuft im Projektstamm, mit `node_modules/.bin` im PATH und demselben JSON auf stdin, das Claude Code sendet, jedoch ohne jede `CODEX_*`-Variable — deshalb deklariert jeder Befehl seinen Host ausdrücklich.',
+      '**Cursor** und **Gemini CLI** erhalten nur Anweisungs-Adapter. Beide bieten keine Hook-Oberfläche: Sie lesen aus der Memory, liefern aber keine Erhebung.',
+    ],
+    upgradeNote: 'Beim Wechsel von 0.5.x: Die Hook-Konfiguration ist jetzt v2. Einmal `npx ownmem init --update` ausführen. Ältere Befehle werden an Ort und Stelle ersetzt, selbst geschriebene Hooks bleiben unangetastet, und bis dahin meldet der Durchlauf beim Sitzungsstart weiterhin eine veraltete Konfiguration.',
+    telemetryIntro: 'Laufzeitereignisse verfallen nach dreißig Tagen und verlassen nie den Rechner, der sie geschrieben hat. Der tägliche Durchlauf verdichtet jeden abgeschlossenen Tag zu einem gezählten Paket, das klein genug für einen Commit ist — damit ein zweiter Rechner und ein Bericht Monate später ihn noch sehen:',
+    telemetryItems: [
+      '**Was ein Paket enthält:** Zählwerte, Gruppen, Latenz-Perzentile, Abstinenzgründe, die Hashes von Kontingent und Goldmenge sowie Topic-Namen, die ohnehin im öffentlichen Index stehen.',
+      '**Was es nie enthält:** Abfragetext oder dessen Digest, Topic-Inhalte, Dateipfade, Rechner- oder Kontonamen und keinen Zeitstempel feiner als den Tag.',
+      '**Es committet sich selbst.** Pakete werden gegen einen privaten Index mit ausdrücklichen Pfaden vorgemerkt, mit Compare-and-Swap auf HEAD — ein Durchlauf kann also nie die vorgemerkte Arbeit einer anderen Sitzung mitnehmen. Für Archivieren ohne Commit `telemetry.auto_commit` in `<memory-dir>/config.json` auf `false` setzen oder `--no-commit` übergeben.',
+      '**Es richtet `core.hooksPath`** auf `<memory-dir>/git-hooks/` aus, wo `ownmem init` den Post-commit-Rückfall erzeugt, und nur solange die Einstellung leer ist oder auf ein unberührtes Standard-Hook-Verzeichnis zeigt. `telemetry.manage_hooks_path` auf `false` setzen, damit es unangetastet bleibt.',
+      '**Über Rechner hinweg** führt `report --fleet` die Pakete aller Rechner zusammen und benennt die Tage mit Commits, aber ohne Paket, statt die Woche eines Laptops stillschweigend als ganze Historie auszugeben.',
+    ],
     trustIntro: 'OwnMem automatisiert, was eine Maschine beweisen kann, nicht was nur plausibel klingt.',
     trustItems: [
       '**Automatisch:** deterministischer Recall, Scan, Tripwire, kontrafaktisches Replay, R0-Backfill, Maschinen-Receipt, Audit, Compile, Beobachtung, Quarantäne und exakter Rollback.',
@@ -664,7 +781,7 @@ const COPY = {
   'pt-BR': {
     tagline: 'Memória de projeto para agentes de programação no repositório: local, determinística, revisável e capaz de evoluir dentro de limites seguros.',
     chips: '`Nativo do Git` · `recall local` · `multiagente` · `governado por evidência` · `Apache-2.0`',
-    headings: ['Por que OwnMem', 'Arquitetura', 'Como o OwnMem governa memória de agentes de IA', 'Comece em três minutos', 'Uso diário', 'Limite entre confiança e automação', 'Quando usar', 'Local por padrão', 'Linhagem de pesquisa', 'Documentação'],
+    headings: ['Por que OwnMem', 'Arquitetura', 'Como o OwnMem governa memória de agentes de IA', 'Comece em três minutos', 'Uso diário', 'Limite entre confiança e automação', 'Quando usar', 'Local por padrão', 'Linhagem de pesquisa', 'Documentação', 'Telemetria e passagem diária'],
     whyIntro: 'A maioria dos sistemas otimiza “lembrar mais”. O OwnMem começa por outra pergunta: **quem possui o conhecimento do projeto, quem pode alterá-lo e como impedir uma memória errada antes que ela mude as ações do agente?**',
     whyHeader: ['Vantagem', 'O que significa na prática'],
     whyRows: [
@@ -703,6 +820,20 @@ const COPY = {
     rememberQuote: '> “Lembre: o timeout de staging vem do limite do pool, não de poucos workers. Verifique os dois na próxima vez.”',
     recallQuote: '> “Antes de mudar, veja se a memória do projeto já encontrou a mesma falha.”',
     dailyAfter: 'O host faz recall antes do trabalho relevante e agenda uma evolução bloqueada e com debounce ao fim do turno. Normalmente não é preciso encadear promotion, trust, audit e compile. Use o console local ou o status do coordenador para acompanhar:',
+    hostNotes: [
+      '**Claude Code** e **Grok CLI** leem o mesmo `.claude/settings.json`. O grok ainda exige confiar nesta pasta uma vez (execute `/hooks-trust` dentro do grok, ou inicie com `grok --trust`); sem isso ele não executa nenhum destes hooks e não avisa.',
+      '**Codex** lê `<projeto>/.codex/hooks.json`, mas atrás de três permissões independentes: (1) `hooks = true` sob `[features]` em `~/.codex/config.toml`; (2) o próprio projeto confiado — o Codex interativo pergunta na primeira vez que o abre, ou adicione `[projects."<caminho>"]` com `trust_level = "trusted"`; e (3) o aviso de confiança do hook na primeira vez que ele aparece. Um projeto não confiado falha em silêncio: ele nunca descobre o arquivo, e nem `--dangerously-bypass-hook-trust` nem uma substituição `-c projects...` alcançam essa camada. O processo do hook roda na raiz do projeto, com `node_modules/.bin` no PATH e o mesmo JSON no stdin que o Claude Code envia, mas sem nenhuma variável `CODEX_*`, então cada comando declara seu host explicitamente.',
+      '**Cursor** e **Gemini CLI** recebem apenas adaptadores de instrução. Nenhum dos dois expõe superfície de hooks: eles consultam a memória, mas não contribuem com coleta.',
+    ],
+    upgradeNote: 'Ao atualizar de 0.5.x: a configuração de hooks agora é v2. Rode `npx ownmem init --update` uma vez. Os comandos anteriores são substituídos no lugar, os hooks que você mesmo escreveu não são tocados e, até você rodar, a passagem de início de sessão continua avisando que a configuração está desatualizada.',
+    telemetryIntro: 'Eventos de execução expiram em trinta dias e nunca saem da máquina que os escreveu. A passagem diária reduz cada dia encerrado a um pacote de contagens pequeno o bastante para ser versionado, de modo que outra máquina — e um relatório rodado meses depois — ainda consiga vê-lo:',
+    telemetryItems: [
+      '**O que um pacote contém:** contagens, agrupamentos, percentis de latência, motivos de abstenção, os hashes da cota e do conjunto dourado, e nomes de topic que já estão no índice público.',
+      '**O que ele nunca contém:** o texto da consulta nem seu resumo, o corpo dos topics, caminhos de arquivo, nomes de máquina ou de conta, nem carimbos de tempo mais finos que o dia.',
+      '**Ele mesmo faz o commit.** Os pacotes são preparados contra um índice privado, com caminhos explícitos e compare-and-swap no HEAD, então uma passagem nunca leva junto o trabalho preparado por outra sessão. Defina `telemetry.auto_commit` como `false` em `<memory-dir>/config.json`, ou passe `--no-commit`, para arquivar sem commitar.',
+      '**Ele aponta o `core.hooksPath`** para `<memory-dir>/git-hooks/`, onde o `ownmem init` gera o fallback de post-commit, e apenas enquanto essa configuração estiver vazia ou apontar para um diretório de hooks padrão intocado. Defina `telemetry.manage_hooks_path` como `false` para que ele não mexa.',
+      '**Entre máquinas**, `report --fleet` funde os pacotes de todas elas e nomeia os dias que têm commits mas nenhum pacote, em vez de apresentar a semana de um notebook como se fosse todo o histórico.',
+    ],
     trustIntro: 'O OwnMem automatiza o que a máquina consegue provar, não o que apenas parece plausível.',
     trustItems: [
       '**Automático:** recall determinístico, varredura, tripwire, replay contrafactual, backfill R0, receipt de máquina, audit, compile, observação, quarentena e rollback exato.',
@@ -833,6 +964,10 @@ ${COMMON.install}
 
 ${t.quickAfter}
 
+${list(t.hostNotes)}
+
+${t.upgradeNote}
+
 ## ${t.headings[4]}
 
 ${t.dailyIntro}
@@ -844,6 +979,14 @@ ${t.recallQuote}
 ${t.dailyAfter}
 
 ${COMMON.evolution}
+
+## ${t.headings[10]}
+
+${t.telemetryIntro}
+
+${COMMON.telemetry}
+
+${list(t.telemetryItems)}
 
 ## ${t.headings[5]}
 

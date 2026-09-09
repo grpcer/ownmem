@@ -67,10 +67,16 @@ Requires Node.js 20.6 or newer. Run this inside the repository that should own t
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
+npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
 ```
 
 Reopen the agent after initialization. OwnMem creates `.ownmem/` and edits only managed marker regions in host files. Use `--hosts claude`, `--hosts codex`, `--hosts cursor`, or `--hosts gemini` when only one adapter is needed; preview changes with `npx ownmem init --check`.
+
+- **Claude Code** and **Grok CLI** both read `.claude/settings.json`. Grok additionally needs this folder trusted once — run `/hooks-trust` inside grok, or start it with `grok --trust` — otherwise it silently runs none of these hooks.
+- **Codex** reads `<project>/.codex/hooks.json` behind three separate permissions: (1) `hooks = true` under `[features]` in `~/.codex/config.toml`, (2) the project itself trusted — interactive Codex asks the first time it opens it, or add `[projects."<path>"]` with `trust_level = "trusted"` — and (3) the hook trust prompt on first sight. An untrusted project is silent: it never discovers the file, and neither `--dangerously-bypass-hook-trust` nor a `-c projects...` override reaches that layer. The hook process runs at the project root with `node_modules/.bin` on PATH and the same JSON on stdin that Claude Code sends, but with no `CODEX_*` variable of any kind, so every command declares its host explicitly.
+- **Cursor** and **Gemini CLI** receive instruction adapters only. Neither exposes a hook surface, so they recall from memory but contribute no collection.
+
+Upgrading from 0.5.x: the hook configuration is now v2. Run `npx ownmem init --update` once. Commands that predate it are replaced where they stand, hooks you wrote yourself are never touched, and the session-start pass keeps saying the configuration is out of date until you do.
 
 ## Daily use
 
@@ -87,6 +93,22 @@ npx ownmem dashboard --open
 npx ownmem evolve status
 npx ownmem evolve run --force
 ```
+
+## Telemetry and the daily pass
+
+Runtime events expire after thirty days and never leave the machine that wrote them. The daily pass reduces each finished day to a counted package small enough to commit, so a second machine — and a report run months later — can still see it:
+
+```bash
+npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
+npx ownmem archive --backfill          # reduce every day still on disk to a counted package
+npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+```
+
+- **What a package holds:** counts, buckets, latency percentiles, abstain reasons, the quota and golden-set hashes, and topic names that are already in the public index.
+- **What it never holds:** query text or its digest, topic bodies, file paths, machine or account names, and no timestamp finer than the day.
+- **It commits itself.** Packages are staged against a private index with explicit paths and a compare-and-swap on HEAD, so a pass can never carry away another session’s staged work. Set `telemetry.auto_commit` to `false` in `<memory-dir>/config.json`, or pass `--no-commit`, to archive without committing.
+- **It points `core.hooksPath`** at `<memory-dir>/git-hooks/`, where `ownmem init` generates the post-commit fallback, and only while that setting is empty or points at an untouched default hook directory. Set `telemetry.manage_hooks_path` to `false` to leave it alone.
+- **Across machines,** `report --fleet` merges every machine’s packages and names the days that have commits but no package, instead of quietly presenting one laptop’s week as the whole history.
 
 ## Trust and automation boundary
 

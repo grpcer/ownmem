@@ -96,7 +96,7 @@
         "coverage_source": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "enum": ["claude-hook", "cli", "manual"] }
+          "items": { "enum": ["hook", "claude-hook", "cli", "manual"] }
         },
         "consumed_traces": { "$ref": "#/$defs/count" },
         "observable_consumed_traces": { "$ref": "#/$defs/count" },
@@ -112,7 +112,7 @@
     "performance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["total_ms", "hot_ms", "cold_ms", "cold_rate", "hot_rate", "current_runtime", "historical_runtime_samples", "cache_hit_observed", "cache_hit_rate", "snapshot_degradation", "embedding", "query_classes", "channels", "retrieval_attempts", "retrieval_abstained", "retrieval_abstain_rate", "retrieval_by_surface", "unclassified_abstains", "deduplicated", "deduplication_rate", "abstain_reasons"],
+      "required": ["total_ms", "hot_ms", "cold_ms", "cold_rate", "hot_rate", "current_runtime", "historical_runtime_samples", "cache_hit_observed", "cache_hit_rate", "snapshot_degradation", "embedding", "query_classes", "channels", "retrieval_attempts", "retrieval_abstained", "retrieval_abstain_rate", "retrieval_by_surface", "retrieval_by_surface_agent", "unclassified_abstains", "deduplicated", "deduplication_rate", "abstain_reasons"],
       "properties": {
         "total_ms": { "$ref": "#/$defs/distribution" },
         "hot_ms": { "$ref": "#/$defs/distribution" },
@@ -210,6 +210,31 @@
         "retrieval_attempts": { "$ref": "#/$defs/count" },
         "retrieval_abstained": { "$ref": "#/$defs/count" },
         "retrieval_abstain_rate": { "$ref": "#/$defs/ratio" },
+        "retrieval_by_surface_agent": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The same abstain rate split by entry point and by which agent was asking, keyed `<surface>/<agent>`. Two groups stay outside every bucket and are counted on their own: rows written before agent attribution existed, whose days really were mixed, and rows whose environment carried markers for more than one host. Filing either of them under an agent would be a guess reported as a measurement.",
+          "required": ["buckets", "legacy_attempts", "legacy_abstained", "nested_attempts", "nested_abstained"],
+          "properties": {
+            "buckets": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["attempts", "abstained", "abstain_rate"],
+                "properties": {
+                  "attempts": { "$ref": "#/$defs/count" },
+                  "abstained": { "$ref": "#/$defs/count" },
+                  "abstain_rate": { "$ref": "#/$defs/ratio" }
+                }
+              }
+            },
+            "legacy_attempts": { "$ref": "#/$defs/count" },
+            "legacy_abstained": { "$ref": "#/$defs/count" },
+            "nested_attempts": { "$ref": "#/$defs/count" },
+            "nested_abstained": { "$ref": "#/$defs/count" }
+          }
+        },
         "retrieval_by_surface": { "type": "object", "description": "Abstain rate per recall surface. cli (a deliberate question) and claude-hook (fires on every Read/Edit/Write) differ by an order of magnitude, so the blended rate alone is misleading.", "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["attempts", "abstained", "abstain_rate"], "properties": { "attempts": { "$ref": "#/$defs/count" }, "abstained": { "$ref": "#/$defs/count" }, "abstain_rate": { "$ref": "#/$defs/ratio" } } } },
         "unclassified_abstains": { "$ref": "#/$defs/count" },
         "deduplicated": { "$ref": "#/$defs/count" },
@@ -628,7 +653,7 @@
       "additionalProperties": false,
       "required": ["surface", "execution", "query_shape", "samples", "total_ms", "retrieval_attempts", "retrieval_abstained", "retrieval_abstain_rate", "deduplicated"],
       "properties": {
-        "surface": { "enum": ["claude-hook", "cli", "unknown"] },
+        "surface": { "enum": ["hook", "claude-hook", "cli", "unknown"] },
         "execution": { "enum": ["cold", "hot"] },
         "query_shape": { "enum": ["pure-path", "natural-only", "mixed", "other"] },
         "samples": { "$ref": "#/$defs/count" },

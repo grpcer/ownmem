@@ -28,8 +28,21 @@ A release is blocked until every item below has fresh evidence:
 - `npm run benchmark:release` meets every global, per-language, and per-script
   Recall@1/5, MRR, unrelated-query abstention, latency, and determinism lock; the
   fixed algorithm selector still chooses the shipped default.
+- Every consumer-facing document is read against this version's changelog entry,
+  item by item through Breaking, Added, and Fixed: the README generator,
+  `UPDATING.md`, `PLUGINS.md`, `PRIVACY.md`, and `TECHNICAL.md`. The
+  generator-drift gate below proves only that the nine READMEs match the
+  generator; it cannot tell whether the generator, or any of the other
+  documents, still describes what this version does.
+- Every README is regenerated from its generator and committed: run
+  `node docs/generate-readmes.mjs`, then the release audit. All nine READMEs
+  are generated output, including the English one at the repository root, so a
+  release note written by hand ships in one language and silently not in the
+  other eight. The audit compares each of them byte for byte with a fresh
+  generator run and blocks on any difference.
 - The public release audit reports zero private-content, secret, comment,
-  catalog, package-whitelist, and dependency-license findings.
+  catalog, package-whitelist, README-generator, and dependency-license
+  findings.
 - `npm pack --dry-run --json` matches the locked package whitelist.
 - The packed tarball installs with npm's offline mode into a clean consumer,
   then its npm bin initializes and recalls from that consumer.

@@ -18,6 +18,23 @@ the ignored local review inbox so a maintainer can reproduce the result.
 Feedback is never collected automatically, uploaded, or promoted into a
 benchmark without manual privacy review.
 
+From 0.6.0, `ownmem archive` and `ownmem daily` reduce a finished UTC day of
+those local events to a counted package at
+`<memory-dir>/telemetry/<installation>/<day>.json`. That path is inside the
+memory directory rather than the ignored local-data directory, and the daily
+pass commits it by default, so the package travels with the repository to every
+remote the repository is pushed to. That is what it is for -- `ownmem report
+--fleet` merges the packages several machines wrote -- and it is not an upload
+to OwnMem. A package holds counts and buckets, latency percentiles, abstention
+reasons, the quota and quality lock digests, the topic names recall returned
+most often that day, and an installation identifier derived from the machine's
+local HMAC key. It never holds query text or a query digest, topic bodies, file
+paths, a machine or account name, or a timestamp finer than the day; the writer
+checks the rendered file for each of those and refuses to write it otherwise.
+Set `telemetry.auto_commit` to `false` in `<memory-dir>/config.json`, or run
+`ownmem daily --no-commit`, to keep the packages out of commits. They are still
+written to disk, to be handled however the repository prefers.
+
 Outcome receipts and weak self-attribution labels are stricter still. Neither
 stores a prompt, a confirming sentence, or a file body. An outcome receipt keeps
 only the SHA-256 of the statement that confirmed it, plus an optional note that

@@ -51,6 +51,11 @@ repository with `--hosts codex` so the project-local skill and `AGENTS.md`
 adapter are generated together. The project adapter remains the portable
 contract; a machine-level plugin is only a shortcut.
 
+`ownmem init --hosts codex` now also writes `.codex/hooks.json`, the hook
+configuration Codex reads. Reaching those hooks takes three separate
+permissions, and a project missing any of them is silent rather than failing;
+see [UPDATING.md](./UPDATING.md#moving-from-05x-to-060).
+
 Codex best-effort refreshes configured Git marketplaces on startup. To refresh
 explicitly:
 
@@ -60,8 +65,17 @@ codex plugin marketplace upgrade ownmem
 
 ## Grok CLI
 
-Grok reads the Codex-family adapter from the repository
-(`.agents/skills/ownmem` and `AGENTS.md`) after `ownmem init --hosts codex`.
+Grok reads the Claude files through a compatibility layer, so it shares that
+configuration instead of keeping one of its own. Initialize with
+`ownmem init --hosts grok`, or `--hosts claude,grok` when both are used in the
+same checkout; either writes the same `CLAUDE.md` block,
+`.claude/commands/ownmem.md`, and `.claude/settings.json` hook entries.
+
+Grok runs a repository's hook configuration only while the checkout is in its
+trusted-folder list, which it records outside the repository. `init --check`
+reports a checkout that is missing from that list; trust it with `/hooks-trust`
+inside grok, or `grok --trust`.
+
 The machine-level plugin is optional. Grok does not auto-update third-party
 plugins; refresh with:
 

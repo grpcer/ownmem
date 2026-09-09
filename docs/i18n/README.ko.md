@@ -67,10 +67,16 @@ Node.js 20.6 이상이 필요합니다. 메모리를 소유할 저장소에서 �
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
+npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
 ```
 
 초기화 뒤 Agent를 다시 여세요. OwnMem은 `.ownmem/`을 만들고 host 파일의 관리 marker 내부만 수정합니다. adapter 하나만 필요하면 `--hosts claude`, `--hosts codex`, `--hosts cursor`, `--hosts gemini`를 사용하고 `npx ownmem init --check`로 미리 볼 수 있습니다.
+
+- **Claude Code** 와 **Grok CLI** 는 같은 `.claude/settings.json` 을 읽습니다. grok 은 이 폴더를 한 번 신뢰해야 하며(grok 안에서 `/hooks-trust` 실행, 또는 `grok --trust` 로 시작), 그렇지 않으면 아무 말 없이 이 hook 들을 전혀 실행하지 않습니다.
+- **Codex** 는 `<프로젝트>/.codex/hooks.json` 을 읽지만, 서로 독립된 세 가지 허가가 필요합니다. (1) `~/.codex/config.toml` 의 `[features]` 아래 `hooks = true`, (2) 프로젝트 자체의 신뢰 — 대화형 Codex 가 처음 열 때 물어보며, `[projects."<경로>"]` 에 `trust_level = "trusted"` 를 직접 써도 됩니다 — (3) hook 을 처음 발견할 때의 신뢰 프롬프트. 신뢰되지 않은 프로젝트에서는 아무 말도 없습니다. 파일 자체를 발견하지 못하며, `--dangerously-bypass-hook-trust` 도 `-c projects...` 재정의도 그 층까지 닿지 않습니다. hook 프로세스는 프로젝트 루트에서 실행되고 PATH 에 `node_modules/.bin` 이 있으며 stdin 으로 Claude Code 와 같은 JSON 을 받지만, `CODEX_*` 환경 변수는 전혀 주어지지 않습니다. 그래서 모든 명령이 host 를 명시적으로 선언합니다.
+- **Cursor** 와 **Gemini CLI** 에는 지시 어댑터만 설치됩니다. 둘 다 hook 표면이 없어 회상은 하지만 수집에는 기여하지 않습니다.
+
+0.5.x 에서 올라올 때: hook 설정이 v2 가 되었습니다. `npx ownmem init --update` 를 한 번 실행하세요. 이전 명령은 자리를 지킨 채 교체되고, 직접 작성한 hook 은 건드리지 않습니다. 실행하기 전까지는 세션 시작마다 설정이 오래되었다고 알립니다.
 
 ## 일상 사용
 
@@ -87,6 +93,22 @@ npx ownmem dashboard --open
 npx ownmem evolve status
 npx ownmem evolve run --force
 ```
+
+## 텔레메트리와 일일 패스
+
+런타임 이벤트는 30 일이 지나면 만료되며, 기록한 머신을 벗어나지 않습니다. 일일 패스는 끝난 하루를 커밋할 수 있을 만큼 작은 집계 패키지로 줄여 두므로, 다른 머신에서도 몇 달 뒤의 리포트에서도 그 하루를 볼 수 있습니다:
+
+```bash
+npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
+npx ownmem archive --backfill          # reduce every day still on disk to a counted package
+npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+```
+
+- **패키지에 들어가는 것:** 횟수, 버킷, 지연 백분위, 기권 사유, 쿼터와 골든셋 해시, 그리고 이미 공개 색인에 있는 topic 이름.
+- **절대 들어가지 않는 것:** 질의 원문과 그 다이제스트, topic 본문, 파일 경로, 머신 이름과 계정 이름. 타임스탬프도 일 단위보다 세밀하지 않습니다.
+- **스스로 커밋합니다.** 패키지는 전용 index 와 명시적 경로로 스테이징되고 HEAD 에 대해 compare-and-swap 을 하므로, 다른 세션이 스테이징한 작업을 함께 가져가는 일은 없습니다. 커밋 없이 보관만 하려면 `<memory-dir>/config.json` 의 `telemetry.auto_commit` 을 `false` 로 두거나 `--no-commit` 을 쓰세요.
+- **`core.hooksPath` 를 `<memory-dir>/git-hooks/` 로 가리킵니다**(post-commit 폴백은 `ownmem init` 이 그곳에 생성합니다). 다만 그 설정이 비어 있거나 손대지 않은 기본 hook 디렉터리를 가리킬 때만 그렇습니다. 그대로 두려면 `telemetry.manage_hooks_path` 를 `false` 로 설정하세요.
+- **여러 머신에서는** `report --fleet` 가 각 머신의 패키지를 합치고, 커밋은 있는데 패키지가 없는 날을 이름으로 지목합니다. 노트북 한 대의 한 주를 전체 이력처럼 보여주지 않습니다.
 
 ## 신뢰와 자동화 경계
 

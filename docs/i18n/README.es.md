@@ -67,10 +67,16 @@ Requiere Node.js 20.6 o posterior. Ejecútalo en el repositorio que debe poseer 
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
+npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
 ```
 
 Vuelve a abrir el agente tras inicializar. OwnMem crea `.ownmem/` y solo modifica regiones marcadas como administradas. Para un único adaptador usa `--hosts claude`, `--hosts codex`, `--hosts cursor` o `--hosts gemini`; previsualiza con `npx ownmem init --check`.
+
+- **Claude Code** y **Grok CLI** leen el mismo `.claude/settings.json`. Grok además exige confiar en esta carpeta una vez (ejecuta `/hooks-trust` dentro de grok o inícialo con `grok --trust`); si no, no ejecuta ninguno de estos hooks y no lo dice.
+- **Codex** lee `<proyecto>/.codex/hooks.json`, pero detrás de tres permisos independientes: (1) `hooks = true` bajo `[features]` en `~/.codex/config.toml`; (2) el propio proyecto confiado —el Codex interactivo lo pregunta la primera vez que lo abre, o añade `[projects."<ruta>"]` con `trust_level = "trusted"`—; y (3) el aviso de confianza del hook la primera vez que lo ve. Un proyecto sin confianza falla en silencio: nunca descubre el archivo, y ni `--dangerously-bypass-hook-trust` ni una anulación `-c projects...` llegan a esa capa. El proceso del hook se ejecuta en la raíz del proyecto, con `node_modules/.bin` en el PATH y el mismo JSON por stdin que envía Claude Code, pero sin ninguna variable `CODEX_*`, así que cada comando declara su host de forma explícita.
+- **Cursor** y **Gemini CLI** reciben solo adaptadores de instrucciones. Ninguno expone una superficie de hooks, así que consultan la memoria pero no aportan recolección.
+
+Al actualizar desde 0.5.x: la configuración de hooks es ahora v2. Ejecuta `npx ownmem init --update` una vez. Los comandos anteriores se sustituyen en su sitio, los hooks que escribiste tú no se tocan, y hasta entonces el pase de inicio de sesión seguirá avisando de que la configuración está desactualizada.
 
 ## Uso diario
 
@@ -87,6 +93,22 @@ npx ownmem dashboard --open
 npx ownmem evolve status
 npx ownmem evolve run --force
 ```
+
+## Telemetría y pase diario
+
+Los eventos de ejecución caducan a los treinta días y nunca salen de la máquina que los escribió. El pase diario reduce cada día terminado a un paquete de recuentos lo bastante pequeño para versionarlo, de modo que otra máquina —y un informe ejecutado meses después— aún pueda verlo:
+
+```bash
+npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
+npx ownmem archive --backfill          # reduce every day still on disk to a counted package
+npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+```
+
+- **Qué contiene un paquete:** recuentos, agrupaciones, percentiles de latencia, motivos de abstención, los hashes de la cuota y del conjunto dorado, y nombres de topic que ya están en el índice público.
+- **Qué no contiene nunca:** el texto de la consulta ni su resumen, el cuerpo de los topics, rutas de archivo, nombres de máquina o de cuenta, ni marcas de tiempo más finas que el día.
+- **Se confirma solo.** Los paquetes se preparan contra un índice privado con rutas explícitas y un compare-and-swap sobre HEAD, así que un pase nunca puede llevarse el trabajo preparado por otra sesión. Pon `telemetry.auto_commit` en `false` en `<memory-dir>/config.json`, o usa `--no-commit`, para archivar sin confirmar.
+- **Apunta `core.hooksPath`** a `<memory-dir>/git-hooks/`, donde `ownmem init` genera el respaldo post-commit, y solo mientras ese ajuste esté vacío o apunte a un directorio de hooks por defecto intacto. Pon `telemetry.manage_hooks_path` en `false` para que no lo toque.
+- **Entre máquinas**, `report --fleet` fusiona los paquetes de todas ellas y nombra los días que tienen commits pero ningún paquete, en vez de presentar la semana de un portátil como si fuera todo el historial.
 
 ## Límite entre confianza y automatización
 

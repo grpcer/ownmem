@@ -5,6 +5,92 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-09
+
+### Breaking
+
+- Events record `surface` as `hook` rather than `claude-hook`, and carry two new
+  top-level fields: `agent` (which coding agent produced the row) and `nested`
+  (more than one host marker was present, so attribution is refused rather than
+  guessed). Rows written before this release keep `claude-hook` and are reported
+  as a separate legacy bucket; nothing is re-attributed after the fact, because
+  those days genuinely mixed hosts and a guessed attribution is worse than none.
+  Anything reading the event files or the report's buckets has to be updated.
+- `ownmem init --update` installs the unattended daily pass on `SessionStart`
+  and `Stop`, and generates `<memory-dir>/git-hooks/post-commit` as a third
+  trigger. That pass commits the telemetry packages it writes and points
+  `core.hooksPath` at that directory while the setting is empty and the hook is
+  present. Both are new behaviour for a 0.5.x installation and both are
+  disclosed at install time; set `telemetry.auto_commit` or
+  `telemetry.manage_hooks_path` to `false` in `<memory-dir>/config.json`, or
+  pass `ownmem daily --no-commit`, to switch them off. Not upgrading changes
+  nothing: 0.5.x hooks stay as they are.
+- The hook configuration is now v2 and the installed version is recorded in
+  `<memory-dir>/config.json`. Run `ownmem init --update` once. v1 entries are
+  replaced where they stand rather than appended beside, and hooks written by
+  hand are left untouched. `init --check` and the daily pass both report an
+  installation that is still on v1.
+
+### Added
+
+- `ownmem archive [--day] [--backfill]` reduces a finished UTC day of local
+  telemetry to a counted package under `<memory-dir>/telemetry/`, small enough
+  to commit. Counts only: no query text or digest, topic body, path, machine or
+  account name, or timestamp finer than the day. Idempotent, and a day with
+  nothing new is not rewritten.
+- `ownmem report --since 7d --fleet` merges the committed packages from every
+  machine, leads with which machine covered which day, and names the days that
+  have commits but no package. Overlapping days are counted once.
+- `ownmem daily` is the unattended pass behind both of those: archive, commit,
+  inspect what is already in Git, and print only what is wrong. It runs real
+  work at most once per UTC day and always exits 0, so it can sit on a session
+  hook and a `post-commit` hook without ever blocking either.
+- Codex hook support: `ownmem init --hook` writes `<project>/.codex/hooks.json`
+  with the same events as the Claude configuration. Reaching those hooks takes
+  three separate permissions -- `hooks = true` under `[features]` in
+  `~/.codex/config.toml`, the project trusted in that same file, and the hook
+  trust prompt on first sight -- and an untrusted project is silent, because it
+  never discovers the file at all. `init` names all three, and reports a
+  checkout that is missing from the project trust list. A Codex hook process
+  receives no environment of its own, so every command declares its host
+  explicitly and finds the checkout from its working directory.
+- Grok CLI is a supported host (`--hosts grok`). It reads the Claude files
+  through a compatibility layer, so it shares that configuration; `init --check`
+  reports when the checkout is missing from grok's trusted-folder list.
+- Agent attribution: recall, command, and turn events say which host produced
+  them, and the report buckets by agent instead of merging three agents into one
+  average.
+
+### Fixed
+
+- The daily pass points `core.hooksPath` at `<memory-dir>/git-hooks/`, which
+  `ownmem init` generates, and leaves the setting alone until that directory
+  holds a `post-commit` hook. A path in this project's own checkout was used
+  during development; in any other repository it named a directory that does not
+  exist, and a `core.hooksPath` pointing at nothing installs no hooks at all --
+  every hook that repository had would have stopped running, silently.
+- Repository root resolution prefers the git checkout root when it carries an
+  installation, so a nested memory directory copy -- a fixture, an exported tree
+  -- inside a subdirectory no longer claims the root and receives that
+  checkout's local data. A checkout without an installation still yields to the
+  nearest one below it, so a monorepo package that installed its own memory
+  keeps answering for the directories under it.
+- `PostToolUse` and `Stop` hooks now run. v1 registered `ownmem posttool` and
+  `ownmem stop`, which are subcommands of `ownmem hook` and not of the CLI, so
+  both answered "unknown memory command" and every installation collected
+  command outcomes and turn corrections from nowhere. v2 registers
+  `ownmem hook posttool` and `ownmem hook stop`.
+- The hook daemon keys its resident runtime per agent, so two hosts working in
+  one checkout no longer share one connection and one attribution.
+- `ownmem init` on the default `core` layer no longer accepts `--hook` and then
+  installs nothing: asking for hooks now installs the layers they need.
+- `init --check` no longer reports `missing` forever on a repository that
+  replaced the synthetic example topic it was told to replace, and `--update` no
+  longer puts that topic back into a governed corpus.
+- The host set chosen at install time is remembered instead of re-detected.
+  Grok leaves no marker in a repository, so an installation that named it
+  reported drift on the next check.
+
 ## [0.5.5] - 2026-09-06
 
 ### Fixed

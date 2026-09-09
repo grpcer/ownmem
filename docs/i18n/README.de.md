@@ -67,10 +67,16 @@ Erfordert Node.js 20.6 oder neuer. Im Repository ausführen, das das Memory besi
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook
+npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
 ```
 
 Danach den Agent neu öffnen. OwnMem erstellt `.ownmem/` und ändert nur verwaltete Markerbereiche. Für einen Adapter `--hosts claude`, `--hosts codex`, `--hosts cursor` oder `--hosts gemini` verwenden; mit `npx ownmem init --check` vorher prüfen.
+
+- **Claude Code** und **Grok CLI** lesen dieselbe `.claude/settings.json`. Grok verlangt zusätzlich, diesen Ordner einmal zu vertrauen (`/hooks-trust` in grok, oder Start mit `grok --trust`); sonst führt es keinen dieser Hooks aus und sagt nichts dazu.
+- **Codex** liest `<Projekt>/.codex/hooks.json`, aber erst nach drei getrennten Freigaben: (1) `hooks = true` unter `[features]` in `~/.codex/config.toml`; (2) das Projekt selbst als vertrauenswürdig — das interaktive Codex fragt beim ersten Öffnen danach, alternativ `[projects."<Pfad>"]` mit `trust_level = "trusted"` eintragen; und (3) die Hook-Vertrauensabfrage beim ersten Auftreten. Ein nicht freigegebenes Projekt scheitert lautlos: Es findet die Datei überhaupt nicht, und weder `--dangerously-bypass-hook-trust` noch eine `-c projects...`-Überschreibung reichen bis zu dieser Schicht. Der Hook-Prozess läuft im Projektstamm, mit `node_modules/.bin` im PATH und demselben JSON auf stdin, das Claude Code sendet, jedoch ohne jede `CODEX_*`-Variable — deshalb deklariert jeder Befehl seinen Host ausdrücklich.
+- **Cursor** und **Gemini CLI** erhalten nur Anweisungs-Adapter. Beide bieten keine Hook-Oberfläche: Sie lesen aus der Memory, liefern aber keine Erhebung.
+
+Beim Wechsel von 0.5.x: Die Hook-Konfiguration ist jetzt v2. Einmal `npx ownmem init --update` ausführen. Ältere Befehle werden an Ort und Stelle ersetzt, selbst geschriebene Hooks bleiben unangetastet, und bis dahin meldet der Durchlauf beim Sitzungsstart weiterhin eine veraltete Konfiguration.
 
 ## Tägliche Nutzung
 
@@ -87,6 +93,22 @@ npx ownmem dashboard --open
 npx ownmem evolve status
 npx ownmem evolve run --force
 ```
+
+## Telemetrie und täglicher Durchlauf
+
+Laufzeitereignisse verfallen nach dreißig Tagen und verlassen nie den Rechner, der sie geschrieben hat. Der tägliche Durchlauf verdichtet jeden abgeschlossenen Tag zu einem gezählten Paket, das klein genug für einen Commit ist — damit ein zweiter Rechner und ein Bericht Monate später ihn noch sehen:
+
+```bash
+npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
+npx ownmem archive --backfill          # reduce every day still on disk to a counted package
+npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+```
+
+- **Was ein Paket enthält:** Zählwerte, Gruppen, Latenz-Perzentile, Abstinenzgründe, die Hashes von Kontingent und Goldmenge sowie Topic-Namen, die ohnehin im öffentlichen Index stehen.
+- **Was es nie enthält:** Abfragetext oder dessen Digest, Topic-Inhalte, Dateipfade, Rechner- oder Kontonamen und keinen Zeitstempel feiner als den Tag.
+- **Es committet sich selbst.** Pakete werden gegen einen privaten Index mit ausdrücklichen Pfaden vorgemerkt, mit Compare-and-Swap auf HEAD — ein Durchlauf kann also nie die vorgemerkte Arbeit einer anderen Sitzung mitnehmen. Für Archivieren ohne Commit `telemetry.auto_commit` in `<memory-dir>/config.json` auf `false` setzen oder `--no-commit` übergeben.
+- **Es richtet `core.hooksPath`** auf `<memory-dir>/git-hooks/` aus, wo `ownmem init` den Post-commit-Rückfall erzeugt, und nur solange die Einstellung leer ist oder auf ein unberührtes Standard-Hook-Verzeichnis zeigt. `telemetry.manage_hooks_path` auf `false` setzen, damit es unangetastet bleibt.
+- **Über Rechner hinweg** führt `report --fleet` die Pakete aller Rechner zusammen und benennt die Tage mit Commits, aber ohne Paket, statt die Woche eines Laptops stillschweigend als ganze Historie auszugeben.
 
 ## Grenze von Vertrauen und Automatisierung
 

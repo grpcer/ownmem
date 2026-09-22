@@ -57,29 +57,36 @@ change to active memory must name the prior content hash and use `delta` or
 `structured-merge`; a full re-import is rejected. Snapshot pointers retain the
 previous validated active set for deterministic rollback.
 
-## Unattended evolution boundary
+## Delivery boundary
 
-`ownmem evolve` coordinates the safe path at the end of a host turn. It does
-not implement a second promotion policy: the existing candidate, replay,
-regression, quota, trust, audit, compiler, tripwire, and rollback modules remain
-the decision authorities. The coordinator adds a repository-local enable
-switch, a cross-process lock, debounce, ordered execution, observable state,
-and compensating rollback when a later step fails.
+Recall answers in one of three ways, and the envelope says which. Above the
+content threshold it quotes the memory itself. Below it, but still with
+qualified candidates, it returns up to three pointers: a title, one line, and
+the command that opens the topic. With no qualified candidate it abstains and
+names the reason. A pointer is not a short answer and the renderer must not
+present it as one; the tier exists because the protocol previously had only
+"quote" and "say nothing", and a confident quote was the cheaper of the two
+mistakes to make.
 
-Only a change admitted as R0 and `automation: auto` may materialize without a
-person. The first producer is retrieval-trigger backfill: the baseline query
-must miss, the candidate query must hit because of the inserted trigger, and
-every previously passing evaluation case must continue to pass. Sandbox
-replays receive an ephemeral trust delta inside the mirror so they exercise the
-same production recall gates without changing the real repository.
+Gates are independent of tiers. Relevance, epistemic validity, task
+applicability, and action risk each refuse on their own grounds, and the
+abstention reason names the gate that refused rather than collapsing every
+refusal into "nothing matched".
 
-Each trigger promotion is proven to be a pure UTF-8 byte insertion. Its receipt
-records the byte range and hashes needed to reverse it, so rollback neither
-copies the topic into a second store nor requires the pre-promotion state to
-have been committed. The runtime quarantines first, verifies both candidate and
-restored hashes, appends a rollback receipt, reissues trust for the restored
-state, and recompiles. Manual, policy, prose, and other higher-impact changes
-remain review material.
+## No unattended writes
+
+There is no coordinator, no promotion, no candidate queue, and no tripwire.
+Every change to memory is an edit a person makes and commits; the package
+proposes and measures, and it never writes a memory on its own. The commands
+that could write -- `init`, `new`, `outcome` -- are human entry points, and the
+MCP server deliberately exposes only `recall` and `read`, because a governance
+command one token away from an autonomous agent is not governance.
+
+Growth is bounded by a topic quota rather than by automation limits. `ownmem
+audit` enforces a hard entry count for the active corpus that ratchets downward
+only, so a corpus at its ceiling has to give something up before it takes
+something on. Deciding what leaves is a human judgement and stays one; the audit
+refuses the write, it does not pick a victim.
 
 ## Host-owned root entries
 

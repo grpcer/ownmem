@@ -10,16 +10,21 @@ generate the host adapters:
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex --layers dashboard --hook --command "npx ownmem"
+npx ownmem init --hook --hosts claude,codex
 ```
 
 Adjust the flags before running:
 
 - `--hosts`: any comma-separated combination of `claude`, `codex`, `cursor`,
-  `gemini`, and `generic` — match the tools the team uses. Grok CLI reads the
-  Codex adapter (`.agents/skills/ownmem` and `AGENTS.md`).
-- `--layers`: `core`, `gates`, `compiler`, or `dashboard` — `dashboard` adds the local Web console.
-- Drop `--hook` if the team does not want the Claude Code PreToolUse recall guard.
+  `gemini`, `grok`, and `generic` — match the tools the team uses. The list is
+  recorded, and running init again with a new list is how a host is added or
+  removed. Grok CLI reads Claude Code's files, so name it alongside `claude`
+  when both are used.
+- `--locale auto` writes the generated instructions in the system language;
+  the default is English.
+- Drop `--hook` if the team does not want the recall hooks. `--hook` also
+  installs the layers those hooks need, up to the local Web console;
+  `--layers core,gates,compiler,dashboard` installs a subset instead.
 
 Initialization creates `.ownmem/` plus bounded `ownmem-generated` blocks in the
 host instructions, and preserves every line outside those boundaries. Verify:

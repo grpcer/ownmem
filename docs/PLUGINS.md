@@ -93,6 +93,44 @@ The repository includes a Gemini extension manifest plus matching commands and
 skills. `ownmem init --hosts gemini` installs the repository-scoped adapter.
 Hosts that read `AGENTS.md` can use `--hosts codex` or `--hosts generic`.
 
+## Cursor
+
+Name `cursor` in `--hosts` (a first install without `--hosts` also picks it up
+from a `.cursor/` directory) and `ownmem init` writes `.cursor/rules/ownmem.mdc`,
+an always-applied rule that tells the agent when to recall. Cursor exposes no
+hook surface, so recall happens when the agent follows that rule, or through the
+MCP server below.
+
+## MCP server
+
+`ownmem mcp` serves recall over MCP on stdio for hosts without a hook surface.
+It exposes exactly two tools, `recall` and `read`, and neither can change a
+memory: `read` records the local consumption receipt that the Read hook records
+on other hosts, and a recall against a stale snapshot rebuilds the local index.
+The gate commands (`audit`, `trust`, `compile`) and every memory write stay off
+this surface.
+
+The server finds the repository from its working directory, and `npx` finds the
+package the same way: started outside the checkout, `npx ownmem` downloads
+whatever version the registry has instead of running the one the project pins.
+Register it so it starts inside the repository, or point both at the checkout
+with `npx --prefix <repository> ownmem mcp --root <repository>`. Cursor reads
+project servers from `.cursor/mcp.json` and can supply the path itself:
+
+```json
+{
+  "mcpServers": {
+    "ownmem": {
+      "command": "npx",
+      "args": ["--prefix", "${workspaceFolder}", "ownmem", "mcp", "--root", "${workspaceFolder}"]
+    }
+  }
+}
+```
+
+Other hosts take the same command and arguments in whatever form their MCP
+configuration uses.
+
 ## Ownership boundary
 
 - A plugin teaches a host how to invoke OwnMem.

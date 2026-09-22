@@ -2,12 +2,13 @@
 
 # OwnMem
 
-**把 AI 编程 Agent 的项目记忆留在仓库里：本地、确定、可审阅，并能在安全边界内自我改进。**
+**面向 AI 编程 Agent 的 Git 原生记忆**
 
-`Git 原生` · `本地召回` · `多 Agent 共用` · `证据治理` · `Apache-2.0`
+把 AI 编程 Agent 的项目记忆留在仓库里：本地、确定、可审阅，而且没有你提交就不会被写入。
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![GitHub stars](https://img.shields.io/github/stars/grpcer/ownmem?style=flat-square&logo=github&color=e3b341)](https://github.com/grpcer/ownmem/stargazers)
 [![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
@@ -16,110 +17,117 @@
 
 </div>
 
-## 为什么是 OwnMem
+## <a name="why-ownmem"></a>✨ 为什么是 OwnMem
 
 大多数记忆方案先解决“记得更多”。OwnMem 先问另一件事：**项目知识由谁拥有，谁有权改变它，错误记忆怎样在影响 Agent 行动前被拦住？**
 
 | 优势 | 对实际开发意味着什么 |
 | --- | --- |
-| **记忆归仓库所有** | 记忆是 `.ownmem/` 中可读的 Markdown，随 Git 克隆、评审和回滚。 |
-| **一份记忆，多 Agent 共用** | Claude Code、Codex、Cursor、Gemini CLI、Grok CLI 等宿主共享同一知识源。 |
+| **记忆归仓库所有** | 记忆是 `.ownmem/` 中可读的 Markdown，随 Git 克隆、评审和回滚；仓库里的每个 Agent 读的都是同一份。 |
 | **默认召回确定且本地** | 不调用模型、不请求网络；相同查询、配置和快照得到相同排序。 |
 | **先验证证据，再授予 authority** | 正文不能自证可信；独立收据和活体证据核验决定是否交付。 |
-| **有界增长** | Schema、配额、去重、生命周期和审计避免记忆变成第二个没人维护的 Wiki。 |
-| **低风险自动，高影响复审** | 回放证明有效的 R0 检索元数据可以无人值守；正文、策略和高风险变化不能。 |
-
-## 总架构
+| **不知道就说不知道** | 交付分档：引用记忆正文、给最多三条指针、或说明是哪道门拒的之后弃权。 |
+| **净零增长** | 条目数上限只降不升；往一个满了的语料里加一条，就得在同一次改动里退役一条。 |
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture-zh-CN-dark.svg">
-  <img alt="OwnMem 总架构：仓库拥有的 Markdown 与独立信任收据编译成不可变快照；本地确定性召回经过四道交付门，受限演化协调器则回放、晋升、观察、隔离并精确回滚低风险变化。" src="../assets/architecture-zh-CN-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/benchmark-dark.svg">
+  <img alt="OwnMem 公开基准：40 种语言、128 条查询的 Recall@1 为 100%，同一语料上 grep -F 为 3.9%；4200 个样本的召回延迟 P50 0.46 ms、P95 1.05 ms，低于 5 ms 的发布门槛；MRR 1.000，对 40 条无关查询全部弃权，不调用模型、不请求网络，两个运行时依赖。" src="../assets/benchmark-light.svg" width="100%">
 </picture>
 
-OwnMem 把“写下经验”和“把经验交给 Agent”分成两个受控流程：
+<sub>在本仓库锁定的 CC0 语料上实测。克隆本仓库后运行 `npm run benchmark` 即可复现。</sub>
 
-- **仓库是真源。** L1 路由、L2 领域索引和 L3 topic 是可审阅 Markdown；信任收据独立于它所授权的正文。
-- **编译后再召回。** Schema、图关系、生命周期和证据门生成内容寻址的不可变快照，查询期不重读正在变化的正文。
-- **默认五路确定性候选。** exact、BM25F、n-gram、fuzzy、graph 在本地融合；embedding 是可选第六路，没有 A/B 证据前权重为 0。
-- **交付前四道门。** 相关性、事实有效性、任务适用性和动作风险共同决定正常交付、advisory、隔离或弃答。
-- **有界无人值守演化。** 轮末协调器只自动晋升经过回放、受配额约束且可精确撤销的 R0 元数据；R1–R5 进入复审。
+## <a name="how-it-compares"></a><a name="how-this-differs-from-claudemd-and-built-in-memory"></a>🆚 与同类方案对比
 
-## OwnMem 如何治理 AI Agent 记忆
+OwnMem 不替代 `CLAUDE.md` 或 `AGENTS.md`。那两个文件说的是“在这里该怎么干活”，每一轮都整份读进去。OwnMem 回答的是另一个问题——这个项目踩过的坑里，哪几条值得**为当前这个任务**放到模型眼前——而且它有权回答“一条都不值得”。
 
-差异不在某一个排序公式，而在于 OwnMem 把编程 Agent 记忆做成一条可验证的检索与演化协议：
+|  | 项目指令文件 | 平台自带 memory | OwnMem |
+| --- | --- | --- | --- |
+| 谁来写 | 你，手写 | Agent，从你和它的对话里提取 | 你写，像代码一样被审阅 |
+| 存在哪 | 仓库里的一个文件 | 厂商的账号里 | 你仓库里的 Markdown |
+| 每轮进模型的是什么 | 整份，每一轮 | 它自己的召回挑中的那些 | 三档之一，且受 token 预算约束 |
+| 某条写错了会怎样 | 你去改那个文件 | 你可能永远看不到那一条 | 证据漂移把它降级，并说明变的是什么 |
+| 每轮成本 | 整份文件的 token | 一次检索调用 | 零模型调用、零网络请求 |
 
-| 机制 | 如何强制执行 |
-| --- | --- |
-| **证据携带记忆** | 内容哈希、证据根、生命周期、适用范围、风险和前驱收据共同决定正文能否进入上下文。 |
-| **反事实晋升门** | 自动化必须证明“改前失败、只因候选改动而恢复、原有通过语料零回归”。 |
-| **按变更面定风险** | 风险来自改了什么、能影响什么；Agent 不能给自己的提案降级。 |
-| **内容寻址补偿回滚** | 自动编辑携带可验证逆操作；事务失败或 harmful 结局会恢复原字节，同时保留历史。 |
-| **记忆投毒隔离** | 候选、正文、authority 与证据处于不同信任域；被检索到从不等于获得行动权限。 |
-| **选择性交付** | 证据不足时 advisory、隔离或弃答，不伪造置信度。 |
-| **不可变编译快照** | Markdown、图关系、排序身份和信任状态共同成为可复现的运行时输入。 |
-| **三条反指标污染账** | 检索对错、用户/宿主确认结局和 Agent 自归因互不冒充。 |
-
-深入阅读[技术设计与研究对应](./TECHNICAL.zh-CN.md)。
-
-## 三分钟开始
+## <a name="quick-start"></a>🚀 快速开始
 
 需要 Node.js 20.6 或更新版本。在希望拥有项目记忆的仓库里执行：
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
+npx ownmem init --hook --hosts claude,codex
 ```
 
-初始化后重新打开 Agent。OwnMem 会创建 `.ownmem/`，并只修改宿主文件中受管理的标记区。只需一个适配器时使用 `--hosts claude`、`--hosts codex`、`--hosts cursor` 或 `--hosts gemini`；用 `npx ownmem init --check` 可以先预览。
+装好后重新打开 Agent。用 `--hosts` 列出你在用的宿主（`claude`、`codex`、`cursor`、`gemini`、`grok`）；这份列表会被记录下来，以后增减宿主就是带着新列表再跑一次。`init` 会创建 `.ownmem/` 和各宿主的适配文件，对 `CLAUDE.md` 这类指令文件只改托管区块，并把各宿主仍需完成的一次性步骤直接打印出来。在同一条命令后加 `--check` 可以先预览；加 `--locale auto`，生成的指令文件会使用系统语言。
 
-- **Claude Code** 与 **Grok CLI** 读同一份 `.claude/settings.json`。grok 还需要把本目录信任一次——在 grok 里执行 `/hooks-trust`，或用 `grok --trust` 启动——否则它会一声不响地不跑这些 hook。
-- **Codex** 读 `<项目>/.codex/hooks.json`，但要过三道各自独立的门：(1) `~/.codex/config.toml` 的 `[features]` 下写 `hooks = true`；(2) 项目本身被授信——交互式 Codex 第一次打开该项目时会问，也可以手写 `[projects."<路径>"]` 加 `trust_level = "trusted"`；(3) 首次看到 hook 时的信任提示。未授信的项目是静默失败：它根本不会发现这个文件，`--dangerously-bypass-hook-trust` 和 `-c projects...` 覆盖都到不了这一层。hook 进程在项目根目录运行，PATH 带 `node_modules/.bin`，stdin 收到与 Claude Code 相同的 JSON，但没有任何 `CODEX_*` 环境变量，所以每条命令都显式声明自己的 host。
-- **Cursor** 与 **Gemini CLI** 只装说明适配器：两者都没有 hook 接口，能召回但不产生采集。
+| 宿主 | 怎么召回 | 接入方式 |
+| --- | --- | --- |
+| Claude Code | 每次 Edit、Write 前由 hook 召回，也可以随时要求 | `claude` |
+| Codex | 每次应用补丁前由 hook 召回，也可以随时要求 | `codex`；hook 需要三步一次性信任设置，`init` 会逐条提示 |
+| Grok CLI | 通过兼容层读取 Claude Code 的 hook 配置 | `grok`，若同时使用 Claude Code，一并写上 `claude`；在 grok 里执行一次 `/hooks-trust` 信任本目录 |
+| Cursor | 始终生效的规则文件，或 MCP server | `cursor`；MCP server 需要一步手动配置，见[插件与宿主](../PLUGINS.md) |
+| Gemini CLI | 指令文件，或 MCP server | `gemini`；MCP server 需要一步手动配置，见[插件与宿主](../PLUGINS.md) |
 
-从 0.5.x 升级：hook 配置已经是 v2，跑一次 `npx ownmem init --update`。旧版命令会被原位替换，你自己写的 hook 不会被动，不跑它的话每次会话开始都会提示配置已过期。
+> **⚠️ 从 0.6.0 升级？** 先用 `npm install --save-dev ownmem@latest` 升级依赖，再跑一次 `npx ownmem init --update`，其他都往后放。0.6.0 装的 hook 指向的子命令已经不存在了，留着它们，Agent 每跑一条 Bash 都会触发一个失败的命令。更新会把它们移除，你自己写的 hook 不会被动到。其余事项（包括清理 `core.hooksPath`）见[升级指南](../UPDATING.md)。
 
-## 日常怎么用
+## <a name="daily-use"></a>💬 日常使用
 
-安装后继续用人话工作：
+接下来照常用自然语言工作。你让 Agent 记下什么，它就起草一条记忆，你像审代码一样审它：
 
 > “记住：staging 部署超时来自连接池上限，不是 worker 太少。下次两者一起检查。”
 
 > “改之前先看看项目记忆里有没有遇到同一种故障。”
 
-宿主会在相关工作前召回，并在每轮结束后调度一次带锁、防抖的演化。通常不需要手工串联 promotion、trust、audit 和 compile。想查看时打开本地控制台或检查协调器：
+召回按三档之一作答：引用记忆正文、给最多三条指针让你去读，或者弃权。一次真实运行：
 
-```bash
-npx ownmem dashboard --open
-npx ownmem evolve status
-npx ownmem evolve run --force
+```console
+$ npx ownmem recall -- "staging deploy timed out again, should I add more workers?"
+== staging deploy timed out again, should I add more workers? ==
+  staging_timeout_pool_cap  [score=0.875 lanes=exact,bm25f,ngram fields=body,codePath,description,hooks,name,triggers]
+      matched deploy,more,out,staging,staging deploy timed out,timed
+      trust advisory authority · lifecycle advisory (not fully verified)
+        Treat it as a lead to re-check against the code, not as an established fact.
+      excerpt(body) **Why**: `DB_POOL_MAX` is 10 on staging. Adding workers only queues more requests behind the same ten connections, so the deploy health check times out sooner, not later.
+      file .ownmem/staging_timeout_pool_cap.md
 ```
 
-## 遥测与每日封存
+信任程度会明确标出，而不是隐含的。这条记忆目前没有任何背书——没人复核确认过，也没引用权威文档或代码锚点——所以它作为“需要回头核对的线索”交付，而不是既定事实。
 
-运行期事件 30 天后过期，且从不离开写下它的那台机器。每日封存把每个已结束的日子压成一个小到可以提交的计数包，另一台机器——以及几个月后再跑的报告——才看得见它：
+你自己会用到的几条命令：
 
 ```bash
-npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
-npx ownmem archive --backfill          # reduce every day still on disk to a counted package
-npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+npx ownmem new staging_timeout_pool_cap   # scaffold one memory that already passes every gate
+npx ownmem report --since 7d              # used? fast enough? right? what to do next
+npx ownmem dashboard --open               # open the local console
+npx ownmem mcp                            # serve recall and read to any MCP host over stdio
 ```
 
-- **包里有什么：** 计数、分桶、延迟分位、弃答原因、配额与黄金集哈希，以及本来就在公开索引里的 topic 名。
-- **包里绝不会有：** 查询原文及其摘要值、topic 正文、文件路径、机器名与账号名，时间戳也不细于「日」。
-- **它会自己提交。** 封存包用独立 index、显式路径暂存，并对 HEAD 做 compare-and-swap，所以绝不会卷走别的 session 已暂存的改动。想只封存不提交，把 `<记忆目录>/config.json` 的 `telemetry.auto_commit` 设为 `false`，或加 `--no-commit`。
-- **它会把 `core.hooksPath` 指向 `<memory-dir>/git-hooks/`**（post-commit 兜底就由 `ownmem init` 生成在那里），且仅限该配置为空、或指向一个原样未动的默认 hook 目录时。把 `telemetry.manage_hooks_path` 设为 `false` 即可让它别碰。
-- **跨机器时**，`report --fleet` 合并每台机器的封存包，并点名「有提交却没有封存包」的日子，而不是把一台笔记本的一周当成全部历史。
+<img alt="OwnMem 本地控制台：以已知误交付残留率为主指标，旁边是查找漏斗，下方是语料与证据健康度，侧栏可切换性能、质量、治理与语义检索。" src="../assets/console.png" width="100%">
 
-## 信任与自动化边界
+`ownmem mcp` 是给没有 hook 的宿主准备的。它只暴露 `recall` 和 `read` 两个工具，两者都不能改动记忆；门禁命令（`audit`、`trust`、`compile`）和所有记忆写入都不在这个接口上。怎样注册才能确保运行的是项目自己安装的那一份，见[插件与宿主](../PLUGINS.md)。
 
-OwnMem 自动化的是“机器能证明”的部分，不是“听起来像对”的部分。
+## <a name="how-it-works"></a><a name="architecture"></a><a name="how-ownmem-governs-ai-agent-memory"></a>🧩 工作原理
 
-- **自动完成：** 确定性召回、候选扫描、tripwire、反事实回放、R0 trigger 回填、机器信任收据、审计、编译、观察、隔离和精确回滚。
-- **升级复审：** 新正文知识、策略、active set、冲突、证据不足、R1–R5 变化和发布动作。
-- **硬边界：** candidate 不是 memory；Agent 自归因不是用户确认；被召回的文本不能覆盖宿主指令或授权工具。
-- **失败行为：** 未签正文或不可核验证据进入隔离；证据漂移降为 advisory；事务失败恢复上一份已验证状态。
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture-zh-CN-dark.svg">
+  <img alt="OwnMem 总架构：仓库拥有的 Markdown 与独立信任收据编译成不可变快照；本地确定性召回经过四道交付门，并按三档之一交付——引用记忆正文、给最多三条指针、或说明原因后弃权；本地反馈账本、评测台与净零增长配额约束语料的走向。" src="../assets/architecture-zh-CN-light.svg" width="100%">
+</picture>
 
-## 适合什么
+- **仓库是唯一事实来源。** L1 路由、L2 领域索引和 L3 topic 是可审阅 Markdown；信任收据独立于它所授权的正文。
+- **编译后再召回。** 经 schema、图关系、生命周期与证据校验后，生成内容寻址的不可变快照。exact、BM25F、n-gram、fuzzy、graph 五路检索通道在本地融合；embedding 是可选的第六路，本地 A/B 证据通过之前权重为 0。
+- **四道门，三档交付。** 相关性、认知有效性、任务适用性和动作风险各自按自己的理由拒绝。分数高于阈值（取自消融曲线）就引用记忆正文；低于阈值给最多三条**明确不是答案**的指针；一条合格的都没有则弃权，并报出是哪道门拒的。
+- **没有无人值守写入。** 没有协调器、没有晋升、没有候选队列。这个包只负责度量、提议和拒绝；记忆的每一次改动都是某个人的一次提交，任何排序改动都要先过评测台。
+
+机制、威胁模型与研究对应见[技术设计](./TECHNICAL.zh-CN.md)。
+
+## <a name="privacy-and-boundaries"></a><a name="trust-and-automation-boundary"></a><a name="local-first-by-default"></a><a name="telemetry-and-the-daily-pass"></a>🔒 隐私与边界
+
+- **默认本地。** 排序只读仓库文件和本地快照：零 LLM 调用、零网络请求、没有检索 API 账单。交付给 Agent 的摘录仍会占用上下文窗口，并受配置的预算限制。
+- **遥测不出本机。** 运行事件存放在被 Git 忽略的目录中，30 天后过期。每日封存（`ownmem daily`）把每个已结束的自然日归并为计数包，不含查询原文、topic 正文和文件路径。没有样本就显示“暂无”，不会伪装成 0%。
+- **召回的文本只是数据。** 它不能覆盖宿主指令，也不能授权工具；Agent 的自归因永远不算用户确认。
+- **失败看得见。** 正文未签名或证据目标无法核验的条目会被扣住；证据漂移会把条目降为 advisory，并说明变的是什么。
+- **秘密不进记忆。** 不该进入 Git 的密钥、个人信息和生产数据，也不该进入记忆。
+
+## <a name="when-to-use-it"></a><a name="where-it-fits"></a>🧭 适用场景
 
 | 适合 OwnMem | 这些情况更适合其他系统 |
 | --- | --- |
@@ -128,14 +136,22 @@ OwnMem 自动化的是“机器能证明”的部分，不是“听起来像对�
 | 在意本地、可复现且没有检索 API 账单的召回。 | 需要大规模云向量搜索或实时全局知识图谱。 |
 | 错误记忆必须可归因、可拒绝、可撤销。 | 记忆数量比治理更重要。 |
 
-## 默认本地优先
+## <a name="documentation"></a><a name="research-lineage"></a>📚 文档
 
-- 默认排序只读仓库文件和本地快照：零 LLM 调用、零网络请求、没有检索 API 账单。交付给 Agent 的摘要仍会占用上下文 token，并受配置的上下文预算限制。
-- 运行事件保存在 Git 忽略的本机目录；没有 outcome 样本就显示“暂无”，不会伪装成 0%。
-- 不该进入 Git 的密钥、个人信息和生产秘密，也不该进入记忆。
-- embedding 通道是隔离的可选增强；只有仓库本地 A/B 证据过安全门后才参与 weighted 排序。
+| 文档 | 内容 |
+| --- | --- |
+| [Architecture](../ARCHITECTURE.md) | 包边界、快照、信任与交付 |
+| [Technical design](./TECHNICAL.zh-CN.md) | 机制、威胁模型与研究对应 |
+| [Plugins](../PLUGINS.md) | 各宿主接入、插件与授信步骤 |
+| [Updating](../UPDATING.md) | 安全更新与版本迁移 |
+| [Privacy](../PRIVACY.md) | 本地数据和可选通道边界 |
+| [Changelog](../../CHANGELOG.md) | 版本变化 |
+| [Contributing](../../.github/CONTRIBUTING.md) | 提交 issue 与贡献代码 |
+| [Security](../../.github/SECURITY.md) | 报告安全漏洞 |
+| [License](../../LICENSE) | Apache-2.0 |
 
-## 研究脉络
+<details>
+<summary><b>研究脉络</b></summary>
 
 OwnMem 不把这些基础概念冒充原创；它的贡献是把它们组合成仓库记忆的可执行协议：
 
@@ -144,21 +160,11 @@ OwnMem 不把这些基础概念冒充原创；它的贡献是把它们组合成�
 - **不可信数据与授权分离：** [CaMeL: Defeating Prompt Injections by Design (2025)](https://arxiv.org/abs/2503.18813)
 - **独立来源证明：** [in-toto (USENIX Security 2019)](https://www.usenix.org/conference/usenixsecurity19/presentation/torres-arias)
 - **选择性预测与弃答：** [Selective Classification (JMLR 2010)](https://jmlr.org/papers/v11/el-yaniv10a.html)
-- **差分验证与补偿事务：** [Metamorphic Testing (1998)](https://www.cse.ust.hk/~scc/publ/CS98-01-metamorphictesting.pdf)、[Sagas (SIGMOD 1987)](https://doi.org/10.1145/38713.38742)
+- **消融式验证：** [Metamorphic Testing (1998)](https://www.cse.ust.hk/~scc/publ/CS98-01-metamorphictesting.pdf)
 - **分维度检索评测：** [ARES (NAACL 2024)](https://aclanthology.org/2024.naacl-long.20/)、[RAGChecker (2024)](https://arxiv.org/abs/2408.08067)
 
 这些引用只说明研究脉络，不表示相关论文实现了 OwnMem，也不表示 OwnMem 复现了论文实验。
 
-## 文档
-
-| 文档 | 内容 |
-| --- | --- |
-| [Architecture](../ARCHITECTURE.md) | 包边界、快照、信任与演化 |
-| [Technical design](./TECHNICAL.zh-CN.md) | 机制、威胁模型与研究对应 |
-| [Plugins](../PLUGINS.md) | 可选宿主插件安装 |
-| [Updating](../UPDATING.md) | 安全更新与版本迁移 |
-| [Privacy](../PRIVACY.md) | 本地数据和可选通道边界 |
-| [Changelog](../../CHANGELOG.md) | 版本变化 |
-| [License](../../LICENSE) | Apache-2.0 |
+</details>
 
 OwnMem 是开源项目，欢迎提交带可复现证据的 issue 和 pull request。

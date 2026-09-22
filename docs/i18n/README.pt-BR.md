@@ -2,12 +2,13 @@
 
 # OwnMem
 
-**Memória de projeto para agentes de programação no repositório: local, determinística, revisável e capaz de evoluir dentro de limites seguros.**
+**Memória nativa do Git para agentes de programação com IA**
 
-`Nativo do Git` · `recall local` · `multiagente` · `governado por evidência` · `Apache-2.0`
+Memória de projeto para agentes de programação no repositório: local, determinística, revisável e nunca escrita sem o seu commit.
 
 [![npm version](https://img.shields.io/npm/v/ownmem?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/ownmem)
 [![npm downloads](https://img.shields.io/npm/dm/ownmem?style=flat-square&logo=npm&color=555)](https://www.npmjs.com/package/ownmem)
+[![GitHub stars](https://img.shields.io/github/stars/grpcer/ownmem?style=flat-square&logo=github&color=e3b341)](https://github.com/grpcer/ownmem/stargazers)
 [![release gates](https://img.shields.io/github/actions/workflow/status/grpcer/ownmem/ci.yml?branch=main&style=flat-square&label=release%20gates)](https://github.com/grpcer/ownmem/actions/workflows/ci.yml)
 [![node >= 20.6](https://img.shields.io/badge/node-%E2%89%A5%2020.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![license Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-1d7afc?style=flat-square)](../../LICENSE)
@@ -16,110 +17,117 @@
 
 </div>
 
-## Por que OwnMem
+## <a name="why-ownmem"></a>✨ Por que o OwnMem
 
 A maioria dos sistemas otimiza “lembrar mais”. O OwnMem começa por outra pergunta: **quem possui o conhecimento do projeto, quem pode alterá-lo e como impedir uma memória errada antes que ela mude as ações do agente?**
 
 | Vantagem | O que significa na prática |
 | --- | --- |
-| **A memória pertence ao repositório** | Markdown legível em `.ownmem/` acompanha o código em clone, revisão e rollback. |
-| **Uma memória para vários agentes** | Claude Code, Codex, Cursor, Gemini CLI, Grok CLI e outros hosts compartilham uma fonte. |
+| **A memória pertence ao repositório** | Markdown legível em `.ownmem/` acompanha o código em clone, revisão e rollback, e todos os agentes do repositório leem a mesma fonte. |
 | **Recall local e determinístico** | Sem modelo ou rede; mesma consulta, configuração e snapshot geram a mesma ordem. |
 | **Evidência antes da autoridade** | O conteúdo não pode se declarar confiável; receipts independentes e evidência viva decidem. |
-| **Crescimento limitado** | Schema, cotas, duplicatas, ciclo de vida e auditoria evitam outro wiki abandonado. |
-| **Baixo risco automático, alto impacto revisado** | Somente metadata R0 comprovada por replay evolui sem intervenção. |
-
-## Arquitetura
+| **Diz quando não sabe** | A entrega é em níveis: a memória citada, até três ponteiros, ou uma abstenção que nomeia o portão que recusou. |
+| **Crescimento líquido zero** | O número de entradas só diminui: acrescentar a um corpus cheio obriga a aposentar algo na mesma mudança. |
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture-pt-BR-dark.svg">
-  <img alt="Arquitetura do OwnMem: Markdown pertencente ao repositório e trust receipts independentes são compilados em snapshots imutáveis; recall local determinístico passa por quatro portões de entrega, enquanto um coordenador limitado reproduz, promove, observa, isola e reverte com precisão mudanças de baixo risco." src="../assets/architecture-pt-BR-light.svg" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/benchmark-dark.svg">
+  <img alt="Benchmark público do OwnMem: Recall@1 de 100% em 128 consultas em 40 idiomas, contra 3,9% do grep -F no mesmo corpus; latência de recall de 0,46 ms no P50 e 1,05 ms no P95 em 4.200 amostras, abaixo do limite de publicação de 5 ms; MRR 1,000, abstenção nas 40 consultas não relacionadas, nenhuma chamada de modelo ou de rede e duas dependências de execução." src="../assets/benchmark-light.svg" width="100%">
 </picture>
 
-O OwnMem separa “registrar a experiência” de “entregá-la a um agente”:
+<sub>Medido no corpus CC0 fixado neste repositório. Para reproduzir, rode `npm run benchmark` em um clone.</sub>
 
-- **O repositório é a fonte.** Rotas L1, índices L2 e tópicos L3 são Markdown revisável; trust receipts ficam fora do texto autorizado.
-- **Compile antes do recall.** Schema, grafo, ciclo de vida e evidência geram um snapshot imutável endereçado por conteúdo.
-- **Cinco canais determinísticos.** exact, BM25F, n-gram, fuzzy e graph são fundidos localmente. embedding é um sexto canal opcional com peso 0 até passar A/B.
-- **Quatro portões de entrega.** relevância, validade factual, aplicabilidade e risco resultam em entrega, advisory, quarentena ou abstenção.
-- **Evolução autônoma limitada.** No fim do turno, só R0 comprovado, dentro da cota e exatamente reversível é promovido; R1–R5 vai para revisão.
+## <a name="how-it-compares"></a><a name="how-this-differs-from-claudemd-and-built-in-memory"></a>🆚 Comparação
 
-## Como o OwnMem governa memória de agentes de IA
+O OwnMem não substitui `CLAUDE.md` nem `AGENTS.md`. Esses arquivos dizem como se trabalha aqui e são lidos por inteiro a cada turno. O OwnMem responde a outra pergunta: de tudo o que este projeto aprendeu na marra, o que vale colocar diante do modelo **para esta tarefa** — e ele tem o direito de responder “nada”.
 
-O diferencial não é uma fórmula de ranking. O OwnMem transforma memória de agentes de programação em um protocolo verificável de recuperação e evolução:
+|  | Arquivos de instruções | Memória embutida do agente | OwnMem |
+| --- | --- | --- | --- |
+| Quem escreve | você, à mão | o agente, a partir das suas conversas | você, revisado como código |
+| Onde vive | um arquivo no repositório | a conta do fornecedor | Markdown no seu repositório |
+| O que chega ao modelo | tudo, a cada turno | o que o recall dele escolheu | um de três níveis, sob um orçamento de tokens |
+| Quando uma entrada está errada | você edita o arquivo | talvez você nunca veja aquela entrada | o drift de evidência a rebaixa e diz o que mudou |
+| Custo por turno | o arquivo inteiro em tokens | uma chamada de recuperação | nenhuma chamada de modelo nem de rede |
 
-| Mecanismo | Como é aplicado |
-| --- | --- |
-| **Memória com evidência** | Hash, raiz de evidência, ciclo de vida, aplicabilidade, risco e receipts anteriores decidem a entrada no contexto. |
-| **Portão contrafactual de promoção** | É preciso provar falha na base, recuperação só pelo candidato e zero regressão no corpus aprovado. |
-| **Risco pela superfície alterada** | Deriva do que mudou e do impacto possível; o agente não pode rebaixar a própria proposta. |
-| **Rollback compensatório endereçado** | Mudanças automáticas carregam uma inversa verificada e restauram bytes exatos sem apagar histórico. |
-| **Quarentena contra poisoning** | Candidato, conteúdo, autoridade e evidência são domínios separados; ser recuperado não concede permissão. |
-| **Entrega seletiva** | Evidência insuficiente gera advisory, quarentena ou abstenção, nunca confiança inventada. |
-| **Snapshots compilados imutáveis** | Markdown, grafo, identidade de ranking e confiança formam uma entrada de runtime reproduzível. |
-| **Três registros sem mistura** | Correção do recall, outcomes confirmados e autoatribuição do agente permanecem separados. |
-
-Leia o [design técnico e o mapeamento de pesquisa](../TECHNICAL.md).
-
-## Comece em três minutos
+## <a name="quick-start"></a>🚀 Início rápido
 
 Requer Node.js 20.6 ou mais recente. Execute no repositório que deve possuir a memória:
 
 ```bash
 npm install --save-dev ownmem
-npx ownmem init --locale auto --hosts claude,codex,grok --layers dashboard --hook
+npx ownmem init --hook --hosts claude,codex
 ```
 
-Reabra o agente após inicializar. O OwnMem cria `.ownmem/` e altera apenas áreas marcadas como gerenciadas. Para um adaptador use `--hosts claude`, `--hosts codex`, `--hosts cursor` ou `--hosts gemini`; veja antes com `npx ownmem init --check`.
+Depois, reabra o agente. Liste em `--hosts` os hosts que você usa (`claude`, `codex`, `cursor`, `gemini`, `grok`); a lista fica registrada, e para adicionar ou remover um host depois basta passá-la de novo. O `init` cria `.ownmem/` e os adaptadores de cada host, em arquivos de instruções como `CLAUDE.md`, só altera o que está dentro de blocos gerenciados e mostra qualquer etapa de configuração, feita uma única vez, que ainda falte para um host. Adicione `--check` ao mesmo comando para ver antes o que ele faz, e `--locale auto` para gerar as instruções no idioma do sistema.
 
-- **Claude Code** e **Grok CLI** leem o mesmo `.claude/settings.json`. O grok ainda exige confiar nesta pasta uma vez (execute `/hooks-trust` dentro do grok, ou inicie com `grok --trust`); sem isso ele não executa nenhum destes hooks e não avisa.
-- **Codex** lê `<projeto>/.codex/hooks.json`, mas atrás de três permissões independentes: (1) `hooks = true` sob `[features]` em `~/.codex/config.toml`; (2) o próprio projeto confiado — o Codex interativo pergunta na primeira vez que o abre, ou adicione `[projects."<caminho>"]` com `trust_level = "trusted"`; e (3) o aviso de confiança do hook na primeira vez que ele aparece. Um projeto não confiado falha em silêncio: ele nunca descobre o arquivo, e nem `--dangerously-bypass-hook-trust` nem uma substituição `-c projects...` alcançam essa camada. O processo do hook roda na raiz do projeto, com `node_modules/.bin` no PATH e o mesmo JSON no stdin que o Claude Code envia, mas sem nenhuma variável `CODEX_*`, então cada comando declara seu host explicitamente.
-- **Cursor** e **Gemini CLI** recebem apenas adaptadores de instrução. Nenhum dos dois expõe superfície de hooks: eles consultam a memória, mas não contribuem com coleta.
+| Host | Como o recall acontece | Configuração |
+| --- | --- | --- |
+| Claude Code | Um hook antes de cada Edit e Write, e quando você pedir | `claude` |
+| Codex | Um hook antes de cada patch que ele aplica, e quando você pedir | `codex`; os hooks exigem três passos de confiança feitos uma única vez, que o `init` mostra |
+| Grok CLI | Lê a configuração de hooks do Claude Code pela sua camada de compatibilidade | `grok`, junto com `claude` se você usa os dois; marque a pasta como confiável uma vez com `/hooks-trust` |
+| Cursor | Uma regra sempre aplicada ou o servidor MCP | `cursor`; o servidor MCP exige um passo manual, veja [Plugins](../PLUGINS.md) |
+| Gemini CLI | Instruções ou o servidor MCP | `gemini`; o servidor MCP exige um passo manual, veja [Plugins](../PLUGINS.md) |
 
-Ao atualizar de 0.5.x: a configuração de hooks agora é v2. Rode `npx ownmem init --update` uma vez. Os comandos anteriores são substituídos no lugar, os hooks que você mesmo escreveu não são tocados e, até você rodar, a passagem de início de sessão continua avisando que a configuração está desatualizada.
+> **⚠️ Vindo do 0.6.0?** Atualize o pacote com `npm install --save-dev ownmem@latest` e, antes de qualquer outra coisa, rode `npx ownmem init --update`. O 0.6.0 instalou hooks cujos subcomandos não existem mais, então uma instalação que os mantém executa um comando que falha a cada chamada de Bash. A atualização os remove e nunca mexe nos hooks que você mesmo escreveu. [Updating](../UPDATING.md) explica o resto, incluindo a limpeza do `core.hooksPath`.
 
-## Uso diário
+## <a name="daily-use"></a>💬 Uso diário
 
-Depois, continue trabalhando em linguagem natural:
+Continue trabalhando em linguagem natural. Seu agente rascunha uma memória quando você pedir, e você a revisa como código:
 
 > “Lembre: o timeout de staging vem do limite do pool, não de poucos workers. Verifique os dois na próxima vez.”
 
 > “Antes de mudar, veja se a memória do projeto já encontrou a mesma falha.”
 
-O host faz recall antes do trabalho relevante e agenda uma evolução bloqueada e com debounce ao fim do turno. Normalmente não é preciso encadear promotion, trust, audit e compile. Use o console local ou o status do coordenador para acompanhar:
+O recall responde em um de três níveis: a memória citada, até três ponteiros para ir ler ou uma abstenção. Uma execução real:
 
-```bash
-npx ownmem dashboard --open
-npx ownmem evolve status
-npx ownmem evolve run --force
+```console
+$ npx ownmem recall -- "staging deploy timed out again, should I add more workers?"
+== staging deploy timed out again, should I add more workers? ==
+  staging_timeout_pool_cap  [score=0.875 lanes=exact,bm25f,ngram fields=body,codePath,description,hooks,name,triggers]
+      matched deploy,more,out,staging,staging deploy timed out,timed
+      trust advisory authority · lifecycle advisory (not fully verified)
+        Treat it as a lead to re-check against the code, not as an established fact.
+      excerpt(body) **Why**: `DB_POOL_MAX` is 10 on staging. Adding workers only queues more requests behind the same ten connections, so the deploy health check times out sooner, not later.
+      file .ownmem/staging_timeout_pool_cap.md
 ```
 
-## Telemetria e passagem diária
+A confiança é declarada, não presumida. Nada sustenta esta entrada ainda — nenhuma revisão a confirmou e ela não cita documento de autoridade nem âncora de código —, então ela chega como uma pista a verificar de novo, não como um fato estabelecido.
 
-Eventos de execução expiram em trinta dias e nunca saem da máquina que os escreveu. A passagem diária reduz cada dia encerrado a um pacote de contagens pequeno o bastante para ser versionado, de modo que outra máquina — e um relatório rodado meses depois — ainda consiga vê-lo:
+Os comandos que você mesmo vai usar:
 
 ```bash
-npx ownmem daily                       # archive yesterday, commit it, report only what is wrong
-npx ownmem archive --backfill          # reduce every day still on disk to a counted package
-npx ownmem report --since 7d --fleet   # merge every machine's packages, and name the missing days
+npx ownmem new staging_timeout_pool_cap   # scaffold one memory that already passes every gate
+npx ownmem report --since 7d              # used? fast enough? right? what to do next
+npx ownmem dashboard --open               # open the local console
+npx ownmem mcp                            # serve recall and read to any MCP host over stdio
 ```
 
-- **O que um pacote contém:** contagens, agrupamentos, percentis de latência, motivos de abstenção, os hashes da cota e do conjunto dourado, e nomes de topic que já estão no índice público.
-- **O que ele nunca contém:** o texto da consulta nem seu resumo, o corpo dos topics, caminhos de arquivo, nomes de máquina ou de conta, nem carimbos de tempo mais finos que o dia.
-- **Ele mesmo faz o commit.** Os pacotes são preparados contra um índice privado, com caminhos explícitos e compare-and-swap no HEAD, então uma passagem nunca leva junto o trabalho preparado por outra sessão. Defina `telemetry.auto_commit` como `false` em `<memory-dir>/config.json`, ou passe `--no-commit`, para arquivar sem commitar.
-- **Ele aponta o `core.hooksPath`** para `<memory-dir>/git-hooks/`, onde o `ownmem init` gera o fallback de post-commit, e apenas enquanto essa configuração estiver vazia ou apontar para um diretório de hooks padrão intocado. Defina `telemetry.manage_hooks_path` como `false` para que ele não mexa.
-- **Entre máquinas**, `report --fleet` funde os pacotes de todas elas e nomeia os dias que têm commits mas nenhum pacote, em vez de apresentar a semana de um notebook como se fosse todo o histórico.
+<img alt="O console local do OwnMem: o resíduo conhecido de entregas erradas como número principal, o funil de buscas ao lado, a saúde do corpus e das evidências abaixo e a navegação para desempenho, qualidade, governança e recuperação semântica." src="../assets/console.png" width="100%">
 
-## Limite entre confiança e automação
+`ownmem mcp` existe para hosts sem hooks. Ele expõe exatamente duas ferramentas, `recall` e `read`, e nenhuma pode alterar uma memória; os comandos de controle (`audit`, `trust`, `compile`) e qualquer escrita de memória não ficam acessíveis por essa via. [Plugins](../PLUGINS.md) mostra como registrá-lo para que rode a cópia instalada no projeto.
 
-O OwnMem automatiza o que a máquina consegue provar, não o que apenas parece plausível.
+## <a name="how-it-works"></a><a name="architecture"></a><a name="how-ownmem-governs-ai-agent-memory"></a>🧩 Como funciona
 
-- **Automático:** recall determinístico, varredura, tripwire, replay contrafactual, backfill R0, receipt de máquina, audit, compile, observação, quarentena e rollback exato.
-- **Para revisão:** nova prosa, política, active set, conflitos, evidência insuficiente, mudanças R1–R5 e publicação.
-- **Limite rígido:** candidate não é memory; autoatribuição não é confirmação; texto recuperado não substitui instruções nem autoriza ferramentas.
-- **Em falhas:** conteúdo não assinado ou evidência não verificável é isolado; drift vira advisory; falha transacional restaura o estado validado anterior.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/architecture-pt-BR-dark.svg">
+  <img alt="Arquitetura do OwnMem: Markdown pertencente ao repositório e trust receipts independentes são compilados em snapshots imutáveis; o recall local determinístico passa por quatro portões de entrega e chega em um de três níveis — a memória citada, até três ponteiros, ou uma abstenção que diz o motivo — enquanto os livros de feedback local, o banco de avaliação e uma cota de crescimento líquido zero limitam no que o corpus se torna." src="../assets/architecture-pt-BR-light.svg" width="100%">
+</picture>
 
-## Quando usar
+- **O repositório é a fonte.** Rotas L1, índices L2 e tópicos L3 são Markdown revisável; trust receipts ficam fora do texto autorizado.
+- **Compile antes do recall.** Os portões de schema, grafo, ciclo de vida e evidência geram um snapshot imutável endereçado por conteúdo. Cinco canais determinísticos — exact, BM25F, n-gram, fuzzy e graph — são fundidos localmente; embedding é um sexto canal opcional com peso 0 até ser aprovado na avaliação A/B local.
+- **Quatro portões, três níveis.** Relevância, validade epistêmica, aplicabilidade à tarefa e risco da ação recusam cada um por motivo próprio. Acima de um limiar tirado de uma curva de ablação, a memória é citada; abaixo dele, até três ponteiros que explicitamente não são respostas; sem candidato apto, uma abstenção que nomeia o portão que recusou.
+- **Nenhuma escrita sem supervisão.** Não há coordenador, nem promoção, nem fila de candidatos. O pacote mede, propõe e recusa; cada mudança na memória é um commit que alguém faz, e nenhuma mudança de ranking entra sem passar pelo banco de avaliação.
+
+Mecanismos, modelo de ameaças e relação com a pesquisa: [Technical design](../TECHNICAL.md).
+
+## <a name="privacy-and-boundaries"></a><a name="trust-and-automation-boundary"></a><a name="local-first-by-default"></a><a name="telemetry-and-the-daily-pass"></a>🔒 Privacidade e limites
+
+- **Local por padrão.** O ranking lê apenas arquivos do repositório e snapshots locais: zero chamadas LLM, zero requisições de rede e nenhuma cobrança de API de recuperação. Os trechos entregues ainda usam o contexto do agente, dentro do orçamento configurado.
+- **A telemetria não sai da máquina.** Eventos de execução ficam em um diretório ignorado pelo Git e expiram em trinta dias. A rotina diária (`ownmem daily`) reduz cada dia encerrado a um pacote de contagens sem texto de consulta, corpo dos tópicos ou caminhos de arquivo. Sem amostras, aparece “indisponível”, nunca 0%.
+- **Texto recuperado é tratado como dado.** Ele não se sobrepõe às instruções do host nem autoriza ferramentas, e a autoatribuição de um agente nunca conta como confirmação do usuário.
+- **Falhas ficam visíveis.** Uma entrada com conteúdo não assinado ou alvo de evidência não verificável fica retida; o drift de evidência a rebaixa para advisory e diz o que mudou.
+- **Nada de segredos.** Segredos e dados pessoais ou de produção que não pertencem ao Git também não pertencem à memória.
+
+## <a name="when-to-use-it"></a><a name="where-it-fits"></a>🧭 Quando usar
 
 | OwnMem é adequado | Prefira outro sistema |
 | --- | --- |
@@ -128,14 +136,22 @@ O OwnMem automatiza o que a máquina consegue provar, não o que apenas parece p
 | Recall local e reproduzível sem cobrança de API de recuperação importa. | Você precisa de busca vetorial cloud em escala ou grafo global em tempo real. |
 | Memória errada deve ser atribuível, rejeitável e reversível. | Quantidade importa mais que governança. |
 
-## Local por padrão
+## <a name="documentation"></a><a name="research-lineage"></a>📚 Documentação
 
-- O ranking padrão lê apenas arquivos e snapshots locais: zero chamadas LLM, zero rede e nenhuma cobrança de API de recuperação. Os trechos entregues ainda usam o contexto do agente e são limitados pelo orçamento configurado.
-- Eventos ficam em diretório local ignorado pelo Git. Sem outcomes, aparece “indisponível”, nunca 0% inventado.
-- Segredos e dados pessoais ou de produção que não pertencem ao Git também não pertencem à memória.
-- embedding é opcional e isolado; só entra no ranking weighted após evidência A/B local.
+| Documento | Conteúdo |
+| --- | --- |
+| [Architecture](../ARCHITECTURE.md) | Limites, snapshots, confiança e entrega |
+| [Technical design](../TECHNICAL.md) | Mecanismos, ameaças e pesquisa |
+| [Plugins](../PLUGINS.md) | Configuração por host, plugins e passos de confiança |
+| [Updating](../UPDATING.md) | Atualização segura e migrações de versão |
+| [Privacy](../PRIVACY.md) | Dados locais e canais opcionais |
+| [Changelog](../../CHANGELOG.md) | Histórico de versões |
+| [Contributing](../../.github/CONTRIBUTING.md) | Como reportar issues e enviar mudanças |
+| [Security](../../.github/SECURITY.md) | Como reportar uma vulnerabilidade |
+| [License](../../LICENSE) | Apache-2.0 |
 
-## Linhagem de pesquisa
+<details>
+<summary><b>Fundamentos de pesquisa</b></summary>
 
 O OwnMem não reivindica essas bases como invenções. Sua contribuição é combiná-las em um protocolo executável para memória de repositório:
 
@@ -144,21 +160,11 @@ O OwnMem não reivindica essas bases como invenções. Sua contribuição é com
 - **Dados não confiáveis separados da autoridade:** [CaMeL: Defeating Prompt Injections by Design (2025)](https://arxiv.org/abs/2503.18813)
 - **Proveniência independente:** [in-toto (USENIX Security 2019)](https://www.usenix.org/conference/usenixsecurity19/presentation/torres-arias)
 - **Predição seletiva e abstenção:** [Selective Classification (JMLR 2010)](https://jmlr.org/papers/v11/el-yaniv10a.html)
-- **Validação diferencial e compensação:** [Metamorphic Testing (1998)](https://www.cse.ust.hk/~scc/publ/CS98-01-metamorphictesting.pdf), [Sagas (SIGMOD 1987)](https://doi.org/10.1145/38713.38742)
+- **Validação por ablação:** [Metamorphic Testing (1998)](https://www.cse.ust.hk/~scc/publ/CS98-01-metamorphictesting.pdf)
 - **Avaliação de retrieval decomposta:** [ARES (NAACL 2024)](https://aclanthology.org/2024.naacl-long.20/), [RAGChecker (2024)](https://arxiv.org/abs/2408.08067)
 
 As citações mostram a linhagem; não significam que esses trabalhos implementem o OwnMem nem que o OwnMem reproduza seus experimentos.
 
-## Documentação
-
-| Documento | Conteúdo |
-| --- | --- |
-| [Architecture](../ARCHITECTURE.md) | Limites, snapshots, confiança e evolução |
-| [Technical design](../TECHNICAL.md) | Mecanismos, ameaças e pesquisa |
-| [Plugins](../PLUGINS.md) | Instalação opcional de plugins |
-| [Updating](../UPDATING.md) | Atualização segura e migrações de versão |
-| [Privacy](../PRIVACY.md) | Dados locais e canais opcionais |
-| [Changelog](../../CHANGELOG.md) | Histórico de versões |
-| [License](../../LICENSE) | Apache-2.0 |
+</details>
 
 OwnMem é código aberto. Issues e pull requests reproduzíveis são bem-vindos.

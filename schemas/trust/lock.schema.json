@@ -52,7 +52,7 @@
       "type": "object",
       "required": ["kind", "locator", "path", "sha256", "fingerprint", "symbol"],
       "properties": {
-        "kind": { "enum": ["topic", "path", "symbol", "test", "commit", "document", "user-confirmation", "replay"] },
+        "kind": { "enum": ["topic", "path", "symbol", "test", "commit", "document", "user-confirmation"] },
         "locator": { "type": "string", "minLength": 1, "maxLength": 1000 },
         "path": { "$ref": "#/$defs/nullablePath" },
         "sha256": { "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }] },

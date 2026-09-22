@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Arial, sans-serif">
   <title id="title">OwnMem 아키텍처</title>
-  <desc id="description">저장소 소유 Markdown과 독립 trust receipt를 불변 snapshot으로 compile한다. 5개 결정적 로컬 후보 lane과 선택적 embedding lane이 4개 전달 gate를 통과한다. turn 종료 coordinator는 저위험 R0를 replay, 승격, 관찰, 격리하고 정확히 rollback하며 고위험 변경은 검토로 남긴다.</desc>
+  <desc id="description">저장소가 소유한 Markdown과 독립 trust receipt를 불변 snapshot으로 compile한다. 5개의 결정적 로컬 후보 lane과 선택적 embedding lane이 4개의 전달 gate를 통과하고, envelope은 세 tier 중 하나로 도착한다. 기억 본문 인용, 최대 3개의 포인터, 또는 이유를 밝힌 기권이다. 로컬 feedback 원장, 평가 하네스, 순증가 0 quota가 코퍼스의 방향을 묶는다. 사람이 commit하지 않으면 어떤 것도 기억에 들어가지 않는다.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#526176"/></marker>
     <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/></marker>
   </defs>
   <rect x="0" y="0" width="1600" height="980" rx="28" fill="#f4f7ff"/>
   <text x="52" y="58" text-anchor="start" font-size="27" font-weight="750" fill="#0f172a">OwnMem 아키텍처</text>
-  <text x="52" y="88" text-anchor="start" font-size="14" font-weight="500" fill="#526176">저장소 소유 · 로컬 회상 · 증거 거버넌스 · 제한된 자율성</text>
+  <text x="52" y="88" text-anchor="start" font-size="14" font-weight="500" fill="#526176">저장소 소유 · 로컬 회상 · 증거 거버넌스 · 무인 쓰기 없음</text>
   <rect x="1130" y="34" width="418" height="44" rx="22" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
   <text x="1339" y="62" text-anchor="middle" font-size="13" font-weight="650" fill="#2563eb">기본 recall: 모델 0 · 네트워크 0</text>
   <rect x="52" y="120" width="1496" height="108" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
@@ -25,12 +25,12 @@
   <path d="M 916 187 L 962 187" fill="none" stroke="#526176" stroke-width="2" marker-end="url(#arrow)"/>
   <rect x="982" y="150" width="536" height="64" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
   <text x="1250" y="177" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">통합 프로젝트 입구</text>
-  <text x="1250" y="199" text-anchor="middle" font-size="11.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">instructions · skills · commands · hook</text>
+  <text x="1250" y="199" text-anchor="middle" font-size="11.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">instructions · skills · commands · hook · MCP</text>
   <path d="M 800 228 L 800 258" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <rect x="52" y="274" width="420" height="420" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
   <text x="78" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">01 · REPOSITORY SOURCE</text>
   <text x="78" y="342" text-anchor="start" font-size="22" font-weight="750" fill="#0f172a">.ownmem/</text>
-  <text x="78" y="367" text-anchor="start" font-size="12.5" font-weight="400" fill="#526176">읽기 가능 · Git review · rollback</text>
+  <text x="78" y="367" text-anchor="start" font-size="12.5" font-weight="400" fill="#526176">읽기 가능 · Git review · 되돌리기 가능</text>
   <rect x="78" y="394" width="368" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
   <text x="94" y="419" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">L1 · MEMORY.md</text>
   <text x="94" y="441" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">routing index · always-small contract</text>
@@ -42,7 +42,7 @@
   <text x="94" y="589" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">one lesson · triggers · evidence</text>
   <rect x="78" y="620" width="178" height="62" rx="11" fill="#fff7ed" stroke="#9a3412" stroke-width="1.4"/>
   <text x="94" y="645" text-anchor="start" font-size="13.5" font-weight="700" fill="#9a3412">Trust receipt</text>
-  <text x="94" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">content hash · evidence · lifecycle</text>
+  <text x="94" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">hash · evidence · lifecycle</text>
   <rect x="268" y="620" width="178" height="62" rx="11" fill="#f0fdf4" stroke="#166534" stroke-width="1.4"/>
   <text x="284" y="645" text-anchor="start" font-size="13.5" font-weight="700" fill="#166534">Audit gates</text>
   <text x="284" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">quota · dedupe · Schema</text>
@@ -75,35 +75,40 @@
   <text x="862" y="631" text-anchor="start" font-size="13.5" font-weight="700" fill="#9a3412">Four delivery gates</text>
   <text x="862" y="653" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">relevance · validity · applicability · risk</text>
   <rect x="1194" y="274" width="354" height="420" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
-  <text x="1220" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">03 · TRUSTED DELIVERY</text>
+  <text x="1220" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">03 · 등급별 전달</text>
   <rect x="1220" y="336" width="302" height="62" rx="11" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
   <text x="1236" y="361" text-anchor="start" font-size="13.5" font-weight="700" fill="#2563eb">Context envelope</text>
-  <text x="1236" y="383" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">최대 1 topic · 400 token · provenance</text>
+  <text x="1236" y="383" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">tier를 스스로 밝힘 · 최대 1 topic · 400 token</text>
   <path d="M 1166 486 L 1194 486" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
-  <rect x="1220" y="430" width="302" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
-  <text x="1236" y="455" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">Coding agent</text>
-  <text x="1236" y="477" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">현재 code와 docs로 다시 검증</text>
-  <rect x="1220" y="524" width="302" height="62" rx="11" fill="#f0fdf4" stroke="#166534" stroke-width="1.4"/>
-  <text x="1236" y="549" text-anchor="start" font-size="13.5" font-weight="700" fill="#166534">Honest observability</text>
-  <text x="1236" y="571" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">confirmed adoption은 별도 outcome</text>
-  <text x="1371" y="626" text-anchor="middle" font-size="11.5" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">completed → delivered → consumed</text>
+  <rect x="1220" y="412" width="302" height="34" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1234" y="434" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#2563eb">content</text>
+  <text x="1508" y="434" text-anchor="end" font-size="10.5" font-weight="400" fill="#526176">기억 본문을 출처와 함께 인용</text>
+  <rect x="1220" y="452" width="302" height="34" rx="9" fill="#fff7ed" stroke="#9a3412" stroke-width="1.4"/>
+  <text x="1234" y="474" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#9a3412">pointers</text>
+  <text x="1508" y="474" text-anchor="end" font-size="10.5" font-weight="400" fill="#526176">최대 3개 · 단서일 뿐 답이 아님</text>
+  <rect x="1220" y="492" width="302" height="34" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1234" y="514" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">abstain</text>
+  <text x="1508" y="514" text-anchor="end" font-size="10.5" font-weight="400" fill="#526176">아무것도 주지 않고 이유를 밝힘</text>
+  <rect x="1220" y="542" width="302" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1236" y="567" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">Coding agent</text>
+  <text x="1236" y="589" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">현재 code와 docs로 다시 검증</text>
+  <text x="1371" y="630" text-anchor="middle" font-size="11.5" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">completed → delivered → consumed</text>
   <rect x="52" y="736" width="1496" height="188" rx="18" fill="#0f172a"/>
-  <text x="78" y="770" text-anchor="start" font-size="12" font-weight="750" fill="#2563eb">04 · LOCAL FEEDBACK / BOUNDED EVOLUTION</text>
+  <text x="78" y="770" text-anchor="start" font-size="12" font-weight="750" fill="#2563eb">04 · 로컬 feedback과 제한된 성장</text>
   <rect x="78" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
   <text x="215" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Three ledgers</text>
   <text x="215" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">retrieval · confirmed outcome · self-attribution</text>
   <rect x="382" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
-  <text x="519" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Candidate queue</text>
-  <text x="519" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">candidate ≠ memory · 기본 quarantine</text>
+  <text x="519" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Evaluation harness</text>
+  <text x="519" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">외부 출제 · ablation · holdout</text>
   <rect x="686" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
-  <text x="823" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Risk + observation</text>
-  <text x="823" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">replay · regression · quota · tripwire</text>
+  <text x="823" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Net-zero quota</text>
+  <text x="823" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">항목 수 상한 · 낮추는 방향만</text>
   <path d="M 352 840 L 372 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <path d="M 656 840 L 676 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <path d="M 960 840 L 980 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <rect x="990" y="792" width="532" height="96" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
-  <text x="1256" y="824" text-anchor="middle" font-size="14" font-weight="750" fill="#2563eb">R0 자동 쓰기 · R1–R5 검토</text>
-  <text x="1256" y="851" text-anchor="middle" font-size="11.5" font-weight="500" fill="#526176">실패는 격리 후 이전 byte를 정확히 복구</text>
-  <text x="1256" y="874" text-anchor="middle" font-size="10.8" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">trust → audit → compile → tripwire → rollback receipt</text>
-  <path d="M 1256 792 C 1256 718, 262 734, 262 694" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#arrowBlue)"/>
+  <text x="1256" y="824" text-anchor="middle" font-size="14" font-weight="750" fill="#2563eb">무인 쓰기는 없다</text>
+  <text x="1256" y="851" text-anchor="middle" font-size="11.5" font-weight="500" fill="#526176">이 패키지는 측정하고 제안할 뿐, commit은 사람이 한다</text>
+  <text x="1256" y="874" text-anchor="middle" font-size="10.8" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">recall → report → audit refuses → your commit</text>
 </svg>

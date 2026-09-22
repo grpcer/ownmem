@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Arial, sans-serif">
   <title id="title">Arquitetura do OwnMem</title>
-  <desc id="description">Markdown pertencente ao repositório e trust receipts independentes são compilados em snapshots imutáveis. Cinco canais locais determinísticos e embedding opcional passam por quatro portões de entrega. No fim do turno, um coordenador reproduz, promove, observa, isola e reverte com precisão mudanças R0 de baixo risco; riscos maiores ficam para revisão.</desc>
+  <desc id="description">O Markdown que pertence ao repositório e trust receipts independentes são compilados em snapshots imutáveis. Cinco canais locais determinísticos e um canal opcional de embeddings passam por quatro portões de entrega, e o envelope chega em um de três níveis: a memória citada, até três ponteiros, ou uma abstenção que diz o motivo. Os livros de feedback local, o banco de avaliação e uma cota de crescimento líquido zero limitam no que o corpus se torna; nada entra na memória sem que alguém faça o commit.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#a8b3c7"/></marker>
     <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#60a5fa"/></marker>
   </defs>
   <rect x="0" y="0" width="1600" height="980" rx="28" fill="#0b1020"/>
   <text x="52" y="58" text-anchor="start" font-size="27" font-weight="750" fill="#f8fafc">Arquitetura do OwnMem</text>
-  <text x="52" y="88" text-anchor="start" font-size="14" font-weight="500" fill="#a8b3c7">Memória do repositório · recall local · evidência · autonomia limitada</text>
+  <text x="52" y="88" text-anchor="start" font-size="14" font-weight="500" fill="#a8b3c7">Memória do repositório · recall local · evidência · nenhuma escrita automática</text>
   <rect x="1130" y="34" width="418" height="44" rx="22" fill="#172554" stroke="#60a5fa" stroke-width="1.4"/>
   <text x="1339" y="62" text-anchor="middle" font-size="13" font-weight="650" fill="#60a5fa">Recall padrão: 0 modelos · 0 rede</text>
   <rect x="52" y="120" width="1496" height="108" rx="18" fill="#111827" stroke="#334155" stroke-width="1.4"/>
@@ -25,7 +25,7 @@
   <path d="M 916 187 L 962 187" fill="none" stroke="#a8b3c7" stroke-width="2" marker-end="url(#arrow)"/>
   <rect x="982" y="150" width="536" height="64" rx="13" fill="#172554" stroke="#60a5fa" stroke-width="1.4"/>
   <text x="1250" y="177" text-anchor="middle" font-size="14" font-weight="700" fill="#60a5fa">Entrada unificada do projeto</text>
-  <text x="1250" y="199" text-anchor="middle" font-size="11.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#a8b3c7">instruções · skills · commands · hook</text>
+  <text x="1250" y="199" text-anchor="middle" font-size="11.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#a8b3c7">instruções · skills · commands · hook · MCP</text>
   <path d="M 800 228 L 800 258" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <rect x="52" y="274" width="420" height="420" rx="18" fill="#111827" stroke="#334155" stroke-width="1.4"/>
   <text x="78" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#a8b3c7">01 · FONTE DO REPOSITÓRIO</text>
@@ -42,7 +42,7 @@
   <text x="94" y="589" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">one lesson · triggers · evidence</text>
   <rect x="78" y="620" width="178" height="62" rx="11" fill="#352114" stroke="#fdba74" stroke-width="1.4"/>
   <text x="94" y="645" text-anchor="start" font-size="13.5" font-weight="700" fill="#fdba74">Trust receipt</text>
-  <text x="94" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">hash · evidência · ciclo de vida</text>
+  <text x="94" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">hash · evidência · ciclo</text>
   <rect x="268" y="620" width="178" height="62" rx="11" fill="#132a22" stroke="#86efac" stroke-width="1.4"/>
   <text x="284" y="645" text-anchor="start" font-size="13.5" font-weight="700" fill="#86efac">Audit gates</text>
   <text x="284" y="667" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">cota · duplicatas · Schema</text>
@@ -75,35 +75,40 @@
   <text x="862" y="631" text-anchor="start" font-size="13.5" font-weight="700" fill="#fdba74">Four delivery gates</text>
   <text x="862" y="653" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">relevância · validade · aplicabilidade · risco</text>
   <rect x="1194" y="274" width="354" height="420" rx="18" fill="#111827" stroke="#334155" stroke-width="1.4"/>
-  <text x="1220" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#a8b3c7">03 · ENTREGA CONFIÁVEL</text>
+  <text x="1220" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#a8b3c7">03 · ENTREGA EM NÍVEIS</text>
   <rect x="1220" y="336" width="302" height="62" rx="11" fill="#172554" stroke="#60a5fa" stroke-width="1.4"/>
   <text x="1236" y="361" text-anchor="start" font-size="13.5" font-weight="700" fill="#60a5fa">Context envelope</text>
-  <text x="1236" y="383" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">≤1 tópico · 400 tokens · proveniência</text>
+  <text x="1236" y="383" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">declara seu nível · ≤1 tópico · 400 tokens</text>
   <path d="M 1166 486 L 1194 486" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowBlue)"/>
-  <rect x="1220" y="430" width="302" height="62" rx="11" fill="#172033" stroke="#334155" stroke-width="1.4"/>
-  <text x="1236" y="455" text-anchor="start" font-size="13.5" font-weight="700" fill="#f8fafc">Coding agent</text>
-  <text x="1236" y="477" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">verificar com código e docs atuais</text>
-  <rect x="1220" y="524" width="302" height="62" rx="11" fill="#132a22" stroke="#86efac" stroke-width="1.4"/>
-  <text x="1236" y="549" text-anchor="start" font-size="13.5" font-weight="700" fill="#86efac">Honest observability</text>
-  <text x="1236" y="571" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">adoção confirmada é um outcome separado</text>
-  <text x="1371" y="626" text-anchor="middle" font-size="11.5" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#a8b3c7">completed → delivered → consumed</text>
+  <rect x="1220" y="412" width="302" height="34" rx="9" fill="#172554" stroke="#60a5fa" stroke-width="1.4"/>
+  <text x="1234" y="434" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#60a5fa">content</text>
+  <text x="1508" y="434" text-anchor="end" font-size="10.5" font-weight="400" fill="#a8b3c7">a memória citada, com procedência</text>
+  <rect x="1220" y="452" width="302" height="34" rx="9" fill="#352114" stroke="#fdba74" stroke-width="1.4"/>
+  <text x="1234" y="474" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#fdba74">pointers</text>
+  <text x="1508" y="474" text-anchor="end" font-size="10.5" font-weight="400" fill="#a8b3c7">≤3 · onde olhar, não a resposta</text>
+  <rect x="1220" y="492" width="302" height="34" rx="9" fill="#172033" stroke="#334155" stroke-width="1.4"/>
+  <text x="1234" y="514" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#a8b3c7">abstain</text>
+  <text x="1508" y="514" text-anchor="end" font-size="10.5" font-weight="400" fill="#a8b3c7">nada, e o motivo</text>
+  <rect x="1220" y="542" width="302" height="62" rx="11" fill="#172033" stroke="#334155" stroke-width="1.4"/>
+  <text x="1236" y="567" text-anchor="start" font-size="13.5" font-weight="700" fill="#f8fafc">Coding agent</text>
+  <text x="1236" y="589" text-anchor="start" font-size="11.5" font-weight="400" fill="#a8b3c7">verificar com código e docs atuais</text>
+  <text x="1371" y="630" text-anchor="middle" font-size="11.5" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#a8b3c7">completed → delivered → consumed</text>
   <rect x="52" y="736" width="1496" height="188" rx="18" fill="#060b16"/>
-  <text x="78" y="770" text-anchor="start" font-size="12" font-weight="750" fill="#60a5fa">04 · FEEDBACK LOCAL E EVOLUÇÃO LIMITADA</text>
+  <text x="78" y="770" text-anchor="start" font-size="12" font-weight="750" fill="#60a5fa">04 · FEEDBACK LOCAL E CRESCIMENTO LIMITADO</text>
   <rect x="78" y="792" width="274" height="96" rx="13" fill="#111827" stroke="#334155" stroke-width="1.4"/>
   <text x="215" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Three ledgers</text>
   <text x="215" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">retrieval · outcome confirmado · autoatribuição</text>
   <rect x="382" y="792" width="274" height="96" rx="13" fill="#111827" stroke="#334155" stroke-width="1.4"/>
-  <text x="519" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Candidate queue</text>
-  <text x="519" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">candidate ≠ memory · quarentena por padrão</text>
+  <text x="519" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Evaluation harness</text>
+  <text x="519" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">perguntas externas · ablação · holdout</text>
   <rect x="686" y="792" width="274" height="96" rx="13" fill="#111827" stroke="#334155" stroke-width="1.4"/>
-  <text x="823" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Risk + observation</text>
-  <text x="823" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">replay · regressão · cota · tripwire</text>
+  <text x="823" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Net-zero quota</text>
+  <text x="823" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">número de entradas · só diminui</text>
   <path d="M 352 840 L 372 840" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <path d="M 656 840 L 676 840" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <path d="M 960 840 L 980 840" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <rect x="990" y="792" width="532" height="96" rx="13" fill="#172554" stroke="#60a5fa" stroke-width="1.4"/>
-  <text x="1256" y="824" text-anchor="middle" font-size="14" font-weight="750" fill="#60a5fa">R0 automático · R1–R5 revisão</text>
-  <text x="1256" y="851" text-anchor="middle" font-size="11.5" font-weight="500" fill="#a8b3c7">falhas isolam e restauram os bytes exatos</text>
-  <text x="1256" y="874" text-anchor="middle" font-size="10.8" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#a8b3c7">trust → audit → compile → tripwire → rollback receipt</text>
-  <path d="M 1256 792 C 1256 718, 262 734, 262 694" fill="none" stroke="#60a5fa" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#arrowBlue)"/>
+  <text x="1256" y="824" text-anchor="middle" font-size="14" font-weight="750" fill="#60a5fa">Nenhuma escrita automática</text>
+  <text x="1256" y="851" text-anchor="middle" font-size="11.5" font-weight="500" fill="#a8b3c7">o pacote mede e propõe; uma pessoa faz o commit</text>
+  <text x="1256" y="874" text-anchor="middle" font-size="10.8" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#a8b3c7">recall → report → audit refuses → your commit</text>
 </svg>

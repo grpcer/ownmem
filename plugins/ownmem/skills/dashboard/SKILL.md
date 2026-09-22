@@ -1,11 +1,12 @@
 ---
 name: dashboard
-description: Open OwnMem Console, the local dashboard for this repository's memory. Use when the user asks to open the dashboard, see memory metrics, check adoption or recall quality, or set up the optional embedding lane. Requires a repository initialized with the dashboard layer.
+description: Open OwnMem Console, the local dashboard for this repository's memory. Use when the user asks to open the dashboard, see memory metrics, check recall quality, or set up the optional embedding lane. Requires a repository initialized with the dashboard layer.
 ---
 
 # Open OwnMem Console
 
-OwnMem Console renders this repository's memory metrics — adoption funnel,
+OwnMem Console renders this repository's memory metrics — the known
+false-delivery residual and the delivery funnel beneath it,
 recall latency, corpus health, governance — in the browser. It binds
 127.0.0.1 only; nothing is served off this machine.
 
@@ -46,7 +47,8 @@ The CLI defaults to a random port. Pass `--port 45300` (or another free local
 port) when the user needs a stable bookmark, and keep using that port later.
 
 After opening, run `npx ownmem report --since 7d` once and give the user a
-one-line summary: adoption north star, latency P50/P95, and the most notable
+one-line summary: the north star (how much of what was reported as a wrong
+delivery is still answered with prose), latency P50/P95, and the most notable
 gap or warning. When the sample is small, say so instead of dressing process
 metrics up as adoption.
 

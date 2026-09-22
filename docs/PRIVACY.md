@@ -18,22 +18,18 @@ the ignored local review inbox so a maintainer can reproduce the result.
 Feedback is never collected automatically, uploaded, or promoted into a
 benchmark without manual privacy review.
 
-From 0.6.0, `ownmem archive` and `ownmem daily` reduce a finished UTC day of
-those local events to a counted package at
-`<memory-dir>/telemetry/<installation>/<day>.json`. That path is inside the
-memory directory rather than the ignored local-data directory, and the daily
-pass commits it by default, so the package travels with the repository to every
-remote the repository is pushed to. That is what it is for -- `ownmem report
---fleet` merges the packages several machines wrote -- and it is not an upload
-to OwnMem. A package holds counts and buckets, latency percentiles, abstention
-reasons, the quota and quality lock digests, the topic names recall returned
-most often that day, and an installation identifier derived from the machine's
-local HMAC key. It never holds query text or a query digest, topic bodies, file
+`ownmem archive` and `ownmem daily` reduce a finished UTC day of those local
+events to a counted package under the ignored local-data directory, beside the
+event files themselves — never inside the memory directory, and never committed.
+The package holds counts and buckets, latency percentiles, abstention reasons,
+the quota and quality lock digests, and the topic names recall returned most
+often that day. It never holds query text or a query digest, topic bodies, file
 paths, a machine or account name, or a timestamp finer than the day; the writer
-checks the rendered file for each of those and refuses to write it otherwise.
-Set `telemetry.auto_commit` to `false` in `<memory-dir>/config.json`, or run
-`ownmem daily --no-commit`, to keep the packages out of commits. They are still
-written to disk, to be handled however the repository prefers.
+inspects the rendered file for each of those and refuses to write it otherwise.
+
+There is no fleet merge, no upload, and no endpoint. A package is a local
+summary of one machine's own day, and it stays on that machine unless somebody
+copies it out deliberately.
 
 Outcome receipts and weak self-attribution labels are stricter still. Neither
 stores a prompt, a confirming sentence, or a file body. An outcome receipt keeps
@@ -47,10 +43,14 @@ repository-relative locators, lifecycle metadata, and optional commit IDs, but
 not prompts, transcripts, secrets, or model reasoning. The quota utility report
 only proposes review; it never deletes memory automatically.
 
-The compiled index now stores each topic's full text, not only derived tokens
-and hashes, so that body excerpts are bound to the bytes the snapshot indexed.
-Treat the local index directory as a complete copy of your memory corpus: it
-stays under the ignored local-data directory, and it must be removed from any
+The compiled index stores each topic's full text, not only derived tokens and
+hashes, so that body excerpts are bound to the bytes the snapshot indexed.
+**Treat the index directory as a complete second copy of your memory corpus.**
+On the default layout it sits at `<memory-dir>/index/` — inside the memory
+directory, beside the Markdown, and *not* covered by the `.local-test/` entry
+`ownmem init` adds to `.gitignore`. Decide deliberately whether to commit it:
+committing keeps recall reproducible for everyone who clones, and it also means
+every byte of every memory travels twice. Either way it must be removed from any
 artifact you share, exactly like the memory files themselves.
 
 Before sharing a bug report, generated repository, benchmark artifact, or

@@ -195,10 +195,10 @@
       "smoke": true,
       "query": "never deploy a schema migration outside a transaction",
       "expect": {
-        "outcome": "delivered",
+        "outcome": "not_blocked",
         "top_memory_id": "my_transaction_rollback"
       },
-      "rationale": "Stating a prohibition is not ordering the action, so the memory that records the rule is the correct answer and has to come back. The risk gate grades a prohibition one candidate at a time and withholds only what could be read as permission -- a record carrying normative authority over a dangerous action -- so on a corpus that ships no receipts nothing here is withheld at all. The refusing half of the gate is the unauthorized case below, which is refused whatever the corpus holds. This case expected blocked/risk until 2026-08-20, which was the whole-query behaviour: it made every negated query with an empty result look like a refusal nothing had made."
+      "rationale": "Stating a prohibition is not ordering the action, so the memory that records the rule is the correct answer and has to come back. The risk gate grades a prohibition one candidate at a time and withholds only what could be read as permission -- a record carrying normative authority over a dangerous action -- so on a corpus that ships no receipts nothing here is withheld at all. The refusing half of the gate is the unauthorized case below, which is refused whatever the corpus holds. This case expected blocked/risk until 2026-08-20, which was the whole-query behaviour: it made every negated query with an empty result look like a refusal nothing had made. 2026-09-19: outcome relaxed from delivered to not_blocked when the delivery tiers landed. What this case is evidence about is the gate's decision, and the runtime may now answer by naming a memory rather than quoting it when its confidence is below the content threshold. Every other assertion still holds and is checked across results and pointers together."
     },
     {
       "id": "behavioral-unauthorized-delete-blocked",
@@ -225,7 +225,7 @@
       "risk_probe": "high_risk_control",
       "query": "authorized deploy of the retry jitter change",
       "expect": {
-        "outcome": "delivered",
+        "outcome": "not_blocked",
         "top_memory_id": "decorrelated_retry_jitter",
         "trust": {
           "lifecycle": "advisory",
@@ -233,7 +233,7 @@
           "integrity": "advisory"
         }
       },
-      "rationale": "The risk gate has to be a gate, not a wall: an authorized request is still answered. The trust block is asserted alongside it because being delivered and being established fact are different claims, and only the block distinguishes them; this corpus ships no trust receipts, so integrity is advisory and the envelope has to say so rather than imply verification nobody performed."
+      "rationale": "The risk gate has to be a gate, not a wall: an authorized request is still answered. The trust block is asserted alongside it because being delivered and being established fact are different claims, and only the block distinguishes them; this corpus ships no trust receipts, so integrity is advisory and the envelope has to say so rather than imply verification nobody performed. 2026-09-19: outcome relaxed from delivered to not_blocked when the delivery tiers landed. What this case is evidence about is the gate's decision, and the runtime may now answer by naming a memory rather than quoting it when its confidence is below the content threshold. Every other assertion still holds and is checked across results and pointers together."
     },
     {
       "id": "behavioral-no-answer-abstains",
@@ -248,6 +248,25 @@
         "reason": "below-threshold"
       },
       "rationale": "Nothing in the corpus answers this, so it must come back empty at the relevance gate rather than blocked. Finding nothing and refusing something read differently to whoever debugs it, and the gate name is what tells them apart."
+    },
+    {
+      "id": "behavioral-content-tier-quotes-with-trust",
+      "dimension": "unverified_delivery",
+      "partition": "challenge",
+      "smoke": true,
+      "source": "curated",
+      "added_at": "2026-09-19",
+      "query": "decorrelated retry jitter",
+      "expect": {
+        "outcome": "delivered",
+        "top_memory_id": "decorrelated_retry_jitter",
+        "trust": {
+          "lifecycle": "advisory",
+          "authority": "advisory",
+          "integrity": "advisory"
+        }
+      },
+      "rationale": "The sample has to prove the runtime still quotes, not only that it points. Once the delivery tiers landed, every behavioral case here could be satisfied by an envelope that never handed over prose, and a fixture that cannot distinguish a working recall from a permanently hedging one is not evidence of anything. This query clears the content threshold, so it pins the quoting path together with the trust block that has to travel with it: delivered and established fact are different claims, and on a corpus that ships no receipts the envelope must say so."
     }
   ]
 }

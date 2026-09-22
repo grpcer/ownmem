@@ -9,14 +9,14 @@
 
   <g font-size="20" font-weight="650">
     <rect x="96" y="432" width="238" height="52" rx="26" fill="#f0fdf4" stroke="#15803d" stroke-width="1.6"/>
-    <text x="215" y="465" text-anchor="middle" fill="#15803d">0.57 ms P95 recall</text>
+    <text x="215" y="465" text-anchor="middle" fill="#15803d">1.05 ms P95 recall</text>
     <rect x="350" y="432" width="196" height="52" rx="26" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
     <text x="448" y="465" text-anchor="middle" fill="#2563eb">0 model calls</text>
     <rect x="562" y="432" width="192" height="52" rx="26" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.6"/>
     <text x="658" y="465" text-anchor="middle" fill="#0f172a">40 language tags</text>
   </g>
 
-  <text x="96" y="556" font-size="18" fill="#57606a">Claude Code · Codex · Antigravity · Cursor · Gemini CLI · Grok CLI</text>
+  <text x="96" y="556" font-size="18" fill="#57606a">Claude Code · Codex · Cursor · Gemini CLI · Grok CLI</text>
   <text x="96" y="592" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#8b949e">github.com/grpcer/ownmem</text>
 
   <g font-size="19" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
@@ -33,5 +33,5 @@
     <rect x="948" y="468" width="236" height="54" rx="10" fill="#f0fdf4" stroke="#15803d" stroke-width="1.6"/>
     <text x="1066" y="502" text-anchor="middle" fill="#15803d">→ trusted context</text>
   </g>
-  <text x="1066" y="110" text-anchor="middle" font-size="17" letter-spacing="2" font-weight="650" fill="#8b949e">SIX LANES, ONE ANSWER</text>
+  <text x="1066" y="110" text-anchor="middle" font-size="17" letter-spacing="2" font-weight="650" fill="#8b949e">FIVE LANES, ONE ANSWER</text>
 </svg>

@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" role="img" aria-labelledby="title description" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Arial, sans-serif">
   <title id="title">OwnMem-Architektur</title>
-  <desc id="description">Repository-eigenes Markdown und unabhängige Trust Receipts werden zu unveränderlichen Snapshots kompiliert. Fünf deterministische lokale Kanäle und optionales Embedding passieren vier Auslieferungstore. Ein Coordinator replayt, promotet, beobachtet, isoliert und rollt risikoarme R0-Änderungen exakt zurück; höheres Risiko bleibt im Review.</desc>
+  <desc id="description">Repository-eigenes Markdown und unabhängige Trust Receipts werden zu unveränderlichen Snapshots kompiliert. Fünf deterministische lokale Kanäle und ein optionaler Embedding-Kanal passieren vier Auslieferungstore, und der Umschlag kommt in einer von drei Stufen an: die zitierte Erinnerung, bis zu drei Verweise oder eine Enthaltung mit Begründung. Lokale Feedback-Register, ein Evaluationsstand und eine Netto-Null-Quote begrenzen, wozu der Korpus wird; ohne den Commit eines Menschen gelangt nichts in die Erinnerung.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#526176"/></marker>
     <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/></marker>
   </defs>
   <rect x="0" y="0" width="1600" height="980" rx="28" fill="#f4f7ff"/>
   <text x="52" y="58" text-anchor="start" font-size="27" font-weight="750" fill="#0f172a">OwnMem-Architektur</text>
-  <text x="52" y="88" text-anchor="start" font-size="14" font-weight="500" fill="#526176">Repository-eigen · lokaler Recall · Evidenz · begrenzte Autonomie</text>
+  <text x="52" y="88" text-anchor="start" font-size="14" font-weight="500" fill="#526176">Repository-eigen · lokaler Recall · Evidenz · keine unbeaufsichtigten Schreibvorgänge</text>
   <rect x="1130" y="34" width="418" height="44" rx="22" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
   <text x="1339" y="62" text-anchor="middle" font-size="13" font-weight="650" fill="#2563eb">Standard-Recall: 0 Modelle · 0 Netzwerk</text>
   <rect x="52" y="120" width="1496" height="108" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
@@ -25,7 +25,7 @@
   <path d="M 916 187 L 962 187" fill="none" stroke="#526176" stroke-width="2" marker-end="url(#arrow)"/>
   <rect x="982" y="150" width="536" height="64" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
   <text x="1250" y="177" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Einheitlicher Projekteinstieg</text>
-  <text x="1250" y="199" text-anchor="middle" font-size="11.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">Anweisungen · Skills · Commands · Hook</text>
+  <text x="1250" y="199" text-anchor="middle" font-size="11.5" font-weight="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">Anweisungen · Skills · Commands · Hook · MCP</text>
   <path d="M 800 228 L 800 258" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <rect x="52" y="274" width="420" height="420" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
   <text x="78" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">01 · REPOSITORY-QUELLE</text>
@@ -75,35 +75,40 @@
   <text x="862" y="631" text-anchor="start" font-size="13.5" font-weight="700" fill="#9a3412">Four delivery gates</text>
   <text x="862" y="653" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">Relevanz · Gültigkeit · Anwendbarkeit · Risiko</text>
   <rect x="1194" y="274" width="354" height="420" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
-  <text x="1220" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">03 · VERTRAUENSWÜRDIGE LIEFERUNG</text>
+  <text x="1220" y="306" text-anchor="start" font-size="12" font-weight="750" fill="#526176">03 · ABGESTUFTE AUSLIEFERUNG</text>
   <rect x="1220" y="336" width="302" height="62" rx="11" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
   <text x="1236" y="361" text-anchor="start" font-size="13.5" font-weight="700" fill="#2563eb">Context envelope</text>
-  <text x="1236" y="383" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">≤1 Topic · 400 Tokens · Provenance</text>
+  <text x="1236" y="383" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">nennt ihre Stufe · ≤1 Topic · 400 Tokens</text>
   <path d="M 1166 486 L 1194 486" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
-  <rect x="1220" y="430" width="302" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
-  <text x="1236" y="455" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">Coding agent</text>
-  <text x="1236" y="477" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">gegen aktuellen Code und Docs prüfen</text>
-  <rect x="1220" y="524" width="302" height="62" rx="11" fill="#f0fdf4" stroke="#166534" stroke-width="1.4"/>
-  <text x="1236" y="549" text-anchor="start" font-size="13.5" font-weight="700" fill="#166534">Honest observability</text>
-  <text x="1236" y="571" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">bestätigte Nutzung ist eigenes Outcome</text>
-  <text x="1371" y="626" text-anchor="middle" font-size="11.5" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">completed → delivered → consumed</text>
+  <rect x="1220" y="412" width="302" height="34" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
+  <text x="1234" y="434" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#2563eb">content</text>
+  <text x="1508" y="434" text-anchor="end" font-size="10.5" font-weight="400" fill="#526176">die Erinnerung zitiert, mit Herkunft</text>
+  <rect x="1220" y="452" width="302" height="34" rx="9" fill="#fff7ed" stroke="#9a3412" stroke-width="1.4"/>
+  <text x="1234" y="474" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#9a3412">pointers</text>
+  <text x="1508" y="474" text-anchor="end" font-size="10.5" font-weight="400" fill="#526176">≤3 · wo zu suchen ist, keine Antwort</text>
+  <rect x="1220" y="492" width="302" height="34" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1234" y="514" text-anchor="start" font-size="11.5" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">abstain</text>
+  <text x="1508" y="514" text-anchor="end" font-size="10.5" font-weight="400" fill="#526176">nichts, und der Grund dafür</text>
+  <rect x="1220" y="542" width="302" height="62" rx="11" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="1236" y="567" text-anchor="start" font-size="13.5" font-weight="700" fill="#0f172a">Coding agent</text>
+  <text x="1236" y="589" text-anchor="start" font-size="11.5" font-weight="400" fill="#526176">gegen aktuellen Code und Docs prüfen</text>
+  <text x="1371" y="630" text-anchor="middle" font-size="11.5" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">completed → delivered → consumed</text>
   <rect x="52" y="736" width="1496" height="188" rx="18" fill="#0f172a"/>
-  <text x="78" y="770" text-anchor="start" font-size="12" font-weight="750" fill="#2563eb">04 · LOKALES FEEDBACK UND BEGRENZTE EVOLUTION</text>
+  <text x="78" y="770" text-anchor="start" font-size="12" font-weight="750" fill="#2563eb">04 · LOKALES FEEDBACK UND BEGRENZTES WACHSTUM</text>
   <rect x="78" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
   <text x="215" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Three ledgers</text>
   <text x="215" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">Retrieval · bestätigtes Outcome · Selbstzuordnung</text>
   <rect x="382" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
-  <text x="519" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Candidate queue</text>
-  <text x="519" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">candidate ≠ memory · standardmäßig Quarantäne</text>
+  <text x="519" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Evaluation harness</text>
+  <text x="519" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">externe Fragen · Ablation · Holdout</text>
   <rect x="686" y="792" width="274" height="96" rx="13" fill="#1e293b" stroke="#475569" stroke-width="1.4"/>
-  <text x="823" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Risk + observation</text>
-  <text x="823" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">Replay · Regression · Quota · Tripwire</text>
+  <text x="823" y="824" text-anchor="middle" font-size="13.5" font-weight="700" fill="#f8fafc">Net-zero quota</text>
+  <text x="823" y="851" text-anchor="middle" font-size="11.2" font-weight="400" fill="#cbd5e1">Anzahl Einträge · nur abwärts</text>
   <path d="M 352 840 L 372 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <path d="M 656 840 L 676 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <path d="M 960 840 L 980 840" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
   <rect x="990" y="792" width="532" height="96" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="1.4"/>
-  <text x="1256" y="824" text-anchor="middle" font-size="14" font-weight="750" fill="#2563eb">R0 automatisch · R1–R5 Review</text>
-  <text x="1256" y="851" text-anchor="middle" font-size="11.5" font-weight="500" fill="#526176">Fehler isolieren und stellen exakte Bytes wieder her</text>
-  <text x="1256" y="874" text-anchor="middle" font-size="10.8" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">trust → audit → compile → tripwire → rollback receipt</text>
-  <path d="M 1256 792 C 1256 718, 262 734, 262 694" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#arrowBlue)"/>
+  <text x="1256" y="824" text-anchor="middle" font-size="14" font-weight="750" fill="#2563eb">Kein unbeaufsichtigtes Schreiben</text>
+  <text x="1256" y="851" text-anchor="middle" font-size="11.5" font-weight="500" fill="#526176">das Paket misst und schlägt vor; ein Mensch committet</text>
+  <text x="1256" y="874" text-anchor="middle" font-size="10.8" font-weight="500" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#526176">recall → report → audit refuses → your commit</text>
 </svg>

@@ -1,55 +1,55 @@
 {
   "artifacts": {
     "documents": {
-      "bytes": 11278,
+      "bytes": 22666,
       "file": "documents.json",
       "records": 4,
-      "schema": "ownmem-index.documents/v1",
-      "sha256": "bb9a90a15655d2615f1ca919e5f17aad9e70417eaeaf996900aebdd051c83bf6"
+      "schema": "ownmem-index.documents/v2",
+      "sha256": "2a5bce285c641e4c980ba2f7233aedc787f80035fb04052f89cd5e041dc1bfd9"
     },
     "exact_map": {
-      "bytes": 8349,
+      "bytes": 8581,
       "file": "exact-map.json",
       "records": 52,
       "schema": "ownmem-index.exact-map/v1",
-      "sha256": "98f57ad3d171f774d487237eb243b896df5c5fcc8a20bc81e56e23fe12691409"
+      "sha256": "3dc7d876ba18ce2441cab5e4d96704e4a6a628e3bbacb3f6003c5c5ef2fedc4a"
     },
     "graph": {
-      "bytes": 3302,
+      "bytes": 3563,
       "file": "graph.json",
       "records": 10,
       "schema": "ownmem-index.graph/v2",
-      "sha256": "da39c7e32f2c57db3343cec8018c9f2086894e637e5ba7f9df08e2c25a316bca"
+      "sha256": "e8ca0638aec29bb4ecae6c72b600f8bd6b179b542f504c525b737f4bf9645222"
     },
     "postings": {
-      "bytes": 25178,
+      "bytes": 25674,
       "file": "postings.json",
-      "records": 408,
+      "records": 413,
       "schema": "ownmem-index.postings/v2",
-      "sha256": "bce380337cfb26111ce13365dbd39cbff99593ada28d382fc2e2bd7d9f29f026"
+      "sha256": "c2296b89b84e1cb37a27450aedec99b4f7a145443f5d8f13b90f730289a2e895"
     },
     "ranking": {
-      "bytes": 2482,
+      "bytes": 2634,
       "file": "ranking.json",
       "records": 10,
-      "schema": "ownmem-index.ranking/v3",
-      "sha256": "1d29a954724cd6dfec0a7ac00a3c851c03bdd774bb4a1e5f208f31a6fec322c1"
+      "schema": "ownmem-index.ranking/v4",
+      "sha256": "2bbe616c19e5055aa496e49b84e8a47a5bb97acf6d3ff3f26cdf15a70d53aaf7"
     }
   },
   "compatibility": {
     "fallback_policy": "rebuild-then-markdown-v1",
-    "minimum_reader_version": 4,
-    "query_result_schema": "ownmem-query-result/v1"
+    "minimum_reader_version": 5,
+    "query_result_schema": "ownmem-query-result/v6"
   },
   "compiler": {
     "name": "ownmem-compiler",
-    "version": "0.6.1"
+    "version": "0.10.0"
   },
   "schema": "ownmem-index/v1",
   "snapshot": {
-    "content_sha256": "f4495a95e713bc0c65597424d0ce82d59c883a69bc89fda594167c014a3b2891",
-    "created_at": "2026-08-18T09:36:09.763Z",
-    "id": "acbe511fe0a0781b3c3ff0bc1ef3feb4d6db82a7d76be8773b1d6b769370abdf"
+    "content_sha256": "7205218b1424afef795c245a482fa0d58798e386faa51da9e4805e9749fc324e",
+    "created_at": "2026-09-18T23:45:11.442Z",
+    "id": "f03c1cb532c12a145a109fd420868f5919a04d53ea5b914b597436e25cc9ac2e"
   },
   "source": {
     "active_topics": 4,
@@ -58,41 +58,41 @@
       {
         "bytes": 611,
         "kind": "l2",
-        "path": ".ownmem/MEMORY-general.md",
+        "path": "scripts/memory-public-assets/.ownmem/MEMORY-general.md",
         "sha256": "abbd42d9d17a09fa8012d3273639334e78d7ed0c0bea76a921a3b880fb8470b7"
       },
       {
         "bytes": 41,
         "kind": "catalog",
-        "path": ".ownmem/MEMORY.md",
+        "path": "scripts/memory-public-assets/.ownmem/MEMORY.md",
         "sha256": "d4b03e794a3b2f0a0c48e39ef0d9ba061e6ddaa3ecca016748723c9dccfe06fe"
       },
       {
         "bytes": 2176,
         "kind": "topic",
-        "path": ".ownmem/ci_latency_lock_needs_machine_scaling.md",
+        "path": "scripts/memory-public-assets/.ownmem/ci_latency_lock_needs_machine_scaling.md",
         "sha256": "165829ab0a902aff22c850d0b64cd61d73a16cfde8d802837a873ef327d343c0"
       },
       {
         "bytes": 1661,
         "kind": "topic",
-        "path": ".ownmem/lockfile_must_pin_canonical_registry.md",
+        "path": "scripts/memory-public-assets/.ownmem/lockfile_must_pin_canonical_registry.md",
         "sha256": "f035b148c647a44536e59eb8574f2066d070fcf6118aeb9cb23f1cf793b4d6f6"
       },
       {
         "bytes": 1975,
         "kind": "topic",
-        "path": ".ownmem/npm_publish_requires_2fa_and_ci_provenance.md",
+        "path": "scripts/memory-public-assets/.ownmem/npm_publish_requires_2fa_and_ci_provenance.md",
         "sha256": "a34a52e87d2e97be4ff07e85917af9bf380784bd8cf6ea6d5da9c531833021ba"
       },
       {
         "bytes": 2063,
         "kind": "topic",
-        "path": ".ownmem/offline_e2e_requires_fixture_owned_npm_cache.md",
+        "path": "scripts/memory-public-assets/.ownmem/offline_e2e_requires_fixture_owned_npm_cache.md",
         "sha256": "22e1eb8cce465467c7838d53f46559e677870ce6e3a62dc543d765e6a7b87524"
       }
     ],
-    "memory_dir": ".ownmem",
-    "source_sha256": "9b13ec09e6ee477a72e3679cb805a229b2bedbc4e059b6ca060c69086cb0e064"
+    "memory_dir": "scripts/memory-public-assets/.ownmem",
+    "source_sha256": "5d8161de37c57db9b19256327b9881027c4bcf87839527fe288182fee00e1a10"
   }
 }

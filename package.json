@@ -1,7 +1,7 @@
 {
   "name": "ownmem",
-  "version": "0.6.0",
-  "description": "Git-native project memory for AI coding agents. Deterministic local recall and evidence-governed evolution for Claude Code, Codex, Cursor, and Gemini CLI.",
+  "version": "0.7.0",
+  "description": "Git-native project memory for AI coding agents. Deterministic local recall for Claude Code, Codex, Cursor, and Gemini CLI.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "grpcer",
@@ -35,7 +35,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node ./test/structure-self-test.mjs && node ./test/public-self-test.mjs && node ./test/evolution-self-test.mjs",
+    "test": "node ./test/structure-self-test.mjs && node ./test/public-self-test.mjs",
     "test:structure": "node ./test/structure-self-test.mjs",
     "benchmark": "node ./benchmarks/public-benchmark.mjs --iterations 20",
     "benchmark:release": "node ./benchmarks/public-benchmark.mjs --iterations 100",

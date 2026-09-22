@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ownmem-query-result/v5",
+  "$id": "ownmem-query-result/v6",
   "title": "OwnMem memory query result envelope",
   "type": "object",
   "required": [
@@ -13,11 +13,13 @@
     "results",
     "abstain",
     "budget",
-    "warnings"
+    "warnings",
+    "delivery",
+    "pointers"
   ],
   "properties": {
     "schema": {
-      "const": "ownmem-query-result/v5"
+      "const": "ownmem-query-result/v6"
     },
     "trace_id": {
       "type": "string",
@@ -302,8 +304,10 @@
             "blocked-applicability",
             "blocked-risk",
             "budget-empty",
-            "all-candidates-excluded"
-          ]
+            "all-candidates-excluded",
+            "below-content-threshold"
+          ],
+          "description": "Why no prose was handed over. below-content-threshold is the tiered case: candidates cleared every gate but the best one scored under delivery.content_threshold, so pointers were sent instead of a quote."
         },
         "gate": {
           "enum": [
@@ -388,6 +392,16 @@
         "minLength": 1,
         "maxLength": 160
       }
+    },
+    "delivery": {
+      "$ref": "#/$defs/delivery"
+    },
+    "pointers": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/pointer"
+      }
     }
   },
   "allOf": [
@@ -424,7 +438,8 @@
                   "blocked-applicability",
                   "blocked-risk",
                   "budget-empty",
-                  "all-candidates-excluded"
+                  "all-candidates-excluded",
+                  "below-content-threshold"
                 ]
               },
               "gate": {
@@ -459,6 +474,98 @@
             }
           }
         }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "delivery": {
+            "type": "object",
+            "properties": {
+              "tier": {
+                "const": "abstain"
+              }
+            }
+          }
+        },
+        "required": [
+          "delivery"
+        ]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "maxItems": 0
+          },
+          "pointers": {
+            "type": "array",
+            "maxItems": 0
+          }
+        },
+        "description": "The abstain tier is nothing at all. A tier that names itself empty and then carries pointers is the two-state rounding this protocol replaced."
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "delivery": {
+            "type": "object",
+            "properties": {
+              "tier": {
+                "const": "pointers"
+              }
+            }
+          }
+        },
+        "required": [
+          "delivery"
+        ]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "maxItems": 0
+          },
+          "pointers": {
+            "type": "array",
+            "minItems": 1
+          }
+        },
+        "description": "The pointers tier hands over places to look and no prose. Prose here would be the quote the threshold just refused."
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "delivery": {
+            "type": "object",
+            "properties": {
+              "tier": {
+                "const": "content"
+              }
+            }
+          }
+        },
+        "required": [
+          "delivery"
+        ]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "minItems": 1
+          }
+        },
+        "description": "The content tier quotes at least one memory; pointers beside it are the qualified candidates the topic ceiling left out."
       }
     }
   ],
@@ -715,6 +822,130 @@
         }
       },
       "additionalProperties": false
+    },
+    "pointer": {
+      "type": "object",
+      "required": [
+        "memory_id",
+        "path",
+        "gate_score",
+        "summary"
+      ],
+      "additionalProperties": false,
+      "description": "A place to look, not an answer. Carried when the runtime understood the question well enough to name a memory but not well enough to quote it. The plan called for a read command alongside the summary; path is that command's only argument and every host already reads files, so spelling one out would cost about 15 tokens per pointer -- on a surface whose truncation rate is already 95% -- to restate the field above it, and would be wrong in any checkout whose CLI is installed under a different name.",
+      "properties": {
+        "memory_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Repository-relative path to the full text."
+        },
+        "gate_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "One line from the memory's own description. Never an excerpt chosen to fit the query: a pointer must not read as an answer."
+        },
+        "trust": {
+          "type": "object",
+          "required": [
+            "lifecycle",
+            "authority",
+            "action_risk",
+            "integrity"
+          ],
+          "properties": {
+            "lifecycle": {
+              "enum": [
+                "observed",
+                "candidate",
+                "shadow",
+                "advisory",
+                "active",
+                "stale",
+                "deprecated",
+                "rejected",
+                "superseded"
+              ]
+            },
+            "authority": {
+              "enum": [
+                "observed",
+                "advisory",
+                "normative",
+                "user-confirmed"
+              ]
+            },
+            "action_risk": {
+              "enum": [
+                "R0",
+                "R1",
+                "R2",
+                "R3",
+                "R4",
+                "R5"
+              ]
+            },
+            "logical_type": {
+              "description": "What kind of claim this memory makes, which is what decides the advice a delivery surface gives about a non-nominal result: a drifted code lesson is re-checked against the code, a recorded user preference has no code to check. Optional because it is the last thing compaction drops; when it is absent the advice falls back to a generic one instead of guessing.",
+              "enum": [
+                "normative",
+                "procedural",
+                "factual",
+                "diagnostic",
+                "preference",
+                "feedback"
+              ]
+            },
+            "integrity": {
+              "enum": [
+                "passed",
+                "advisory"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Carried only when it says something: a memory that is advisory, whose evidence drifted, or whose lifecycle never reached active. A pointer is a recommendation to go read something, and recommending an unverified memory without saying so moves the cost of finding that out onto the reader. Nominal trust is omitted for the same reason the result ladder drops it -- it describes every healthy memory and tells the reader nothing."
+        }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "required": [
+        "tier",
+        "content_threshold",
+        "eligible"
+      ],
+      "additionalProperties": false,
+      "description": "What the runtime did, and what it had to choose from. Separate from abstain, which says only whether prose was handed over.",
+      "properties": {
+        "tier": {
+          "enum": [
+            "content",
+            "pointers",
+            "abstain"
+          ]
+        },
+        "content_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Gate score at or above which the top candidate is quoted rather than pointed at."
+        },
+        "eligible": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Candidates that passed every gate, before the topic ceiling. budget.dropped_topics counts only what the token budget removed from the ones that fit the ceiling, so without this a reader cannot tell a single confident answer from one of nine."
+        }
+      }
     }
   },
   "additionalProperties": false

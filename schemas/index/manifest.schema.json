@@ -123,7 +123,7 @@
       "required": ["minimum_reader_version", "query_result_schema", "fallback_policy"],
       "properties": {
         "minimum_reader_version": { "type": "integer", "minimum": 1 },
-        "query_result_schema": { "const": "ownmem-query-result/v5" },
+        "query_result_schema": { "const": "ownmem-query-result/v6" },
         "fallback_policy": { "const": "rebuild-then-markdown-v1" }
       },
       "additionalProperties": false

@@ -25,8 +25,15 @@ the deterministic fusion rank them:
 npx ownmem recall --multi -- "symptom in plain words" "root-cause term" "english symbol"
 ```
 
-Open a hit's full topic file before relying on it, then verify against live
-code: memories record what was true when they were written.
+Recall answers in one of three tiers, and reading them as the same thing is the
+one mistake that undoes the design:
+
+- **content** — the memory's own text. It passed every gate; use it, then verify
+  against live code, because a memory records what was true when it was written.
+- **pointers** — up to three titles with the command that opens each one. This is
+  **not a short answer**. Open the topic before you rely on anything in it.
+- **abstain** — nothing is written down about this, and the envelope says which
+  gate refused. Not a search failure to retry with different words.
 
 ## Do not implement memory logic here
 

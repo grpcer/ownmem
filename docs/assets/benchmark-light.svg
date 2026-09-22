@@ -6,19 +6,19 @@
   <rect x="20" y="90" width="380" height="26" rx="4" fill="#2a78d6"/>
   <text x="390" y="107" text-anchor="end" font-size="12.5" font-weight="600" fill="#ffffff">100%</text>
   <text x="20" y="146" font-size="13" fill="#52514e">naive grep -F (same corpus)</text>
-  <rect x="20" y="156" width="12" height="26" rx="3" fill="#6e7681"/>
-  <text x="40" y="173" font-size="12.5" font-weight="600" fill="#52514e">3.1%</text>
+  <rect x="20" y="156" width="15" height="26" rx="3" fill="#6e7681"/>
+  <text x="43" y="173" font-size="12.5" font-weight="600" fill="#52514e">3.9%</text>
 
   <!-- Panel B: latency -->
   <text x="480" y="34" font-size="14" font-weight="600" fill="#0b0b0b">Recall latency — 4,200 samples</text>
   <text x="860" y="72" text-anchor="end" font-size="11.5" fill="#6e7681">release gate ≤ 5 ms</text>
   <line x1="860" y1="80" x2="860" y2="182" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 3"/>
   <text x="480" y="80" font-size="13" fill="#52514e">P50</text>
-  <rect x="480" y="90" width="89" height="26" rx="4" fill="#2a78d6"/>
-  <text x="577" y="107" font-size="12.5" font-weight="600" fill="#52514e">0.30 ms</text>
+  <rect x="480" y="90" width="35" height="26" rx="4" fill="#2a78d6"/>
+  <text x="523" y="107" font-size="12.5" font-weight="600" fill="#52514e">0.46 ms</text>
   <text x="480" y="146" font-size="13" fill="#52514e">P95</text>
-  <rect x="480" y="156" width="187" height="26" rx="4" fill="#2a78d6"/>
-  <text x="675" y="173" font-size="12.5" font-weight="600" fill="#52514e">0.57 ms</text>
+  <rect x="480" y="156" width="80" height="26" rx="4" fill="#2a78d6"/>
+  <text x="568" y="173" font-size="12.5" font-weight="600" fill="#52514e">1.05 ms</text>
 
   <!-- stats row -->
   <line x1="20" y1="216" x2="900" y2="216" stroke="#d0d7de" stroke-width="1"/>
@@ -32,5 +32,5 @@
     <text x="710" y="258" font-size="20" font-weight="600" fill="#0b0b0b">2</text>
     <text x="710" y="280" font-size="11.5" fill="#6e7681">runtime deps (pure JS: ajv, yaml)</text>
   </g>
-  <text x="20" y="316" font-size="11" fill="#8b949e">Apple M5 Pro · Node 25 · locked CC0 corpus · 25 timed iterations per query · reversed-order rerun reproduces identical rankings</text>
+  <text x="20" y="316" font-size="11" fill="#8b949e">Apple M1 Max · Node 22 · locked CC0 corpus · 25 timed iterations per query · reversed-order rerun reproduces identical rankings</text>
 </svg>

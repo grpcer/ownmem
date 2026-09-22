@@ -23,6 +23,78 @@ host. See [PLUGINS.md](./PLUGINS.md) for per-host refresh steps. After the
 package bump, `init --update` refreshes the in-repo adapters those hosts
 actually follow.
 
+## Moving from 0.6.0 to 0.7.0
+
+**After `npm install --save-dev ownmem@latest`, run `ownmem init --update`
+before anything else.** 0.6.0 installed three hooks
+that no longer exist — `PostToolUse`, `PostToolUseFailure`, and `Stop`, all
+routed to `ownmem hook posttool` or `ownmem hook stop`. Those subcommands are
+gone, so an upgraded installation that keeps them fires a command that exits
+non-zero on every Bash, WebFetch, WebSearch and MCP call the agent makes and at
+the end of every turn. Since 2026-09-20 the failure says so and names the fix:
+`memory hook 'posttool' was retired; ... Run ownmem init --update`. `init
+--update` removes the entries where they stand and leaves your own hooks — and
+anything else in that file — untouched; `init --check` reports a leftover as
+drift and prints the same one-line fix.
+
+The unattended governance layer is gone: `ownmem evolve`, `ownmem promote`,
+`ownmem tripwire`, `ownmem candidates`, `report --governance`, and the
+`--quarantine-file` option no longer exist. Local ledger files you already have
+— candidates, evolution, quarantine, trigger-backfill receipts — are not
+deleted; they are simply never read again. Delete them when you are ready to.
+
+`ownmem daily` no longer commits anything, no longer sets `core.hooksPath`, and
+no longer generates `<memory-dir>/git-hooks/post-commit`. The old
+`telemetry.auto_commit` and `telemetry.manage_hooks_path` keys in
+`<memory-dir>/config.json` are ignored rather than honoured, and `init --update`
+removes them for you.
+
+**If 0.6.0 claimed `core.hooksPath` for you, the upgrade does not give it back**
+— and this is the one piece of leftover state that fails silently. Git installs
+no repository hooks at all from a `core.hooksPath` that does not resolve, so once
+`<memory-dir>/git-hooks/` is gone — you delete it, a colleague clones without it,
+this version never regenerates it — *your own* hooks stop running and every
+commit still succeeds. Since 2026-09-20 `init --check` and `init --update` both
+report it as a note naming the exact command, rather than leaving you to find it:
+
+```bash
+git config --get core.hooksPath     # .ownmem/git-hooks, set by 0.6.0
+git config --unset core.hooksPath   # unless that directory is yours now
+```
+
+It is reported and never repaired: you may have pointed that setting somewhere
+deliberately since, and this version does not own it.
+
+Daily telemetry packages are `ownmem-telemetry-day/v3` and are written under the
+ignored local-data directory instead of inside the memory directory. They are
+not committed, and `report --fleet` — which merged committed packages across
+machines — is gone with them. Packages 0.6.0 already committed are left where
+they are and are no longer read.
+
+The recall envelope gained a delivery tier. `recall --json` now carries
+`delivery{tier, content_threshold, eligible}` and a separate `pointers[]` array,
+where `tier` is `content`, `pointers`, or `abstain`. Anything that reads
+`results[]` as the whole delivery will now silently miss qualified memories the
+envelope handed over as pointers — including any trust disclosure attached to
+them. `abstain.reason` gained `below-content-threshold` and the three
+`blocked-*` values that were previously all reported as `no-trusted-candidate`.
+
+The compiled index is rebuilt rather than migrated. 0.6.0's snapshots declare
+artifact contracts this reader does not accept, so the first recall after the
+upgrade rebuilds from your Markdown sources and says so in the envelope
+(`source.status: "rebuilt"`, `source.rebuild_trigger: "manifest-invalid"`). The
+old snapshot directories are left on disk, unread; delete
+`<memory-dir>/.ownmem/index/snapshots/` when you want the space back.
+
+A feedback ledger written by a version older than 0.6.0 is not migrated either.
+`ownmem report` now declares the rows it could not read, because they are absent
+from the north star and from every verdict count rather than merely uncounted.
+Rewrite or delete `.local-test/memory-recall-feedback.jsonl` when you see that
+line.
+
+Two new commands: `ownmem new NAME` scaffolds a memory that already passes every
+gate, and `ownmem mcp` serves recall and read over MCP on stdio.
+
 ## Moving from 0.5.x to 0.6.0
 
 Events record `surface` as `hook` rather than `claude-hook`, and carry two new
@@ -82,26 +154,11 @@ For a normal 0.2.x repository:
 2. run `ownmem init --update` to create the trust baseline for the existing
    corpus and refresh host adapters;
 3. run `ownmem audit` and resolve every blocking issue;
-4. run `ownmem compile` and reopen the agent;
-5. inspect `ownmem evolve status` and disable the repository-local coordinator
-   if unattended R0 metadata evolution is not desired.
+4. run `ownmem compile` and reopen the agent.
 
 Local telemetry from pre-0.3 schemas is discardable and is not migrated or
 dual-parsed. Delete the old Git-ignored local telemetry directory if the CLI
 reports a schema mismatch; current events will be collected from a clean slate.
-
-## Automation controls
-
-```bash
-npx ownmem evolve status
-npx ownmem evolve disable
-npx ownmem evolve enable
-npx ownmem evolve run --force
-```
-
-Disabling evolution does not disable recall, trust checks, audit, or manual
-maintenance. It only stops the end-of-turn unattended coordinator for that
-repository.
 
 ## Release status
 

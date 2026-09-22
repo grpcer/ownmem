@@ -5,6 +5,230 @@ Versioning.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-22
+
+The observation-window and fleet work that was built and removed again between
+0.6.0 and this release was never published, so it is not recorded as an
+addition followed by a removal; every entry below is stated against 0.6.0,
+which is what consumers had.
+
+### Breaking
+
+- The unattended governance layer is removed: `ownmem evolve`, `ownmem promote`,
+  `ownmem tripwire`, `ownmem candidates`, `report --governance`,
+  `--quarantine-file`, and the `memory-maintenance` module. In 703 runs it
+  promoted nothing and rolled back nothing, and the promotion, quarantine, and
+  tripwire ledgers it was documented as keeping had never been created. Local
+  ledger files a consumer already has are not deleted; they are no longer read.
+- `PostToolUse`, `PostToolUseFailure`, and `Stop` hooks are removed, together
+  with the `hook posttool` and `hook stop` subcommands and the three events they
+  collected. The events had no reader anywhere in the package. **Run
+  `ownmem init --update`:** an installation that keeps the 0.6.0 entries now
+  fires a command that exits non-zero on every Bash call. `--update` removes
+  them where they stand and `--check` reports a leftover as drift.
+- `ownmem daily` no longer commits, no longer claims `core.hooksPath`, and no
+  longer generates `<memory-dir>/git-hooks/post-commit`. The
+  `telemetry.auto_commit` and `telemetry.manage_hooks_path` keys are ignored
+  rather than honoured. A `core.hooksPath` that 0.6.0 claimed is not handed
+  back automatically; check and unset it yourself.
+- Daily packages are `ownmem-telemetry-day/v3` and live under the gitignored
+  observability tree rather than inside the memory directory, so they are no
+  longer committed. `report --fleet`, which merged committed packages across
+  machines, is removed with them. A finished v2 package on disk is kept, not
+  rewritten and not read.
+- The recall envelope is `ownmem-query-result/v6`, up from v5, and the index
+  manifest's `compatibility.query_result_schema` follows. The shape changed and
+  the version did not, so for a while 0.6.0 envelopes and 2.0 envelopes shared
+  one version number while failing each other's validator — and that number is
+  the only thing a consumer can tell them apart by. A v5 snapshot on disk is now
+  judged incompatible and rebuilt rather than read.
+- The recall envelope gained `delivery{tier, content_threshold, eligible}` and a
+  separate `pointers[]` array. A consumer that reads `results[]` as the whole
+  delivery now silently drops qualified memories handed over as pointers, and
+  any trust disclosure attached to them. `abstain.reason` gained
+  `below-content-threshold`, `blocked-validity`, `blocked-applicability`, and
+  `blocked-risk`; the last three were previously reported as
+  `no-trusted-candidate`, which asks the caller for the opposite response.
+- `max_active_bytes` is removed from the quota lock. In seven weeks it was
+  raised by hand six times, and the lock's own rationale gives the same reason
+  each time — no compliant swap-out, raised to the new entry's exact byte count,
+  no headroom — which is to say the ceiling was always set equal to the present
+  and never refused anything. Net-zero growth is carried by the entry count,
+  which still ratchets downward only.
+
+### Added
+
+- `ownmem recall` delivers in three tiers instead of two. Above the content
+  threshold it quotes the memory; below it, with qualified candidates, it
+  returns up to three pointers — a title, one line, and the command that opens
+  the topic; with no qualified candidate it abstains and names the reason. The
+  threshold is read off the measured ablation curve, not chosen by taste: it is
+  the smallest value at which false delivery stops falling. Every renderer
+  states that a pointer is not an answer.
+- `ownmem new NAME` scaffolds one memory that already passes every gate,
+  including the trust receipt and the area-index routing line, and refuses
+  before writing the file when the corpus is at its quota. The frontmatter
+  schema and several rules that existed only in prose were previously
+  discoverable only by writing an entry and being told it was wrong.
+- `ownmem mcp` serves recall and read over MCP on stdio, hand-rolled with no
+  dependencies. Exactly two tools, neither of which can change a memory: the
+  gate commands (`audit`, `trust`, `compile`) and every memory write stay off
+  the surface. `read` is the only producer of the consumption receipt
+  on a host with no tool-level hook, which is the case this server exists for.
+- `report` answers four questions by default — whether memory is being used,
+  whether it is fast enough, whether it is right, and what to do next — and
+  `report --full` restores the cohort splits, abstention reasons, token
+  distribution, and build counters. Data gaps are never hidden either way.
+- The evidence verifier reports `symbol-not-a-definition` when an anchor's
+  slice matched a comment or a call site rather than a definition. Such a
+  receipt reads as healthy while vouching for the wrong block, and refreshing
+  it only re-signs the comment.
+- `ownmem archive` reports a finished day it declined to rewrite as `kept`
+  rather than as unchanged.
+
+### Changed
+
+- Recall and compiler stack identity advances to `0.11.0`. Three-tier delivery
+  and the coverage requirement for quoting changed what recall hands over, so
+  the current-engine telemetry cohort and the embedding A/B evidence the console
+  accepts start fresh instead of mixing in `0.10.x` behaviour. The ranking
+  profile hash is unchanged.
+- Recall is faster on both paths. Trust is evaluated after the two relevance
+  gates rather than over every candidate, code-anchor fingerprints are memoised
+  per `(inode, size, mtime, ctime)`, and the snapshot reader parses the bytes it
+  already holds instead of re-running the schema check the compiler just ran.
+  The hot path fell from 20.8ms to 3.0ms P95 and the cold path from 369ms to
+  281ms, with the full ranker output over the whole evaluation corpus identical
+  byte for byte before and after.
+- The recall daemon idles for 30 minutes instead of 5, loads the snapshot at
+  start rather than on first query, and watches only `*.md` under the memory
+  directory, so ledger and lock writes no longer kill the resident process.
+  `SessionStart` warms it. An end-to-end Edit hook takes 120ms once the daemon
+  is ready, against 450–530ms before.
+- Quoting a memory now also requires that it explain the question, so **more
+  queries arrive as pointers than before**. Clearing the content threshold is no
+  longer sufficient: the top candidate must additionally cover at least
+  `coverage_floor` (0.45, the constant the ranker's relevance gate already used)
+  of the query — character-span coverage for natural-language queries, the
+  IDF-weighted coverage for identifier, path and error lookups, because a
+  one-token symbol query has a span coverage of exactly 0 or 1. Nothing about
+  ranking changed and no relevance gate moved, so a memory that fails this is
+  handed over as a pointer rather than lost, and `ranking_profile_hash` is
+  unchanged. Measured on the maintainer's corpus: of the queries a human had
+  filed a wrong-delivery receipt for, those still answered with prose fell from
+  21 of 106 to 8 of 106, the curated quality cases kept every correct quotation
+  (40 of 40, none lost), and Recall@1 on every partition is identical to the
+  digit. A consumer that treats `results[]` as the only answer surface will see
+  this as a drop in answers; it is the same answers, arriving as pointers.
+  `gate_score` alone was the weaker signal it replaced: over 336 quoted
+  deliveries it separates right from wrong with AUC 0.812, but only 0.667 once
+  self-proving smoke questions are excluded, where coverage reaches 0.886.
+- `ownmem report`'s north star is the **known false-delivery residual**: of every
+  distinct query a `wrong` retrieval receipt was recorded for, the share still
+  answered with prose, replayed against the index on disk. Both halves are
+  already-recorded facts and it falls only when retrieval improves. It replaces
+  the confirmed full-text-open rate, which the 400-token envelope is designed to
+  keep low and which was never an outcome; that funnel is still printed, as a
+  coverage floor, now alongside a pointer-tier funnel (pointer deliveries and how
+  many were opened) that the delivery counters could not see, because a pointers
+  envelope is recorded as an abstention. The report object is
+  `ownmem-report/v9`: `quality.false_delivery` is new, `delivery` gained four
+  pointer fields, and `metric_roles.north_star` changed value. The replay costs
+  about a second on a hundred-receipt ledger, so it is opt-in — the CLI does it,
+  `--no-replay` turns it off, and a programmatic caller gets an explicit
+  `not_measured` with the reason rather than a rate over zero replays.
+- The console's headline figure is the same north star the CLI reports, the known
+  false-delivery residual. It used to be the confirmed full-text-open rate under a
+  message key literally named `north_star`, so one word meant two things depending
+  on which entry point you opened. The open rate is still shown, as the middle bar
+  of the funnel beside it, under a name that says what it counts. An unmeasured
+  residual renders as unavailable rather than as 0%, because nothing measured and
+  nothing left over are opposite readings and a percentage cannot tell them apart.
+  The replay costs about a second, so the server builds it once per process and
+  remembers each query's result, keyed on the feedback ledger and the compiled
+  snapshot; only the current window gets it, since the residual is a property of
+  the whole ledger and not of a time range. Message catalogs: `north_star` and
+  `north_star_help` changed meaning, `no_residual` and `fulltext_open` are new,
+  `no_consumption` is removed, in all 16 locales; nothing else in the catalogs
+  moved.
+- An unanswered recall now offers both endings on the command line. Only
+  `retrieval_miss` was ever suggested, and it requires naming the memory that
+  should have come back, so a reader whose honest report is "none of these, and I
+  do not think anybody wrote this down" had no verdict they could use. That
+  reader's verdict is `coverage_gap`, which carries no expected memory, and it is
+  the commoner outcome on this surface: of the pointer deliveries this
+  repository's own machine produced, every one that later received a verdict was
+  a coverage gap and none was a correct answer.
+- Upgrading from 0.6.0 now says what to do at each point it can go wrong, which
+  was measured by upgrading a real 0.6.0 checkout in place rather than by
+  installing fresh. A retired hook subcommand names itself retired and points at
+  `ownmem init --update`, instead of reporting only `unknown memory hook command:
+  posttool` on every Bash, WebFetch, WebSearch and MCP call and at the end of
+  every turn. `init --check` prints the one command that clears the drift it just
+  listed. And `core.hooksPath` left pointing at the `git-hooks` directory an
+  earlier version generated is reported as a note on every `init` run, with the
+  `git config --unset` line — it is the one leftover that fails in silence, since
+  git installs no repository hooks at all from a path that does not resolve, so
+  the repository's own hooks stop running and commits keep succeeding. It is
+  reported and never repaired: the setting may be yours now.
+- `report` declares the feedback rows it could not read. A ledger written under an
+  older schema was simply absent from the north star and from every verdict count,
+  which reads as "nobody ever reported a wrong answer" rather than as "your
+  history is no longer being parsed".
+- A snapshot this reader rejects is reported as `manifest-invalid` rather than as
+  `missing`. When both the current and the previous pointer carry an older
+  artifact contract — exactly what a 0.6.0 install looks like — the reader raises
+  one aggregate error whose text reads as absence, and the published
+  `source.rebuild_trigger` inherited that wording. Nothing was missing: both
+  snapshots were found, read and rejected, and the rebuild is correct either way.
+- `matched_terms` no longer reports words the query does not contain. The n-gram
+  and fuzzy lanes were adding the indexed token they matched through, and the
+  graph lane was adding the name of the memory it hopped from, so an envelope
+  could list another memory's name among "matched terms". Each lane now keeps the
+  query side and the corpus side apart and publishes only the query side. Ranking
+  is unaffected -- the span-coverage feature still reads both, which is what keeps
+  an inflected query word from being scored as irrelevant -- and every evaluation
+  metric is identical before and after.
+- The actual-application rate keeps its line and now states that it is expected
+  to stay unmeasured. Only a user or the host may confirm an outcome receipt, and
+  a user judges the deliverable rather than which memory was injected, so the
+  numerator is not waiting on a lower confirmation bar. The one surface that can
+  produce it is `--confirmed-by host`: a gate or test confirming the memory's own
+  assertion. `recall.consumed` is still not a substitute — a confirmed full-text
+  open proves a body was read, never that the answer used it.
+
+### Fixed
+
+- Codex edits now reach recall. Codex selects the `Edit|Write` hook through its
+  matcher aliases but reports the canonical tool name `apply_patch`, with the raw
+  patch as `tool_input.command`; the hook accepted only `Edit` and `Write`, so
+  every Codex edit invoked it and returned before recalling anything. The target
+  is now the first file header in the patch.
+- A root `CLAUDE.md` or `GEMINI.md` is detected as a host marker. A first
+  `ownmem init` without `--hosts` recognised Claude Code only from a `.claude/`
+  directory, so a repository with just `CLAUDE.md` installed every host except
+  the one it was written for.
+- `ownmem init --check` before the first install names the previewed command as
+  the fix instead of `ownmem init --update`, which on a repository with no
+  config installs the core layer without hooks.
+- A recorded feedback entry can now reach a closed state, so the review queue can
+  reach zero. `stale` closes when the reported memory has been re-signed since
+  the feedback was filed — judged on the trust receipt, never on the
+  hand-editable `last_verified` — and `coverage_gap`, which carries no expected
+  topic and so cannot be replayed, closes on a written ruling about where the gap
+  belongs. A dismissed `coverage_gap` leaves the actionable count; a dismissed
+  `retrieval_miss` does not, because that retrieval failure is still real and
+  only its trigger lane was closed.
+- A test-run ingest that records one changed outcome no longer rewrites every
+  other stored outcome. Records whose graded fields (result, fingerprint,
+  counts) match what the ledger already holds keep their stored entry, so the
+  git-tracked `test-runs.lock.json` diff carries only the suites that actually
+  moved instead of a fresh `run_id` and `duration_ms` on each of them.
+- A test anchor is no longer captured by a production file that names its own
+  suite in a comment. The weak match that accepted any file containing the
+  identifier ran before the repository-wide lookup, so the receipt bound to a
+  doc comment instead of to the test.
+
 ## [0.6.0] - 2026-09-09
 
 ### Breaking
@@ -63,6 +287,12 @@ Versioning.
 
 ### Fixed
 
+- A daily package names as its release point the earliest commit that declared
+  the current version, rather than walking back from the day and stopping at the
+  first commit that declared a different one. A version bump that is reverted --
+  prepared, called off, and set back -- made that walk stop at the revert and
+  compare the day's tree against a tree that was never published, so
+  `unreleased_delta` reported no delta for code that is entirely unreleased.
 - The daily pass points `core.hooksPath` at `<memory-dir>/git-hooks/`, which
   `ownmem init` generates, and leaves the setting alone until that directory
   holds a `post-commit` hook. A path in this project's own checkout was used

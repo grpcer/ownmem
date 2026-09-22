@@ -4,7 +4,10 @@
   "title": "OwnMem recall evaluation cases",
   "description": "Fixture contract for an offline recall evaluation set. A cases file is data, never code: it is loaded by --cases-file, so no consumer may assume a particular path on disk, and no consumer may assume the file exists at all. Repositories keep their real corpus private; the published tree ships benchmarks/recall-cases.sample.json as the smallest fixture that exercises the same contract.",
   "type": "object",
-  "required": ["golden", "negative"],
+  "required": [
+    "golden",
+    "negative"
+  ],
   "properties": {
     "schema": {
       "const": "ownmem-recall-benchmark/v4",
@@ -18,17 +21,26 @@
     },
     "privacy": {
       "type": "object",
-      "required": ["visibility"],
+      "required": [
+        "visibility"
+      ],
       "properties": {
         "visibility": {
-          "enum": ["public", "private"],
+          "enum": [
+            "public",
+            "private"
+          ],
           "description": "public: the queries carry no repository, product or personal specifics and may be published. private: the file stays in its own repository and is never exported."
         },
         "deidentified_only": {
           "type": "boolean",
           "description": "True when every case derived from real usage was rewritten to remove identifying detail."
         },
-        "notes": { "type": "string", "minLength": 1, "maxLength": 2048 }
+        "notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
       },
       "additionalProperties": false
     },
@@ -38,11 +50,19 @@
       "properties": {
         "sources": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
           "maxItems": 16
         },
-        "requires_deidentified_rewrite": { "type": "boolean" },
-        "golden_derivation_forbidden": { "type": "boolean" },
+        "requires_deidentified_rewrite": {
+          "type": "boolean"
+        },
+        "golden_derivation_forbidden": {
+          "type": "boolean"
+        },
         "derivation_similarity_limit": {
           "type": "number",
           "exclusiveMinimum": 0,
@@ -55,17 +75,23 @@
     "golden": {
       "type": "array",
       "description": "Cases with a known correct answer. Ranking metrics are computed over these.",
-      "items": { "$ref": "#/$defs/goldenCase" }
+      "items": {
+        "$ref": "#/$defs/goldenCase"
+      }
     },
     "negative": {
       "type": "array",
       "description": "Cases with no correct answer. Abstention metrics are computed over these; a returned candidate is a false positive.",
-      "items": { "$ref": "#/$defs/negativeCase" }
+      "items": {
+        "$ref": "#/$defs/negativeCase"
+      }
     },
     "behavioral": {
       "type": "array",
       "description": "Cases whose correct answer is a behavior rather than a rank. A golden case can only say \"this name should come back first\" and a negative case can only say \"nothing should come back\"; neither can say \"a gate should stop this for that reason\" or \"this should still be delivered, but marked advisory\". Negation, conflict, staleness, prompt injection and a degraded provider all have that shape, so they were previously untestable and stayed as unit-level constructions over synthetic corpora. Assertions are restricted to envelope fields a caller can rely on: memory_id, path, trust, excerpt, authority_docs, explanation, the top-level abstain block, warnings and budget.",
-      "items": { "$ref": "#/$defs/behavioralCase" }
+      "items": {
+        "$ref": "#/$defs/behavioralCase"
+      }
     }
   },
   "additionalProperties": false,
@@ -89,7 +115,11 @@
       "description": "Query class, reported as a metric breakdown. Golden sets use identifier (exact symbol, command or error string), anchor (a name that exists verbatim in the corpus) and natural (how a person describes the symptom). Negative sets use external (nothing in the corpus is near it) and hard (adjacent vocabulary that must still abstain)."
     },
     "partition": {
-      "enum": ["regression", "challenge", "holdout"],
+      "enum": [
+        "regression",
+        "challenge",
+        "holdout"
+      ],
       "description": "regression: locked behavior that must not degrade. challenge: deliberately harder rewrites. holdout: never used for tuning, so a gate can read it as evidence rather than as a target."
     },
     "source": {
@@ -117,35 +147,70 @@
     },
     "goldenCase": {
       "type": "object",
-      "required": ["query", "expected"],
+      "required": [
+        "query",
+        "expected"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/caseId" },
-        "query": { "$ref": "#/$defs/query" },
+        "id": {
+          "$ref": "#/$defs/caseId"
+        },
+        "query": {
+          "$ref": "#/$defs/query"
+        },
         "expected": {
           "oneOf": [
-            { "type": "string", "minLength": 1, "maxLength": 128 },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
             {
               "type": "array",
               "minItems": 1,
               "maxItems": 16,
-              "items": { "type": "string", "minLength": 1, "maxLength": 128 }
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
             }
           ],
           "description": "Memory name, or names, any one of which counts as correct at that rank."
         },
-        "group": { "$ref": "#/$defs/group" },
-        "partition": { "$ref": "#/$defs/partition" },
-        "source": { "$ref": "#/$defs/source" },
-        "added_at": { "$ref": "#/$defs/addedAt" },
+        "group": {
+          "$ref": "#/$defs/group"
+        },
+        "partition": {
+          "$ref": "#/$defs/partition"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "added_at": {
+          "$ref": "#/$defs/addedAt"
+        },
         "rewrite_kind": {
           "type": "string",
           "minLength": 1,
           "maxLength": 64,
           "description": "How a challenge case was rewritten, for example cross_lingual, debranded, symptomized or colloquial."
         },
-        "smoke": { "$ref": "#/$defs/smoke" },
-        "deidentified": { "$ref": "#/$defs/deidentified" },
-        "feedback_sha256": { "$ref": "#/$defs/feedbackSha256" }
+        "smoke": {
+          "$ref": "#/$defs/smoke"
+        },
+        "deidentified": {
+          "$ref": "#/$defs/deidentified"
+        },
+        "feedback_sha256": {
+          "$ref": "#/$defs/feedbackSha256"
+        },
+        "grounded": {
+          "$ref": "#/$defs/grounded"
+        },
+        "grounding": {
+          "$ref": "#/$defs/grounding"
+        }
       },
       "additionalProperties": false
     },
@@ -167,7 +232,10 @@
       "description": "What the case is evidence about, reported as a breakdown so a missing dimension reads as missing rather than as a passing suite. negation: the query denies or forbids something. unauthorized_action: the query asks for a destructive action without any sign that it was authorized. conflict: two memories disagree, or one retired the other. unverified_delivery: the right answer has to arrive carrying its own label -- a memory whose lifecycle never reached active is correct to return and must not be presented as established fact. It was called `stale` until 2026-08-20, which was a misnomer: wall-clock staleness is a different verdict, and no memory in this corpus is anywhere near the 730-day threshold, so a real case cannot be written yet. The benchmark reports that unreachability by name rather than letting this label imply it was covered. no_answer: nothing in the corpus answers it. multi_hop: no single memory is the answer. streaming_reuse: a symptom already recorded, described in words the recording did not use. scope_applicability: guidance recorded for one platform, asked about another. prompt_injection: the query tries to make the host disregard its own instructions. provider_degraded: an optional retrieval provider is unavailable and the deterministic lane has to carry the query alone. budget_degradation: the answer does not fit and has to be cut down. nominal_lookup: the query is a title rather than a sentence -- a bare noun phrase that happens to open with a word which is also a dangerous verb, which the risk gate has to read as a lookup and not as an order."
     },
     "caseStatus": {
-      "enum": ["enforced", "known_gap"],
+      "enum": [
+        "enforced",
+        "known_gap"
+      ],
       "description": "enforced: a mismatch is a regression and fails the run. known_gap: the expectation is the behavior that would be correct, the system does not do it yet, and the case is counted and named instead of failing the run -- and starts failing the moment it passes, so a fix cannot leave a stale expectation behind. A fixture is data, not a wish list: known_gap exists so a case can state the correct answer without either lying about the current behavior or being deleted for being red."
     },
     "memoryIdList": {
@@ -175,18 +243,37 @@
       "minItems": 1,
       "maxItems": 8,
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1, "maxLength": 128 }
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      }
     },
     "behavioralExpectation": {
       "type": "object",
-      "required": ["outcome"],
+      "required": [
+        "outcome"
+      ],
       "properties": {
         "outcome": {
-          "enum": ["delivered", "abstained", "blocked"],
-          "description": "delivered: abstain.abstained is false and at least one result came back. abstained: nothing came back because nothing was relevant or nothing fit, which is gate relevance or budget. blocked: nothing came back because a gate stopped it, which is gate validity, applicability or risk. Splitting the last two matters: \"found nothing\" and \"found something and refused it\" are different behaviors and a single abstained flag cannot tell them apart."
+          "enum": [
+            "delivered",
+            "pointed",
+            "abstained",
+            "blocked",
+            "not_blocked",
+            "not_quoted"
+          ],
+          "description": "delivered: prose came back. pointed: the query cleared every gate but scored below the confidence needed to quote, so the envelope named memories instead. abstained: nothing came back because nothing was relevant or nothing fit, which is gate relevance or budget. blocked: nothing came back because a gate stopped it, which is gate validity, applicability or risk. not_blocked: delivered or pointed -- for cases whose evidence is the gate's decision and not the ranker's confidence. not_quoted: pointed or abstained -- the mirror image, for cases whose evidence is that a question must not be answered with prose taken from a memory about something else; naming somewhere to look and saying nothing are both honest there, and pinning one of them would make the case fail whenever a neighbouring memory crosses the relevance floor for unrelated reasons. Splitting these matters: \"found nothing\", \"found something and refused it\" and \"found something and would not vouch for it\" are three different behaviors, and one abstained flag cannot tell them apart."
         },
         "gate": {
-          "enum": ["relevance", "validity", "applicability", "risk", "budget"],
+          "enum": [
+            "relevance",
+            "validity",
+            "applicability",
+            "risk",
+            "budget"
+          ],
           "description": "The value abstain.gate must carry. Only meaningful when the outcome is not delivered."
         },
         "reason": {
@@ -209,22 +296,68 @@
           "description": "The memory that must come back at rank 1."
         },
         "memory_ids": {
-          "allOf": [{ "$ref": "#/$defs/memoryIdList" }],
+          "allOf": [
+            {
+              "$ref": "#/$defs/memoryIdList"
+            }
+          ],
           "description": "Every one of these must be present in results, in any order. This is what a multi-hop case needs and a golden case cannot express: golden expected means any one of, this means all of."
         },
         "forbidden_memory_ids": {
-          "allOf": [{ "$ref": "#/$defs/memoryIdList" }],
+          "allOf": [
+            {
+              "$ref": "#/$defs/memoryIdList"
+            }
+          ],
           "description": "None of these may appear in results. Retired guidance, and guidance recorded for another platform, are still in the corpus and still retrievable; the assertion that matters is that they do not reach the caller."
         },
         "trust": {
           "type": "object",
           "description": "The trust block a named result must carry. This is how a case says \"delivered, but not as an established fact\" -- the shape that neither a rank nor an abstention can express. Only assert it at the expanded tier: the default budget is allowed to drop a nominal trust block.",
           "properties": {
-            "memory_id": { "type": "string", "minLength": 1, "maxLength": 128, "description": "Which result to check. Defaults to rank 1." },
-            "lifecycle": { "enum": ["observed", "candidate", "shadow", "advisory", "active", "stale", "deprecated", "rejected", "superseded"] },
-            "authority": { "enum": ["observed", "advisory", "normative", "user-confirmed"] },
-            "action_risk": { "enum": ["R0", "R1", "R2", "R3", "R4", "R5"] },
-            "integrity": { "enum": ["passed", "advisory"] }
+            "memory_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "description": "Which result to check. Defaults to rank 1."
+            },
+            "lifecycle": {
+              "enum": [
+                "observed",
+                "candidate",
+                "shadow",
+                "advisory",
+                "active",
+                "stale",
+                "deprecated",
+                "rejected",
+                "superseded"
+              ]
+            },
+            "authority": {
+              "enum": [
+                "observed",
+                "advisory",
+                "normative",
+                "user-confirmed"
+              ]
+            },
+            "action_risk": {
+              "enum": [
+                "R0",
+                "R1",
+                "R2",
+                "R3",
+                "R4",
+                "R5"
+              ]
+            },
+            "integrity": {
+              "enum": [
+                "passed",
+                "advisory"
+              ]
+            }
           },
           "additionalProperties": false
         },
@@ -238,8 +371,14 @@
           "type": "object",
           "description": "What the envelope must report about fitting the answer into the caller's context.",
           "properties": {
-            "truncated": { "type": "boolean" },
-            "max_estimated_tokens": { "type": "integer", "minimum": 1, "maximum": 1200 }
+            "truncated": {
+              "type": "boolean"
+            },
+            "max_estimated_tokens": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1200
+            }
           },
           "additionalProperties": false
         }
@@ -248,12 +387,26 @@
     },
     "behavioralCase": {
       "type": "object",
-      "required": ["id", "query", "dimension", "expect", "rationale"],
+      "required": [
+        "id",
+        "query",
+        "dimension",
+        "expect",
+        "rationale"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/caseId" },
-        "query": { "$ref": "#/$defs/query" },
-        "dimension": { "$ref": "#/$defs/dimension" },
-        "expect": { "$ref": "#/$defs/behavioralExpectation" },
+        "id": {
+          "$ref": "#/$defs/caseId"
+        },
+        "query": {
+          "$ref": "#/$defs/query"
+        },
+        "dimension": {
+          "$ref": "#/$defs/dimension"
+        },
+        "expect": {
+          "$ref": "#/$defs/behavioralExpectation"
+        },
         "rationale": {
           "type": "string",
           "minLength": 16,
@@ -261,7 +414,10 @@
           "description": "Why this expectation is the correct behavior, in the author's own words. Required because a behavioral expectation is a judgement, not a measurement: without the reasoning, a later reader cannot tell a deliberate contract from a recorded accident, and the cheapest way to make a red case green is to quietly rewrite the expectation into whatever the code now does."
         },
         "risk_probe": {
-          "enum": ["unauthorized_high_risk", "high_risk_control"],
+          "enum": [
+            "unauthorized_high_risk",
+            "high_risk_control"
+          ],
           "description": "What this query is, as ground truth for the high-risk false-allow rate. unauthorized_high_risk: the query asks the agent to carry out a destructive or exfiltrating action and carries no sign of authorization, so delivering anything in reply is a false allow. high_risk_control: the query names the same dangerous vocabulary but is authorized or is a question about the action, so it must still be answered; controls are reported beside the rate and never inside it, because a gate can drive the rate to zero by refusing everything. The label classifies the query and never the behavior -- expect still records what the system does today -- but an enforced case may not contradict its own label, which is what keeps the metric from being satisfied by relabelling instead of fixing. Only labelled cases are counted: a query that requests no dangerous action is not an occasion to allow one, and padding the denominator with those would buy a flattering rate that measures nothing."
         },
         "gap_reason": {
@@ -270,39 +426,89 @@
           "maxLength": 1024,
           "description": "Required when status is known_gap: what the system does today instead, so the defect is readable without re-running anything."
         },
-        "status": { "$ref": "#/$defs/caseStatus" },
+        "status": {
+          "$ref": "#/$defs/caseStatus"
+        },
         "tier": {
-          "enum": ["default", "expanded"],
+          "enum": [
+            "default",
+            "expanded"
+          ],
           "description": "Which context budget to query with. Defaults to expanded, because most of what a behavioral case asserts is what the default budget is allowed to compact away."
         },
         "channel": {
-          "enum": ["deterministic", "embedding_degraded"],
+          "enum": [
+            "deterministic",
+            "embedding_degraded"
+          ],
           "description": "deterministic: the ordinary lane. embedding_degraded: the same query with the optional embedding provider unavailable, which must fall back to the deterministic lane and say so in the warnings rather than answer differently."
         },
-        "partition": { "$ref": "#/$defs/partition" },
-        "source": { "$ref": "#/$defs/source" },
-        "added_at": { "$ref": "#/$defs/addedAt" },
-        "smoke": { "$ref": "#/$defs/smoke" },
-        "deidentified": { "$ref": "#/$defs/deidentified" },
-        "feedback_sha256": { "$ref": "#/$defs/feedbackSha256" }
+        "partition": {
+          "$ref": "#/$defs/partition"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "added_at": {
+          "$ref": "#/$defs/addedAt"
+        },
+        "smoke": {
+          "$ref": "#/$defs/smoke"
+        },
+        "deidentified": {
+          "$ref": "#/$defs/deidentified"
+        },
+        "feedback_sha256": {
+          "$ref": "#/$defs/feedbackSha256"
+        }
       },
       "additionalProperties": false
     },
     "negativeCase": {
       "type": "object",
-      "required": ["query"],
+      "required": [
+        "query"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/caseId" },
-        "query": { "$ref": "#/$defs/query" },
-        "group": { "$ref": "#/$defs/group" },
-        "partition": { "$ref": "#/$defs/partition" },
-        "source": { "$ref": "#/$defs/source" },
-        "added_at": { "$ref": "#/$defs/addedAt" },
-        "smoke": { "$ref": "#/$defs/smoke" },
-        "deidentified": { "$ref": "#/$defs/deidentified" },
-        "feedback_sha256": { "$ref": "#/$defs/feedbackSha256" }
+        "id": {
+          "$ref": "#/$defs/caseId"
+        },
+        "query": {
+          "$ref": "#/$defs/query"
+        },
+        "group": {
+          "$ref": "#/$defs/group"
+        },
+        "partition": {
+          "$ref": "#/$defs/partition"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "added_at": {
+          "$ref": "#/$defs/addedAt"
+        },
+        "smoke": {
+          "$ref": "#/$defs/smoke"
+        },
+        "deidentified": {
+          "$ref": "#/$defs/deidentified"
+        },
+        "feedback_sha256": {
+          "$ref": "#/$defs/feedbackSha256"
+        }
       },
       "additionalProperties": false
+    },
+    "grounded": {
+      "type": "boolean",
+      "description": "Machine-generated query cleared the grounding floor: enough of its terms appear in the memory it is labelled with. Only cases with true enter quality metrics."
+    },
+    "grounding": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Measured share of query terms present in the target memory, recorded so the grounding verdict is auditable in the fixture."
     }
   }
 }

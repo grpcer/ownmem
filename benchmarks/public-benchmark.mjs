@@ -17,6 +17,7 @@ import { compileMemoryIndex } from '../lib/memory-compiler.mjs';
 import {
   createMemoryRecallRuntime,
   MEMORY_RECALL_RUNTIME_VERSION,
+  memoryEnvelopeHandedOver,
   memoryRankingProfileHash,
   queryMemoryRuntime,
 } from '../lib/memory-runtime.mjs';
@@ -508,8 +509,12 @@ async function verifyOrderInvariance(corpus, profile, expectedDigest) {
       tokenizer,
       observability: false,
     });
-    const search = item => queryMemoryRuntime(runtime, item.query, { tier: 'expanded' })
-      .envelope.results.map(result => result.memory_id);
+    // Same surface the candidate run measured; the digest it is compared against was computed that
+    // way, so reading a narrower one here would report a determinism failure that is really a
+    // mismatch between two spellings of "what came back".
+    const search = item => memoryEnvelopeHandedOver(
+      queryMemoryRuntime(runtime, item.query, { tier: 'expanded' }).envelope,
+    ).map(entry => entry.memory_id);
     const rankings = corpus.queries.map(search);
     const negativeRankings = corpus.negative_queries.map(search);
     return { reversed_topic_order: rankingDigest(rankings, negativeRankings) === expectedDigest };
@@ -550,8 +555,12 @@ export async function runPublicBenchmark({
         provenance: 'repository code under test',
         tokenizer,
         runtime,
-        search: async query => queryMemoryRuntime(runtime, query, { tier: 'expanded' })
-          .envelope.results.map(result => result.memory_id),
+        // Quotes and pointers together: this measures whether a tokenizer profile can retrieve the
+        // right topic, and a profile that finds it but scores it below the quoting threshold has
+        // still found it. Reading prose alone made the comparison pick a different winner.
+        search: async query => memoryEnvelopeHandedOver(
+          queryMemoryRuntime(runtime, query, { tier: 'expanded' }).envelope,
+        ).map(entry => entry.memory_id),
       }));
     }
     assert(defaultRuntime, `default tokenizer profile ${MEMORY_TOKENIZER_PROFILE} is not in the candidate set`);

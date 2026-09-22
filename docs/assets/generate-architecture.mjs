@@ -24,96 +24,150 @@ const THEMES = {
 
 const LOCALES = {
   en: {
-    title: 'OwnMem architecture', subtitle: 'Repository-owned · local recall · evidence governance · bounded autonomy',
-    desc: 'Repository-owned Markdown and independent trust receipts compile into immutable snapshots. Five deterministic local candidate lanes and an optional embedding lane pass four delivery gates. An end-of-turn coordinator replays, promotes, observes, quarantines, and precisely rolls back low-risk R0 changes while higher-risk changes remain review material.',
-    pill: 'Default recall: 0 model calls · 0 network calls', host: 'HOST LAYER', entry: 'Unified project entry', entryDesc: 'instructions · skills · commands · hook',
+    title: 'OwnMem architecture', subtitle: 'Repository-owned · local recall · evidence governance · no unattended writes',
+    desc: 'Repository-owned Markdown and independent trust receipts compile into immutable snapshots. Five deterministic local candidate lanes and an optional embedding lane pass four delivery gates, and the envelope arrives in one of three tiers: the memory quoted, up to three pointers, or an abstention that names its reason. Local feedback ledgers, an evaluation harness and a net-zero quota bound what the corpus becomes, and nothing enters memory without a person committing it.',
+    pill: 'Default recall: 0 model calls · 0 network calls', host: 'HOST LAYER', entry: 'Unified project entry', entryDesc: 'instructions · skills · commands · hook · MCP',
     repo: '01 · REPOSITORY SOURCE OF TRUTH', repoDesc: 'Human-readable · Git-reviewable · reversible',
-    trustDesc: 'content hash · evidence · lifecycle', auditDesc: 'quota · dedupe · schema',
+    trustDesc: 'hash · evidence · lifecycle', auditDesc: 'quota · dedupe · schema',
     runtime: '02 · CANONICAL RUNTIME', compileDesc: 'schema · graph · receipts · live evidence',
     embed: 'Optional embedding: observe / weight 0 until local A/B passes', gatesDesc: 'relevance · validity · applicability · risk',
-    delivery: '03 · TRUSTED DELIVERY', envelopeDesc: '≤1 topic · 400 tokens · provenance', agentDesc: 'verify against current code and docs', obsDesc: 'confirmed adoption is a separate outcome',
-    governance: '04 · LOCAL FEEDBACK AND BOUNDED EVOLUTION', ledgerDesc: 'retrieval · confirmed outcome · self-attribution', candidateDesc: 'candidate ≠ memory · quarantine by default', riskDesc: 'replay · regression · quota · tripwire',
-    auto: 'R0 auto-write · R1–R5 review', autoDesc: 'failures quarantine and restore exact previous bytes',
+    delivery: '03 · GRADED DELIVERY', envelopeDesc: 'names its tier · ≤1 topic · 400 tokens',
+    tierContent: 'content', tierContentDesc: 'the memory quoted, with provenance',
+    tierPointers: 'pointers', tierPointersDesc: '≤3 · where to look, not an answer',
+    tierAbstain: 'abstain', tierAbstainDesc: 'nothing, and the reason why',
+    agentDesc: 'verify against current code and docs',
+    governance: '04 · LOCAL FEEDBACK AND BOUNDED GROWTH', ledgerDesc: 'retrieval · confirmed outcome · self-attribution',
+    evalTitle: 'Evaluation harness', evalDesc: 'outside questions · ablation · holdout',
+    quotaTitle: 'Net-zero quota', quotaDesc: 'entry count · ratchets down only',
+    noAuto: 'No unattended write', noAutoDesc: 'the package measures and proposes; a person commits',
   },
   'zh-CN': {
-    title: 'OwnMem 总架构', subtitle: '仓库拥有 · 本地召回 · 证据治理 · 有界自治',
-    desc: '仓库拥有的 Markdown 与独立信任收据编译成不可变快照。五路确定性本地候选和可选 embedding 通道经过四道交付门。轮末协调器对低风险 R0 变化进行回放、晋升、观察、隔离和精确回滚，高风险变化进入复审。',
-    pill: '默认召回：0 模型调用 · 0 网络请求', host: '宿主层', entry: '统一项目入口', entryDesc: '项目指令 · skills · commands · hook',
+    title: 'OwnMem 总架构', subtitle: '仓库拥有 · 本地召回 · 证据治理 · 无人值守写入为零',
+    desc: '仓库拥有的 Markdown 与独立信任收据编译成不可变快照。五路确定性本地候选和可选 embedding 通道经过四道交付门，信封按三档之一交付：引用记忆正文、给最多三条指针、或说明原因后弃权。本地反馈账本、评测台与净零增长配额约束语料的走向；没有人提交，任何内容都进不了记忆。',
+    pill: '默认召回：0 模型调用 · 0 网络请求', host: '宿主层', entry: '统一项目入口', entryDesc: '项目指令 · skills · commands · hook · MCP',
     repo: '01 · 仓库真源', repoDesc: '人类可读 · Git 可审阅 · 可撤销', trustDesc: '内容哈希 · 证据 · 生命周期', auditDesc: '配额 · 去重 · Schema',
     runtime: '02 · 统一运行时', compileDesc: 'Schema · 图关系 · 收据 · 活体证据', embed: '可选 embedding：默认 observe / 权重 0，本地 A/B 过门后才加入', gatesDesc: '相关性 · 有效性 · 适用性 · 风险',
-    delivery: '03 · 可信交付', envelopeDesc: '最多 1 个 topic · 400 token · 来源', agentDesc: '再对照当前代码和文档复核', obsDesc: '真实采用只认独立 outcome',
-    governance: '04 · 本地反馈与有界演化', ledgerDesc: '检索反馈 · 确认结局 · Agent 自归因', candidateDesc: 'candidate ≠ memory · 默认隔离', riskDesc: '回放 · 回归 · 配额 · tripwire',
-    auto: 'R0 自动写回 · R1–R5 复审', autoDesc: '失败先隔离，再精确恢复原字节',
+    delivery: '03 · 分档交付', envelopeDesc: '自报档位 · 最多 1 个 topic · 400 token',
+    tierContent: 'content', tierContentDesc: '引用记忆正文，带出处',
+    tierPointers: 'pointers', tierPointersDesc: '最多 3 条 · 是线索不是答案',
+    tierAbstain: 'abstain', tierAbstainDesc: '什么都不给，并说明为什么',
+    agentDesc: '再对照当前代码和文档复核',
+    governance: '04 · 本地反馈与有界增长', ledgerDesc: '检索反馈 · 确认结局 · Agent 自归因',
+    evalTitle: 'Evaluation harness', evalDesc: '外源出题 · 消融 · 留出集',
+    quotaTitle: 'Net-zero quota', quotaDesc: '条目数上限 · 只降不升',
+    noAuto: '没有无人值守写入', noAutoDesc: '这个包只度量和提议，提交由人来做',
   },
   'zh-TW': {
-    title: 'OwnMem 總架構', subtitle: '儲存庫擁有 · 本機召回 · 證據治理 · 有界自治',
-    desc: '儲存庫擁有的 Markdown 與獨立信任收據編譯成不可變快照。五路確定性本機候選和可選 embedding 通道經過四道交付門。輪末協調器對低風險 R0 變更進行回放、晉升、觀察、隔離與精確回復，高風險變更進入複審。',
-    pill: '預設召回：0 模型呼叫 · 0 網路請求', host: '宿主層', entry: '統一專案入口', entryDesc: '專案指令 · skills · commands · hook',
+    title: 'OwnMem 總架構', subtitle: '儲存庫擁有 · 本機召回 · 證據治理 · 無人值守寫入為零',
+    desc: '儲存庫擁有的 Markdown 與獨立信任收據編譯成不可變快照。五路確定性本機候選和可選 embedding 通道經過四道交付門，信封按三檔之一交付：引用記憶正文、給最多三條指標、或說明原因後棄權。本機回饋帳本、評測台與淨零成長配額約束語料的走向；沒有人提交，任何內容都進不了記憶。',
+    pill: '預設召回：0 模型呼叫 · 0 網路請求', host: '宿主層', entry: '統一專案入口', entryDesc: '專案指令 · skills · commands · hook · MCP',
     repo: '01 · 儲存庫真源', repoDesc: '人類可讀 · Git 可審閱 · 可撤銷', trustDesc: '內容雜湊 · 證據 · 生命週期', auditDesc: '配額 · 去重 · Schema',
     runtime: '02 · 統一執行期', compileDesc: 'Schema · 圖關係 · 收據 · 即時證據', embed: '可選 embedding：預設 observe / 權重 0，本機 A/B 通過後才加入', gatesDesc: '相關性 · 有效性 · 適用性 · 風險',
-    delivery: '03 · 可信交付', envelopeDesc: '最多 1 個 topic · 400 token · 來源', agentDesc: '再對照目前程式碼與文件複核', obsDesc: '真實採用只認獨立 outcome',
-    governance: '04 · 本機回饋與有界演化', ledgerDesc: '檢索回饋 · 確認結果 · Agent 自歸因', candidateDesc: 'candidate ≠ memory · 預設隔離', riskDesc: '回放 · 回歸 · 配額 · tripwire',
-    auto: 'R0 自動寫回 · R1–R5 複審', autoDesc: '失敗先隔離，再精確恢復原位元組',
+    delivery: '03 · 分檔交付', envelopeDesc: '自報檔位 · 最多 1 個 topic · 400 token',
+    tierContent: 'content', tierContentDesc: '引用記憶正文，帶出處',
+    tierPointers: 'pointers', tierPointersDesc: '最多 3 條 · 是線索不是答案',
+    tierAbstain: 'abstain', tierAbstainDesc: '什麼都不給，並說明為什麼',
+    agentDesc: '再對照目前程式碼與文件複核',
+    governance: '04 · 本機回饋與有界成長', ledgerDesc: '檢索回饋 · 確認結果 · Agent 自歸因',
+    evalTitle: 'Evaluation harness', evalDesc: '外源出題 · 消融 · 留出集',
+    quotaTitle: 'Net-zero quota', quotaDesc: '條目數上限 · 只降不升',
+    noAuto: '沒有無人值守寫入', noAutoDesc: '這個套件只度量與提議，提交由人來做',
   },
   ja: {
-    title: 'OwnMem アーキテクチャ', subtitle: 'リポジトリ所有 · ローカル想起 · 証拠ガバナンス · 制限付き自律',
-    desc: 'リポジトリ所有の Markdown と独立した信頼 receipt を不変 snapshot にコンパイルする。5 本の決定的ローカル候補と任意の embedding lane が 4 つの配信 gate を通る。turn 終了 coordinator は低リスク R0 を replay、昇格、観測、隔離し正確に rollback し、高リスク変更は review に残す。',
-    pill: '既定 recall：モデル 0 · ネットワーク 0', host: 'HOST LAYER', entry: '統一プロジェクト入口', entryDesc: 'instructions · skills · commands · hook',
-    repo: '01 · REPOSITORY SOURCE', repoDesc: '可読 · Git review · rollback 可能', trustDesc: 'content hash · evidence · lifecycle', auditDesc: 'quota · dedupe · Schema',
+    title: 'OwnMem アーキテクチャ', subtitle: 'リポジトリ所有 · ローカル想起 · 証拠ガバナンス · 無人書き込みなし',
+    desc: 'リポジトリ所有の Markdown と独立した信頼 receipt を不変 snapshot にコンパイルする。5 本の決定的ローカル候補と任意の embedding lane が 4 つの配信 gate を通り、envelope は 3 つの tier のいずれかで届く。記憶本文の引用、最大 3 件のポインタ、または理由を明示した棄権である。ローカルの feedback 台帳、評価ハーネス、純増ゼロの quota がコーパスの行き先を縛る。人が commit しない限り、何も記憶には入らない。',
+    pill: '既定 recall：モデル 0 · ネットワーク 0', host: 'HOST LAYER', entry: '統一プロジェクト入口', entryDesc: 'instructions · skills · commands · hook · MCP',
+    repo: '01 · REPOSITORY SOURCE', repoDesc: '可読 · Git review · 取り消し可能', trustDesc: 'hash · evidence · lifecycle', auditDesc: 'quota · dedupe · Schema',
     runtime: '02 · CANONICAL RUNTIME', compileDesc: 'Schema · graph · receipts · live evidence', embed: '任意 embedding：observe / weight 0、local A/B 合格後のみ参加', gatesDesc: 'relevance · validity · applicability · risk',
-    delivery: '03 · TRUSTED DELIVERY', envelopeDesc: '最大 1 topic · 400 token · provenance', agentDesc: '現在の code と docs で再検証', obsDesc: 'confirmed adoption は別 outcome',
-    governance: '04 · LOCAL FEEDBACK / BOUNDED EVOLUTION', ledgerDesc: 'retrieval · confirmed outcome · self-attribution', candidateDesc: 'candidate ≠ memory · 既定 quarantine', riskDesc: 'replay · regression · quota · tripwire',
-    auto: 'R0 自動書き戻し · R1–R5 review', autoDesc: '失敗は隔離し以前の byte を正確に復元',
+    delivery: '03 · 段階的な配信', envelopeDesc: 'tier を自己申告 · 最大 1 topic · 400 token',
+    tierContent: 'content', tierContentDesc: '記憶本文を出典つきで引用',
+    tierPointers: 'pointers', tierPointersDesc: '最大 3 件 · 手がかりであって答えではない',
+    tierAbstain: 'abstain', tierAbstainDesc: '何も返さず、理由を述べる',
+    agentDesc: '現在の code と docs で再検証',
+    governance: '04 · ローカル feedback と有界な成長', ledgerDesc: 'retrieval · confirmed outcome · self-attribution',
+    evalTitle: 'Evaluation harness', evalDesc: '外部出題 · ablation · holdout',
+    quotaTitle: 'Net-zero quota', quotaDesc: '件数上限 · 下げる方向のみ',
+    noAuto: '無人の書き込みはしない', noAutoDesc: '計測と提案までが本パッケージ、commit は人が行う',
   },
   ko: {
-    title: 'OwnMem 아키텍처', subtitle: '저장소 소유 · 로컬 회상 · 증거 거버넌스 · 제한된 자율성',
-    desc: '저장소 소유 Markdown과 독립 trust receipt를 불변 snapshot으로 compile한다. 5개 결정적 로컬 후보 lane과 선택적 embedding lane이 4개 전달 gate를 통과한다. turn 종료 coordinator는 저위험 R0를 replay, 승격, 관찰, 격리하고 정확히 rollback하며 고위험 변경은 검토로 남긴다.',
-    pill: '기본 recall: 모델 0 · 네트워크 0', host: 'HOST LAYER', entry: '통합 프로젝트 입구', entryDesc: 'instructions · skills · commands · hook',
-    repo: '01 · REPOSITORY SOURCE', repoDesc: '읽기 가능 · Git review · rollback', trustDesc: 'content hash · evidence · lifecycle', auditDesc: 'quota · dedupe · Schema',
+    title: 'OwnMem 아키텍처', subtitle: '저장소 소유 · 로컬 회상 · 증거 거버넌스 · 무인 쓰기 없음',
+    desc: '저장소가 소유한 Markdown과 독립 trust receipt를 불변 snapshot으로 compile한다. 5개의 결정적 로컬 후보 lane과 선택적 embedding lane이 4개의 전달 gate를 통과하고, envelope은 세 tier 중 하나로 도착한다. 기억 본문 인용, 최대 3개의 포인터, 또는 이유를 밝힌 기권이다. 로컬 feedback 원장, 평가 하네스, 순증가 0 quota가 코퍼스의 방향을 묶는다. 사람이 commit하지 않으면 어떤 것도 기억에 들어가지 않는다.',
+    pill: '기본 recall: 모델 0 · 네트워크 0', host: 'HOST LAYER', entry: '통합 프로젝트 입구', entryDesc: 'instructions · skills · commands · hook · MCP',
+    repo: '01 · REPOSITORY SOURCE', repoDesc: '읽기 가능 · Git review · 되돌리기 가능', trustDesc: 'hash · evidence · lifecycle', auditDesc: 'quota · dedupe · Schema',
     runtime: '02 · CANONICAL RUNTIME', compileDesc: 'Schema · graph · receipts · live evidence', embed: '선택적 embedding: observe / weight 0, local A/B 통과 후 참여', gatesDesc: 'relevance · validity · applicability · risk',
-    delivery: '03 · TRUSTED DELIVERY', envelopeDesc: '최대 1 topic · 400 token · provenance', agentDesc: '현재 code와 docs로 다시 검증', obsDesc: 'confirmed adoption은 별도 outcome',
-    governance: '04 · LOCAL FEEDBACK / BOUNDED EVOLUTION', ledgerDesc: 'retrieval · confirmed outcome · self-attribution', candidateDesc: 'candidate ≠ memory · 기본 quarantine', riskDesc: 'replay · regression · quota · tripwire',
-    auto: 'R0 자동 쓰기 · R1–R5 검토', autoDesc: '실패는 격리 후 이전 byte를 정확히 복구',
+    delivery: '03 · 등급별 전달', envelopeDesc: 'tier를 스스로 밝힘 · 최대 1 topic · 400 token',
+    tierContent: 'content', tierContentDesc: '기억 본문을 출처와 함께 인용',
+    tierPointers: 'pointers', tierPointersDesc: '최대 3개 · 단서일 뿐 답이 아님',
+    tierAbstain: 'abstain', tierAbstainDesc: '아무것도 주지 않고 이유를 밝힘',
+    agentDesc: '현재 code와 docs로 다시 검증',
+    governance: '04 · 로컬 feedback과 제한된 성장', ledgerDesc: 'retrieval · confirmed outcome · self-attribution',
+    evalTitle: 'Evaluation harness', evalDesc: '외부 출제 · ablation · holdout',
+    quotaTitle: 'Net-zero quota', quotaDesc: '항목 수 상한 · 낮추는 방향만',
+    noAuto: '무인 쓰기는 없다', noAutoDesc: '이 패키지는 측정하고 제안할 뿐, commit은 사람이 한다',
   },
   es: {
-    title: 'Arquitectura de OwnMem', subtitle: 'Propiedad del repositorio · recall local · evidencia · autonomía acotada',
-    desc: 'Markdown propiedad del repositorio y trust receipts independientes se compilan en snapshots inmutables. Cinco canales deterministas locales y embedding opcional pasan cuatro puertas de entrega. Un coordinador al final del turno reproduce, promueve, observa, aísla y revierte con precisión cambios R0 de bajo riesgo; los cambios de mayor riesgo quedan para revisión.',
-    pill: 'Recall por defecto: 0 modelos · 0 red', host: 'CAPA DE HOSTS', entry: 'Entrada unificada del proyecto', entryDesc: 'instrucciones · skills · commands · hook',
-    repo: '01 · FUENTE DEL REPOSITORIO', repoDesc: 'Legible · revisable en Git · reversible', trustDesc: 'hash · evidencia · ciclo de vida', auditDesc: 'cuota · duplicados · Schema',
+    title: 'Arquitectura de OwnMem', subtitle: 'Propiedad del repositorio · recall local · evidencia · sin escrituras desatendidas',
+    desc: 'El Markdown que pertenece al repositorio y los trust receipts independientes se compilan en snapshots inmutables. Cinco canales deterministas locales y un canal opcional de embeddings atraviesan cuatro puertas de entrega, y el sobre llega en uno de tres niveles: la memoria citada, hasta tres punteros, o una abstención que dice por qué. Los libros de feedback local, el banco de evaluación y una cuota de crecimiento neto cero acotan en qué se convierte el corpus; nada entra en la memoria sin que alguien lo confirme con un commit.',
+    pill: 'Recall por defecto: 0 modelos · 0 red', host: 'CAPA DE HOSTS', entry: 'Entrada unificada del proyecto', entryDesc: 'instrucciones · skills · commands · hook · MCP',
+    repo: '01 · FUENTE DEL REPOSITORIO', repoDesc: 'Legible · revisable en Git · reversible', trustDesc: 'hash · evidencia · ciclo', auditDesc: 'cuota · duplicados · Schema',
     runtime: '02 · RUNTIME CANÓNICO', compileDesc: 'Schema · grafo · receipts · evidencia viva', embed: 'embedding opcional: observe / peso 0 hasta superar A/B local', gatesDesc: 'relevancia · validez · aplicabilidad · riesgo',
-    delivery: '03 · ENTREGA CONFIABLE', envelopeDesc: '≤1 tema · 400 tokens · procedencia', agentDesc: 'verificar contra código y docs actuales', obsDesc: 'la adopción confirmada es otro outcome',
-    governance: '04 · FEEDBACK LOCAL Y EVOLUCIÓN ACOTADA', ledgerDesc: 'retrieval · outcome confirmado · autoatribución', candidateDesc: 'candidate ≠ memory · cuarentena por defecto', riskDesc: 'replay · regresión · cuota · tripwire',
-    auto: 'R0 automático · R1–R5 a revisión', autoDesc: 'los fallos aíslan y restauran los bytes exactos',
+    delivery: '03 · ENTREGA POR NIVELES', envelopeDesc: 'declara su nivel · ≤1 tema · 400 tokens',
+    tierContent: 'content', tierContentDesc: 'la memoria citada, con procedencia',
+    tierPointers: 'pointers', tierPointersDesc: '≤3 · dónde mirar, no la respuesta',
+    tierAbstain: 'abstain', tierAbstainDesc: 'nada, y el motivo',
+    agentDesc: 'verificar contra código y docs actuales',
+    governance: '04 · FEEDBACK LOCAL Y CRECIMIENTO ACOTADO', ledgerDesc: 'retrieval · outcome confirmado · autoatribución',
+    evalTitle: 'Evaluation harness', evalDesc: 'preguntas externas · ablación · holdout',
+    quotaTitle: 'Net-zero quota', quotaDesc: 'número de entradas · solo baja',
+    noAuto: 'Ninguna escritura desatendida', noAutoDesc: 'el paquete mide y propone; una persona hace el commit',
   },
   fr: {
-    title: 'Architecture OwnMem', subtitle: 'Mémoire du dépôt · rappel local · preuves · autonomie bornée',
-    desc: 'Le Markdown détenu par le dépôt et des trust receipts indépendants sont compilés en snapshots immuables. Cinq canaux locaux déterministes et un embedding optionnel passent quatre portes de livraison. En fin de tour, un coordinateur rejoue, promeut, observe, isole et annule précisément les changements R0 à faible risque ; les autres restent à relire.',
-    pill: 'Rappel par défaut : 0 modèle · 0 réseau', host: 'COUCHE HOST', entry: 'Entrée projet unifiée', entryDesc: 'instructions · skills · commands · hook',
-    repo: '01 · SOURCE DU DÉPÔT', repoDesc: 'Lisible · révisable dans Git · réversible', trustDesc: 'hash · preuves · cycle de vie', auditDesc: 'quota · doublons · Schema',
+    title: 'Architecture OwnMem', subtitle: 'Mémoire du dépôt · rappel local · preuves · aucune écriture automatique',
+    desc: 'Le Markdown détenu par le dépôt et des trust receipts indépendants sont compilés en snapshots immuables. Cinq canaux locaux déterministes et un canal d’embeddings optionnel franchissent quatre portes de livraison, et l’enveloppe arrive selon l’un de trois niveaux : la mémoire citée, jusqu’à trois pointeurs, ou une abstention qui en donne la raison. Les registres de retour locaux, le banc d’évaluation et un quota à croissance nette nulle bornent ce que devient le corpus ; rien n’entre en mémoire sans qu’une personne le valide par un commit.',
+    pill: 'Rappel par défaut : 0 modèle · 0 réseau', host: 'COUCHE HOST', entry: 'Entrée projet unifiée', entryDesc: 'instructions · skills · commands · hook · MCP',
+    repo: '01 · SOURCE DU DÉPÔT', repoDesc: 'Lisible · révisable dans Git · réversible', trustDesc: 'hash · preuves · cycle', auditDesc: 'quota · doublons · Schema',
     runtime: '02 · RUNTIME CANONIQUE', compileDesc: 'Schema · graphe · receipts · preuves vivantes', embed: 'embedding optionnel : observe / poids 0 avant A/B local', gatesDesc: 'pertinence · validité · applicabilité · risque',
-    delivery: '03 · LIVRAISON FIABLE', envelopeDesc: '≤1 sujet · 400 tokens · provenance', agentDesc: 'vérifier avec le code et les docs actuels', obsDesc: 'l’adoption confirmée est un outcome distinct',
-    governance: '04 · FEEDBACK LOCAL ET ÉVOLUTION BORNÉE', ledgerDesc: 'retrieval · outcome confirmé · auto-attribution', candidateDesc: 'candidate ≠ memory · quarantaine par défaut', riskDesc: 'replay · régression · quota · tripwire',
-    auto: 'R0 automatique · R1–R5 relu', autoDesc: 'un échec isole puis restaure les octets exacts',
+    delivery: '03 · LIVRAISON PAR NIVEAUX', envelopeDesc: 'annonce son niveau · ≤1 sujet · 400 tokens',
+    tierContent: 'content', tierContentDesc: 'la mémoire citée, avec provenance',
+    tierPointers: 'pointers', tierPointersDesc: '≤3 · où chercher, pas la réponse',
+    tierAbstain: 'abstain', tierAbstainDesc: 'rien, et pourquoi',
+    agentDesc: 'vérifier avec le code et les docs actuels',
+    governance: '04 · RETOURS LOCAUX ET CROISSANCE BORNÉE', ledgerDesc: 'retrieval · outcome confirmé · auto-attribution',
+    evalTitle: 'Evaluation harness', evalDesc: 'questions externes · ablation · holdout',
+    quotaTitle: 'Net-zero quota', quotaDesc: 'nombre d’entrées · ne fait que baisser',
+    noAuto: 'Aucune écriture automatique', noAutoDesc: 'le paquet mesure et propose ; une personne valide',
   },
   de: {
-    title: 'OwnMem-Architektur', subtitle: 'Repository-eigen · lokaler Recall · Evidenz · begrenzte Autonomie',
-    desc: 'Repository-eigenes Markdown und unabhängige Trust Receipts werden zu unveränderlichen Snapshots kompiliert. Fünf deterministische lokale Kanäle und optionales Embedding passieren vier Auslieferungstore. Ein Coordinator replayt, promotet, beobachtet, isoliert und rollt risikoarme R0-Änderungen exakt zurück; höheres Risiko bleibt im Review.',
-    pill: 'Standard-Recall: 0 Modelle · 0 Netzwerk', host: 'HOST-SCHICHT', entry: 'Einheitlicher Projekteinstieg', entryDesc: 'Anweisungen · Skills · Commands · Hook',
+    title: 'OwnMem-Architektur', subtitle: 'Repository-eigen · lokaler Recall · Evidenz · keine unbeaufsichtigten Schreibvorgänge',
+    desc: 'Repository-eigenes Markdown und unabhängige Trust Receipts werden zu unveränderlichen Snapshots kompiliert. Fünf deterministische lokale Kanäle und ein optionaler Embedding-Kanal passieren vier Auslieferungstore, und der Umschlag kommt in einer von drei Stufen an: die zitierte Erinnerung, bis zu drei Verweise oder eine Enthaltung mit Begründung. Lokale Feedback-Register, ein Evaluationsstand und eine Netto-Null-Quote begrenzen, wozu der Korpus wird; ohne den Commit eines Menschen gelangt nichts in die Erinnerung.',
+    pill: 'Standard-Recall: 0 Modelle · 0 Netzwerk', host: 'HOST-SCHICHT', entry: 'Einheitlicher Projekteinstieg', entryDesc: 'Anweisungen · Skills · Commands · Hook · MCP',
     repo: '01 · REPOSITORY-QUELLE', repoDesc: 'Lesbar · Git-reviewbar · reversibel', trustDesc: 'Hash · Evidenz · Lifecycle', auditDesc: 'Quota · Duplikate · Schema',
     runtime: '02 · CANONICAL RUNTIME', compileDesc: 'Schema · Graph · Receipts · Live-Evidenz', embed: 'Optionales Embedding: observe / Gewicht 0 bis lokales A/B besteht', gatesDesc: 'Relevanz · Gültigkeit · Anwendbarkeit · Risiko',
-    delivery: '03 · VERTRAUENSWÜRDIGE LIEFERUNG', envelopeDesc: '≤1 Topic · 400 Tokens · Provenance', agentDesc: 'gegen aktuellen Code und Docs prüfen', obsDesc: 'bestätigte Nutzung ist eigenes Outcome',
-    governance: '04 · LOKALES FEEDBACK UND BEGRENZTE EVOLUTION', ledgerDesc: 'Retrieval · bestätigtes Outcome · Selbstzuordnung', candidateDesc: 'candidate ≠ memory · standardmäßig Quarantäne', riskDesc: 'Replay · Regression · Quota · Tripwire',
-    auto: 'R0 automatisch · R1–R5 Review', autoDesc: 'Fehler isolieren und stellen exakte Bytes wieder her',
+    delivery: '03 · ABGESTUFTE AUSLIEFERUNG', envelopeDesc: 'nennt ihre Stufe · ≤1 Topic · 400 Tokens',
+    tierContent: 'content', tierContentDesc: 'die Erinnerung zitiert, mit Herkunft',
+    tierPointers: 'pointers', tierPointersDesc: '≤3 · wo zu suchen ist, keine Antwort',
+    tierAbstain: 'abstain', tierAbstainDesc: 'nichts, und der Grund dafür',
+    agentDesc: 'gegen aktuellen Code und Docs prüfen',
+    governance: '04 · LOKALES FEEDBACK UND BEGRENZTES WACHSTUM', ledgerDesc: 'Retrieval · bestätigtes Outcome · Selbstzuordnung',
+    evalTitle: 'Evaluation harness', evalDesc: 'externe Fragen · Ablation · Holdout',
+    quotaTitle: 'Net-zero quota', quotaDesc: 'Anzahl Einträge · nur abwärts',
+    noAuto: 'Kein unbeaufsichtigtes Schreiben', noAutoDesc: 'das Paket misst und schlägt vor; ein Mensch committet',
   },
   'pt-BR': {
-    title: 'Arquitetura do OwnMem', subtitle: 'Memória do repositório · recall local · evidência · autonomia limitada',
-    desc: 'Markdown pertencente ao repositório e trust receipts independentes são compilados em snapshots imutáveis. Cinco canais locais determinísticos e embedding opcional passam por quatro portões de entrega. No fim do turno, um coordenador reproduz, promove, observa, isola e reverte com precisão mudanças R0 de baixo risco; riscos maiores ficam para revisão.',
-    pill: 'Recall padrão: 0 modelos · 0 rede', host: 'CAMADA DE HOSTS', entry: 'Entrada unificada do projeto', entryDesc: 'instruções · skills · commands · hook',
-    repo: '01 · FONTE DO REPOSITÓRIO', repoDesc: 'Legível · revisável no Git · reversível', trustDesc: 'hash · evidência · ciclo de vida', auditDesc: 'cota · duplicatas · Schema',
+    title: 'Arquitetura do OwnMem', subtitle: 'Memória do repositório · recall local · evidência · nenhuma escrita automática',
+    desc: 'O Markdown que pertence ao repositório e trust receipts independentes são compilados em snapshots imutáveis. Cinco canais locais determinísticos e um canal opcional de embeddings passam por quatro portões de entrega, e o envelope chega em um de três níveis: a memória citada, até três ponteiros, ou uma abstenção que diz o motivo. Os livros de feedback local, o banco de avaliação e uma cota de crescimento líquido zero limitam no que o corpus se torna; nada entra na memória sem que alguém faça o commit.',
+    pill: 'Recall padrão: 0 modelos · 0 rede', host: 'CAMADA DE HOSTS', entry: 'Entrada unificada do projeto', entryDesc: 'instruções · skills · commands · hook · MCP',
+    repo: '01 · FONTE DO REPOSITÓRIO', repoDesc: 'Legível · revisável no Git · reversível', trustDesc: 'hash · evidência · ciclo', auditDesc: 'cota · duplicatas · Schema',
     runtime: '02 · RUNTIME CANÔNICO', compileDesc: 'Schema · grafo · receipts · evidência viva', embed: 'embedding opcional: observe / peso 0 até passar A/B local', gatesDesc: 'relevância · validade · aplicabilidade · risco',
-    delivery: '03 · ENTREGA CONFIÁVEL', envelopeDesc: '≤1 tópico · 400 tokens · proveniência', agentDesc: 'verificar com código e docs atuais', obsDesc: 'adoção confirmada é um outcome separado',
-    governance: '04 · FEEDBACK LOCAL E EVOLUÇÃO LIMITADA', ledgerDesc: 'retrieval · outcome confirmado · autoatribuição', candidateDesc: 'candidate ≠ memory · quarentena por padrão', riskDesc: 'replay · regressão · cota · tripwire',
-    auto: 'R0 automático · R1–R5 revisão', autoDesc: 'falhas isolam e restauram os bytes exatos',
+    delivery: '03 · ENTREGA EM NÍVEIS', envelopeDesc: 'declara seu nível · ≤1 tópico · 400 tokens',
+    tierContent: 'content', tierContentDesc: 'a memória citada, com procedência',
+    tierPointers: 'pointers', tierPointersDesc: '≤3 · onde olhar, não a resposta',
+    tierAbstain: 'abstain', tierAbstainDesc: 'nada, e o motivo',
+    agentDesc: 'verificar com código e docs atuais',
+    governance: '04 · FEEDBACK LOCAL E CRESCIMENTO LIMITADO', ledgerDesc: 'retrieval · outcome confirmado · autoatribuição',
+    evalTitle: 'Evaluation harness', evalDesc: 'perguntas externas · ablação · holdout',
+    quotaTitle: 'Net-zero quota', quotaDesc: 'número de entradas · só diminui',
+    noAuto: 'Nenhuma escrita automática', noAutoDesc: 'o pacote mede e propõe; uma pessoa faz o commit',
   },
 };
 
@@ -135,6 +189,18 @@ function render(locale, themeName) {
     rect(x, y, width, 62, 11, fill, stroke);
     text(x + 16, y + 25, title, 13.5, 700, tone === 'blue' ? c.blue : tone === 'green' ? c.green : tone === 'amber' ? c.amber : c.ink);
     text(x + 16, y + 47, description, 11.5, 400, c.muted);
+  };
+  // One delivery tier: the machine-readable name on the left, what the agent actually receives on
+  // the right. The three sit in one column because the reader has to see them as alternatives --
+  // drawn as three separate cards they read as three things that happen, which is the exact
+  // misreading the pointer tier exists to prevent.
+  const tierRow = (x, y, width, label, description, tone) => {
+    const fill = tone === 'blue' ? c.blueSoft : tone === 'amber' ? c.amberSoft : c.soft;
+    const stroke = tone === 'blue' ? c.blue : tone === 'amber' ? c.amber : c.border;
+    const accent = tone === 'blue' ? c.blue : tone === 'amber' ? c.amber : c.muted;
+    rect(x, y, width, 34, 9, fill, stroke);
+    text(x + 14, y + 22, label, 11.5, 700, accent, 'start', true);
+    text(x + width - 14, y + 22, description, 10.5, 400, c.muted, 'end');
   };
 
   push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" role="img" aria-labelledby="title description" font-family="${FONT}">`);
@@ -189,16 +255,18 @@ function render(locale, themeName) {
   text(1220, 306, t.delivery, 12, 750, c.muted);
   smallBox(1220, 336, 302, 'Context envelope', t.envelopeDesc, 'blue');
   arrow('M 1166 486 L 1194 486', true);
-  smallBox(1220, 430, 302, 'Coding agent', t.agentDesc);
-  smallBox(1220, 524, 302, 'Honest observability', t.obsDesc, 'green');
-  text(1371, 626, 'completed → delivered → consumed', 11.5, 500, c.muted, 'middle', true);
+  tierRow(1220, 412, 302, t.tierContent, t.tierContentDesc, 'blue');
+  tierRow(1220, 452, 302, t.tierPointers, t.tierPointersDesc, 'amber');
+  tierRow(1220, 492, 302, t.tierAbstain, t.tierAbstainDesc, 'plain');
+  smallBox(1220, 542, 302, 'Coding agent', t.agentDesc);
+  text(1371, 630, 'completed → delivered → consumed', 11.5, 500, c.muted, 'middle', true);
 
   rect(52, 736, 1496, 188, 18, c.navy);
   text(78, 770, t.governance, 12, 750, c.blue);
   const gov = [
     [78, 'Three ledgers', t.ledgerDesc],
-    [382, 'Candidate queue', t.candidateDesc],
-    [686, 'Risk + observation', t.riskDesc],
+    [382, t.evalTitle, t.evalDesc],
+    [686, t.quotaTitle, t.quotaDesc],
   ];
   for (const [x, title, description] of gov) {
     rect(x, 792, 274, 96, 13, c.navyBox, c.navyBorder);
@@ -208,11 +276,13 @@ function render(locale, themeName) {
   arrow('M 352 840 L 372 840', true);
   arrow('M 656 840 L 676 840', true);
   arrow('M 960 840 L 980 840', true);
+  // The band ends at a person, not at a write-back arrow into the repository. An arrow closing that
+  // loop is what the previous revision drew, and it is precisely the claim this package no longer
+  // makes: measurement and nomination end here, and the next edit is somebody's commit.
   rect(990, 792, 532, 96, 13, c.blueSoft, c.blue);
-  text(1256, 824, t.auto, 14, 750, c.blue, 'middle');
-  text(1256, 851, t.autoDesc, 11.5, 500, c.muted, 'middle');
-  text(1256, 874, 'trust → audit → compile → tripwire → rollback receipt', 10.8, 500, c.muted, 'middle', true);
-  arrow('M 1256 792 C 1256 718, 262 734, 262 694', true, true);
+  text(1256, 824, t.noAuto, 14, 750, c.blue, 'middle');
+  text(1256, 851, t.noAutoDesc, 11.5, 500, c.muted, 'middle');
+  text(1256, 874, 'recall → report → audit refuses → your commit', 10.8, 500, c.muted, 'middle', true);
   push('</svg>');
   return `${lines.join('\n')}\n`;
 }
